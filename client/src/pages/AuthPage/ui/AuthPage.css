@@ -56,6 +56,8 @@
 .auth-input {
   border: 1px solid #e0e0e0;
   background-color: #f0f0f0;
+  color: #000000;
+  caret-color: #000000;
   padding: 0.8rem 1rem;
   border-radius: 8px;
   font-size: 1rem;
