@@ -48,6 +48,9 @@ export const AuthPage: React.FC = () => {
           />
           <button type="submit" className="auth-button">Войти</button>
         </form>
+        <div className="auth-register-link">
+          <p>Нет аккаунта? <a href="/register">Зарегистрируйтесь</a></p>
+        </div>
       </main>
       <footer className="auth-footer"></footer>
     </div>
