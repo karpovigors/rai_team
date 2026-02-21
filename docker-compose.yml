@@ -25,6 +25,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      s3:
+        condition: service_healthy
     environment:
       DB_NAME: ${DB_NAME:-rai_db}
       DB_USER: ${DB_USER:-rai_user}
@@ -32,6 +34,10 @@ services:
       DB_HOST: db
       DB_PORT: 5432
       DEBUG: "True"
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-rai-images}
+      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-http://s3:9000}
     volumes:
       - ./rai_project:/app
     ports:
@@ -39,6 +45,12 @@ services:
     command: >
       sh -c "python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
 
   frontend:
     build:
@@ -49,6 +61,12 @@ services:
       - backend
     ports:
       - "80:80"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
 
   s3:
     image: minio/minio:latest
@@ -62,6 +80,12 @@ services:
       - "9000:9000"
       - "9001:9001"
     command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
 
 volumes:
   postgres_data:
