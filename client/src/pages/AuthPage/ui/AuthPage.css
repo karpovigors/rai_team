@@ -45,6 +45,11 @@
   font-weight: 500;
 }
 
+.auth-header-link {
+  color: inherit;
+  text-decoration: none;
+}
+
 .auth-main {
   flex-grow: 1;
   display: flex;
