@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import './AccessibilityCard.css'
 import type { ChangeEvent } from 'react'
 
@@ -49,6 +50,7 @@ interface AccessibilityCardProps {
   onDescriptionChange: (event: ChangeEvent<HTMLTextAreaElement>) => void
   onChecklistChange: (field: keyof AccessibilityChecklist, value: boolean) => void
   onInfrastructureTypeChange: (event: ChangeEvent<HTMLSelectElement>) => void
+  onPhotoUpload?: (file: File) => void
 }
 
 function AccessibilityCard({
@@ -60,12 +62,23 @@ function AccessibilityCard({
   onDescriptionChange,
   onChecklistChange,
   onInfrastructureTypeChange,
+  onPhotoUpload,
 }: AccessibilityCardProps) {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+
   const handleCheckboxChange =
     (field: keyof AccessibilityChecklist) =>
     (event: ChangeEvent<HTMLInputElement>) => {
       onChecklistChange(field, event.target.checked)
     }
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setSelectedFile(file)
+      onPhotoUpload?.(file)
+    }
+  }
 
   return (
     <div className="accessibility-card">
@@ -133,6 +146,24 @@ function AccessibilityCard({
           </option>
         ))}
       </select>
+
+      <div className="accessibility-card__photo-section">
+        <input
+          id="photo-input"
+          type="file"
+          className="accessibility-card__file-input"
+          accept="image/*"
+          onChange={handleFileChange}
+        />
+        <label htmlFor="photo-input" className="accessibility-card__file-label">
+          {selectedFile ? selectedFile.name : 'Выберите фото'}
+        </label>
+        {selectedFile && (
+          <div className="accessibility-card__photo-preview">
+            ✓ Фото готово к отправке
+          </div>
+        )}
+      </div>
     </div>
   )
 }
