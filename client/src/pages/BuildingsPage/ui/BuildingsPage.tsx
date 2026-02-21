@@ -13,31 +13,67 @@ interface BuildingListItem {
 
 export const BuildingsPage: React.FC = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [buildings, setBuildings] = useState<BuildingListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [createError, setCreateError] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [infrastructureType, setInfrastructureType] = useState('');
+  const [address, setAddress] = useState('');
+  const [schedule, setSchedule] = useState('');
+  const [metros, setMetros] = useState('');
+  const [mapImageUrl, setMapImageUrl] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [signLanguage, setSignLanguage] = useState(false);
+  const [subtitles, setSubtitles] = useState(false);
+  const [ramps, setRamps] = useState(false);
+  const [braille, setBraille] = useState(false);
   const isAuthenticated = authService.isAuthenticated();
+  const [isModerator, setIsModerator] = useState(authService.isModerator());
   const username = authService.getUsername();
   const apiBaseUrl = useMemo(() => (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, ''), []);
 
   useEffect(() => {
-    const loadBuildings = async () => {
-      setIsLoading(true);
-      setLoadError('');
+    if (!isAuthenticated) {
+      setIsModerator(false);
+      return;
+    }
+
+    const syncRole = async () => {
       try {
-        const response = await fetch(`${apiBaseUrl}/api/objects`);
-        if (!response.ok) {
-          throw new Error('Failed to load buildings');
-        }
-        const data = await response.json();
-        setBuildings(data);
+        const response = await authService.fetchCurrentUser();
+        authService.setUsername(response.user.username);
+        authService.setIsModerator(response.user.is_moderator);
+        setIsModerator(response.user.is_moderator);
       } catch {
-        setLoadError('Не удалось загрузить список объектов');
-      } finally {
-        setIsLoading(false);
+        setIsModerator(authService.isModerator());
       }
     };
 
+    void syncRole();
+  }, [isAuthenticated]);
+
+  const loadBuildings = async () => {
+    setIsLoading(true);
+    setLoadError('');
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/objects`);
+      if (!response.ok) {
+        throw new Error('Failed to load buildings');
+      }
+      const data = await response.json();
+      setBuildings(data);
+    } catch {
+      setLoadError('Не удалось загрузить список объектов');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     void loadBuildings();
   }, [apiBaseUrl]);
 
@@ -49,6 +85,74 @@ export const BuildingsPage: React.FC = () => {
     authService.logout();
     setIsProfileModalOpen(false);
     window.location.href = '/';
+  };
+
+  const handleModeratorClick = () => {
+    window.location.href = '/moderator';
+  };
+
+  const handleAddObjectSubmit = (e: React.FormEvent) => {
+    void (async () => {
+      e.preventDefault();
+      setCreateError('');
+      if (!title.trim() || !address.trim()) {
+        setCreateError('Заполните обязательные поля: название и адрес');
+        return;
+      }
+
+      setIsCreating(true);
+      try {
+        const formData = new FormData();
+        formData.append('title', title.trim());
+        formData.append('description', description.trim());
+        formData.append('infrastructureType', infrastructureType.trim());
+        formData.append('address', address.trim());
+        formData.append('schedule', schedule.trim());
+        formData.append('metros', metros);
+        formData.append('mapImageUrl', mapImageUrl.trim());
+        formData.append('sign_language', String(signLanguage));
+        formData.append('subtitles', String(subtitles));
+        formData.append('ramps', String(ramps));
+        formData.append('braille', String(braille));
+
+        if (imageFile) {
+          formData.append('image', imageFile);
+        }
+
+        const response = await authService.authFetch('/api/objects', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err?.error || 'Не удалось создать объект');
+        }
+
+        setIsAddFormOpen(false);
+        setTitle('');
+        setDescription('');
+        setInfrastructureType('');
+        setAddress('');
+        setSchedule('');
+        setMetros('');
+        setMapImageUrl('');
+        setImageFile(null);
+        setSignLanguage(false);
+        setSubtitles(false);
+        setRamps(false);
+        setBraille(false);
+        await loadBuildings();
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setCreateError(error.message);
+        } else {
+          setCreateError('Не удалось создать объект');
+        }
+      } finally {
+        setIsCreating(false);
+      }
+    })();
   };
 
   return (
@@ -74,7 +178,32 @@ export const BuildingsPage: React.FC = () => {
           <button>Кинотеатр</button>
           <button>Музей</button>
           <button>...</button>
+          {isModerator && (
+            <button onClick={() => setIsAddFormOpen((prev) => !prev)}>
+              {isAddFormOpen ? 'Скрыть форму' : 'Добавить объект'}
+            </button>
+          )}
         </div>
+        {isModerator && isAddFormOpen && (
+          <form className="moderator-inline-form" onSubmit={handleAddObjectSubmit}>
+            {createError && <div className="moderator-inline-error">{createError}</div>}
+            <input placeholder="Название*" value={title} onChange={(e) => setTitle(e.target.value)} required />
+            <input placeholder="Тип (театр, кинотеатр...)" value={infrastructureType} onChange={(e) => setInfrastructureType(e.target.value)} />
+            <input placeholder="Адрес*" value={address} onChange={(e) => setAddress(e.target.value)} required />
+            <input placeholder="Расписание" value={schedule} onChange={(e) => setSchedule(e.target.value)} />
+            <input placeholder="Метро через запятую" value={metros} onChange={(e) => setMetros(e.target.value)} />
+            <input placeholder="URL карты" value={mapImageUrl} onChange={(e) => setMapImageUrl(e.target.value)} />
+            <textarea placeholder="Описание" value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
+            <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
+            <div className="moderator-inline-checklist">
+              <label><input type="checkbox" checked={signLanguage} onChange={(e) => setSignLanguage(e.target.checked)} />Жестовый язык</label>
+              <label><input type="checkbox" checked={subtitles} onChange={(e) => setSubtitles(e.target.checked)} />Субтитры</label>
+              <label><input type="checkbox" checked={ramps} onChange={(e) => setRamps(e.target.checked)} />Пандусы</label>
+              <label><input type="checkbox" checked={braille} onChange={(e) => setBraille(e.target.checked)} />Брайль</label>
+            </div>
+            <button type="submit" disabled={isCreating}>{isCreating ? 'Сохранение...' : 'Сохранить объект'}</button>
+          </form>
+        )}
         <div className="buildings-list">
           {isLoading && <div>Загрузка...</div>}
           {loadError && <div>{loadError}</div>}
@@ -108,6 +237,11 @@ export const BuildingsPage: React.FC = () => {
             ) : (
               <>
                 <p className="profile-username">{username || 'Пользователь'}</p>
+                {isModerator && (
+                  <button type="button" className="profile-action-button" onClick={handleModeratorClick}>
+                    Режим модератора
+                  </button>
+                )}
                 <button type="button" className="profile-action-button" onClick={handleLogoutClick}>
                   Выйти
                 </button>
