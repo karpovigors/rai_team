@@ -1,136 +1,145 @@
 .PHONY: help build up down restart logs shell-backend shell-db migrate collectstatic test lint clean rebuild
 
-# Default target
+# Основная справка
 help:
-	@echo "Docker Management Commands"
+	@echo "Команды управления Docker"
 	@echo ""
-	@echo "Usage: make [command]"
+	@echo "Использование: make [команда]"
 	@echo ""
-	@echo "Commands:"
-	@echo "  build         Build all containers"
-	@echo "  up            Start all services in detached mode"
-	@echo "  down          Stop and remove all containers, networks"
-	@echo "  restart       Restart all services"
-	@echo "  logs          View logs from all services"
-	@echo "  logs-backend  View backend logs only"
-	@echo "  logs-frontend View frontend logs only"
-	@echo "  logs-db       View database logs only"
-	@echo "  shell-backend Open shell in backend container"
-	@echo "  shell-db      Open shell in database container"
-	@echo "  migrate       Run Django migrations"
-	@echo "  collectstatic Collect static files for Django"
-	@echo "  test          Run Django tests"
-	@echo "  lint          Run linter on frontend"
-	@echo "  clean         Remove all containers, volumes, and build artifacts"
-	@echo "  rebuild       Rebuild and restart all services"
-	@echo "  dev           Start services in development mode (with logs)"
+	@echo "Основные команды:"
+	@echo "  build         Собрать все контейнеры"
+	@echo "  up            Запустить все сервисы (фоновый режим)"
+	@echo "  dev           Запустить все сервисы (режим разработки с логами)"
+	@echo "  down          Остановить и удалить контейнеры, сети"
+	@echo "  restart       Перезапустить все сервисы"
+	@echo "  logs          Просмотр логов всех сервисов"
+	@echo "  logs-backend  Логи только бекенда"
+	@echo "  logs-frontend Логи только фронтенда"
+	@echo "  logs-db       Логи только базы данных"
+	@echo "  shell-backend Открыть shell в контейнере бекенда"
+	@echo "  shell-python  Открыть Python shell бекенда"
+	@echo "  shell-db      Открыть shell в контейнере БД"
+	@echo "  psql          Подключиться к PostgreSQL через psql"
+	@echo "  migrate       Применить миграции Django"
+	@echo "  makemigrations Создать новые миграции"
+	@echo "  collectstatic Собрать статические файлы Django"
+	@echo "  createsuperuser Создать суперпользователя Django"
+	@echo "  test          Запустить тесты Django"
+	@echo "  lint          Запустить линтер фронтенда"
+	@echo "  frontend-install Установить зависимости фронтенда"
+	@echo "  frontend-build Собрать фронтенд"
+	@echo "  clean         Удалить контейнеры, тома и артефакты"
+	@echo "  rebuild       Пересобрать и перезапустить сервисы"
+	@echo "  ps            Показать работающие контейнеры"
+	@echo "  db-backup     Создать бэкап базы данных"
+	@echo "  db-restore    Восстановить БД из бэкапа (FILE=путь_к_файлу)"
 	@echo ""
 
-# Build all containers
+# Собрать все контейнеры
 build:
 	docker-compose build
 
-# Start all services in detached mode
+# Запустить все сервисы в фоновом режиме
 up:
 	docker-compose up -d
 
-# Start all services in foreground (development)
+# Запустить все сервисы в режиме разработки (с логами)
 dev:
 	docker-compose up
 
-# Stop and remove all containers and networks
+# Остановить и удалить контейнеры и сети
 down:
 	docker-compose down
 
-# Restart all services
+# Перезапустить все сервисы
 restart:
 	docker-compose restart
 
-# View logs from all services
+# Просмотр логов всех сервисов
 logs:
 	docker-compose logs -f
 
-# View backend logs only
+# Логи только бекенда
 logs-backend:
 	docker-compose logs -f backend
 
-# View frontend logs only
+# Логи только фронтенда
 logs-frontend:
 	docker-compose logs -f frontend
 
-# View database logs only
+# Логи только базы данных
 logs-db:
 	docker-compose logs -f db
 
-# Open shell in backend container
+# Открыть shell в контейнере бекенда
 shell-backend:
 	docker-compose exec backend sh
 
-# Open Python shell in backend container
+# Открыть Python shell в контейнере бекенда
 shell-python:
 	docker-compose exec backend python manage.py shell
 
-# Open shell in database container
+# Открыть shell в контейнере базы данных
 shell-db:
 	docker-compose exec db sh
 
-# Open psql in database container
+# Подключиться к PostgreSQL через psql
 psql:
 	docker-compose exec db psql -U rai_user -d rai_db
 
-# Run Django migrations
+# Применить миграции Django
 migrate:
 	docker-compose exec backend python manage.py migrate
 
-# Create Django migrations
+# Создать новые миграции Django
 makemigrations:
 	docker-compose exec backend python manage.py makemigrations
 
-# Collect static files for Django
+# Собрать статические файлы Django
 collectstatic:
 	docker-compose exec backend python manage.py collectstatic --noinput
 
-# Create superuser
+# Создать суперпользователя Django
 createsuperuser:
 	docker-compose exec backend python manage.py createsuperuser
 
-# Run Django tests
+# Запустить тесты Django
 test:
 	docker-compose exec backend python manage.py test
 
-# Run linter on frontend
+# Запустить линтер фронтенда
 lint:
 	docker-compose run --rm frontend npm run lint
 
-# Install frontend dependencies
+# Установить зависимости фронтенда
 frontend-install:
 	docker-compose run --rm frontend npm install
 
-# Run frontend build
+# Собрать фронтенд
 frontend-build:
 	docker-compose run --rm frontend npm run build
 
-# Remove all containers, volumes, and build artifacts
+# Удалить контейнеры, тома и артефакты сборки
 clean:
 	docker-compose down -v --remove-orphans
 	docker system prune -f
 
-# Rebuild and restart all services
+# Пересобрать и перезапустить сервисы
 rebuild:
 	docker-compose down
 	docker-compose build --no-cache
 	docker-compose up -d
 
-# Show running containers
+# Показать работающие контейнеры
 ps:
 	docker-compose ps
 
-# Database backup
+# Создать бэкап базы данных
 db-backup:
 	@mkdir -p ./backups
 	docker-compose exec db pg_dump -U rai_user rai_db > ./backups/db_backup_$$(date +%Y%m%d_%H%M%S).sql
 
-# Database restore (usage: make db-restore FILE=backups/db_backup_YYYYMMDD_HHMMSS.sql)
+# Восстановить БД из бэкапа (использование: make db-restore FILE=backups/db_backup_YYYYMMDD_HHMMSS.sql)
 db-restore:
-	@if [ -z "$(FILE)" ]; then echo "Error: FILE is required. Usage: make db-restore FILE=backups/file.sql"; exit 1; fi
+	@if [ -z "$(FILE)" ]; then echo "Ошибка: требуется FILE. Пример: make db-restore FILE=backups/file.sql"; exit 1; fi
 	docker-compose exec -T db psql -U rai_user -d rai_db < $(FILE)
