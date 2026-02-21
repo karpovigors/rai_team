@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 #Объект карта яндекс
 class PlaceObject(models.Model):
@@ -38,6 +39,10 @@ class PlaceReview(models.Model):
     place = models.ForeignKey(PlaceObject, on_delete=models.CASCADE, related_name="reviews")
     author_name = models.CharField(max_length=150)
     text = models.TextField()
+    rating = models.PositiveSmallIntegerField(
+        default=5,
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
