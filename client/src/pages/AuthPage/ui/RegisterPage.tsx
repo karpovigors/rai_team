@@ -17,6 +17,7 @@ export const RegisterPage: React.FC = () => {
       const response = await authService.register({ username, password });
       authService.setTokens(response.access, response.refresh);
       authService.setUsername(response.user.username);
+      authService.setIsModerator(response.user.is_moderator);
       setSuccess(true);
       // Redirect to main page or dashboard after a short delay
       setTimeout(() => {

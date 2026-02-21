@@ -7,6 +7,7 @@ class CustomUser(AbstractUser):
     Custom user model for the application
     """
     username = models.CharField(max_length=150, unique=True)
+    is_moderator = models.BooleanField(default=False)
     
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []

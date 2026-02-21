@@ -27,14 +27,50 @@ interface BuildingDetails {
 export const BuildingDetailsPage: React.FC = () => {
   const buildingId = Number(window.location.pathname.split('/')[2]);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [building, setBuilding] = useState<BuildingDetails | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReviewText, setNewReviewText] = useState('');
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editInfrastructureType, setEditInfrastructureType] = useState('');
+  const [editAddress, setEditAddress] = useState('');
+  const [editSchedule, setEditSchedule] = useState('');
+  const [editMetros, setEditMetros] = useState('');
+  const [editMapImageUrl, setEditMapImageUrl] = useState('');
+  const [editImageFile, setEditImageFile] = useState<File | null>(null);
+  const [editSignLanguage, setEditSignLanguage] = useState(false);
+  const [editSubtitles, setEditSubtitles] = useState(false);
+  const [editRamps, setEditRamps] = useState(false);
+  const [editBraille, setEditBraille] = useState(false);
+  const [editError, setEditError] = useState('');
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const isAuthenticated = authService.isAuthenticated();
+  const [isModerator, setIsModerator] = useState(authService.isModerator());
   const username = authService.getUsername();
   const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setIsModerator(false);
+      return;
+    }
+
+    const syncRole = async () => {
+      try {
+        const response = await authService.fetchCurrentUser();
+        authService.setUsername(response.user.username);
+        authService.setIsModerator(response.user.is_moderator);
+        setIsModerator(response.user.is_moderator);
+      } catch {
+        setIsModerator(authService.isModerator());
+      }
+    };
+
+    void syncRole();
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const loadBuilding = async () => {
@@ -55,6 +91,20 @@ export const BuildingDetailsPage: React.FC = () => {
         const data = await response.json();
         setBuilding(data);
         setReviews(data.reviews || []);
+        setEditTitle(data.title || '');
+        setEditDescription(data.description || '');
+        setEditInfrastructureType(data.infrastructure_type || '');
+        setEditAddress(data.address || '');
+        setEditSchedule(data.schedule || '');
+        setEditMetros(Array.isArray(data.metros) ? data.metros.join(', ') : '');
+        setEditMapImageUrl(data.map_image_url || '');
+        setEditSignLanguage(Boolean(data.sign_language));
+        setEditSubtitles(Boolean(data.subtitles));
+        setEditRamps(Boolean(data.ramps));
+        setEditBraille(Boolean(data.braille));
+        setEditImageFile(null);
+        setEditError('');
+        setIsEditMode(false);
       } catch {
         setLoadError('Не удалось загрузить данные объекта');
       } finally {
@@ -75,6 +125,66 @@ export const BuildingDetailsPage: React.FC = () => {
     window.location.href = '/';
   };
 
+  const handleModeratorClick = () => {
+    window.location.href = '/moderator';
+  };
+
+  const handleSaveEdit = (e: React.FormEvent) => {
+    void (async () => {
+      e.preventDefault();
+      if (!building) {
+        return;
+      }
+      setEditError('');
+      if (!editTitle.trim() || !editAddress.trim()) {
+        setEditError('Заполните обязательные поля: название и адрес');
+        return;
+      }
+
+      setIsSavingEdit(true);
+      try {
+        const formData = new FormData();
+        formData.append('title', editTitle.trim());
+        formData.append('description', editDescription.trim());
+        formData.append('infrastructureType', editInfrastructureType.trim());
+        formData.append('address', editAddress.trim());
+        formData.append('schedule', editSchedule.trim());
+        formData.append('metros', editMetros);
+        formData.append('mapImageUrl', editMapImageUrl.trim());
+        formData.append('sign_language', String(editSignLanguage));
+        formData.append('subtitles', String(editSubtitles));
+        formData.append('ramps', String(editRamps));
+        formData.append('braille', String(editBraille));
+        if (editImageFile) {
+          formData.append('image', editImageFile);
+        }
+
+        const response = await authService.authFetch(`/api/objects/${building.id}`, {
+          method: 'PUT',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err?.error || 'Не удалось обновить объект');
+        }
+
+        const updated = await response.json();
+        setBuilding(updated);
+        setReviews(updated.reviews || []);
+        setIsEditMode(false);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setEditError(error.message);
+        } else {
+          setEditError('Не удалось обновить объект');
+        }
+      } finally {
+        setIsSavingEdit(false);
+      }
+    })();
+  };
+
   const handleSubmitReview = (e: React.FormEvent) => {
     void (async () => {
       e.preventDefault();
@@ -84,13 +194,12 @@ export const BuildingDetailsPage: React.FC = () => {
       }
 
       try {
-        const response = await fetch(`${apiBaseUrl}/api/objects/${building.id}/reviews`, {
+        const response = await authService.authFetch(`/api/objects/${building.id}/reviews`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            author: username || 'Пользователь',
             text,
           }),
         });
@@ -140,7 +249,32 @@ export const BuildingDetailsPage: React.FC = () => {
       <main className="details-main">
         <div className="building-title">
           <h2>{building.title}</h2>
+          {isModerator && (
+            <button type="button" className="details-edit-button" onClick={() => setIsEditMode((prev) => !prev)}>
+              {isEditMode ? 'Скрыть редактирование' : 'Редактировать объект'}
+            </button>
+          )}
         </div>
+        {isModerator && isEditMode && (
+          <form className="details-edit-form" onSubmit={handleSaveEdit}>
+            {editError && <div className="details-edit-error">{editError}</div>}
+            <input placeholder="Название*" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required />
+            <input placeholder="Тип (театр, кинотеатр...)" value={editInfrastructureType} onChange={(e) => setEditInfrastructureType(e.target.value)} />
+            <input placeholder="Адрес*" value={editAddress} onChange={(e) => setEditAddress(e.target.value)} required />
+            <input placeholder="Расписание" value={editSchedule} onChange={(e) => setEditSchedule(e.target.value)} />
+            <input placeholder="Метро через запятую" value={editMetros} onChange={(e) => setEditMetros(e.target.value)} />
+            <input placeholder="URL карты" value={editMapImageUrl} onChange={(e) => setEditMapImageUrl(e.target.value)} />
+            <textarea placeholder="Описание" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} rows={4} />
+            <input type="file" accept="image/*" onChange={(e) => setEditImageFile(e.target.files?.[0] || null)} />
+            <div className="details-edit-checklist">
+              <label><input type="checkbox" checked={editSignLanguage} onChange={(e) => setEditSignLanguage(e.target.checked)} />Жестовый язык</label>
+              <label><input type="checkbox" checked={editSubtitles} onChange={(e) => setEditSubtitles(e.target.checked)} />Субтитры</label>
+              <label><input type="checkbox" checked={editRamps} onChange={(e) => setEditRamps(e.target.checked)} />Пандусы</label>
+              <label><input type="checkbox" checked={editBraille} onChange={(e) => setEditBraille(e.target.checked)} />Брайль</label>
+            </div>
+            <button type="submit" disabled={isSavingEdit}>{isSavingEdit ? 'Сохранение...' : 'Сохранить изменения'}</button>
+          </form>
+        )}
         <div className="info-grid">
           <div className="info-left">
             <ul>
@@ -205,6 +339,11 @@ export const BuildingDetailsPage: React.FC = () => {
             ) : (
               <>
                 <p className="details-profile-username">{username || 'Пользователь'}</p>
+                {isModerator && (
+                  <button type="button" className="details-profile-action-button" onClick={handleModeratorClick}>
+                    Режим модератора
+                  </button>
+                )}
                 <button type="button" className="details-profile-action-button" onClick={handleLogoutClick}>
                   Выйти
                 </button>

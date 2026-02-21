@@ -1,6 +1,7 @@
 import { AuthPage, RegisterPage } from './pages/AuthPage';
 import { BuildingsPage } from './pages/BuildingsPage';
 import { BuildingDetailsPage } from './pages/BuildingDetailsPage';
+import { ModeratorPage } from './pages/ModeratorPage';
 
 function App() {
   const { pathname } = window.location;
@@ -17,6 +18,10 @@ function App() {
     return <AuthPage />;
   }
 
+  if (pathname === '/moderator') {
+    return <ModeratorPage />;
+  }
+
   if (pathname === '/buildings') {
     window.location.replace('/');
     return null;
@@ -26,7 +31,13 @@ function App() {
     return <BuildingsPage />;
   }
 
-  return <BuildingsPage />;
+  return (
+    <main style={{ padding: 24 }}>
+      <h1>404</h1>
+      <p>Страница не найдена.</p>
+      <a href="/">На главную</a>
+    </main>
+  );
 }
 
 export default App
