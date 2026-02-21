@@ -21,7 +21,11 @@ export const RegisterPage: React.FC = () => {
       setTimeout(() => {
         window.location.href = '/';
       }, 2000);
-    } catch (err) {
+    } catch (err: unknown) {
+      if (err instanceof TypeError) {
+        setError('Сервер регистрации недоступен. Проверьте API URL и CORS.');
+        return;
+      }
       setError('Ошибка регистрации. Попробуйте другое имя пользователя.');
     }
   };
