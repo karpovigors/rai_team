@@ -2,41 +2,28 @@ import { AuthPage, RegisterPage } from './pages/AuthPage';
 import { BuildingsPage } from './pages/BuildingsPage';
 import { BuildingDetailsPage } from './pages/BuildingDetailsPage';
 import { MapAdminPage } from './pages/MapAdminPage';
+import { Link, Navigate, Route, Routes } from 'react-router-dom';
 
 function App() {
-  const { pathname } = window.location;
-
-  if (pathname.startsWith('/building/')) {
-    return <BuildingDetailsPage />;
-  }
-
-  if (pathname === '/register') {
-    return <RegisterPage />;
-  }
-
-  if (pathname === '/map-admin') {
-    return <MapAdminPage />;
-  }
-
-  if (pathname === '/auth') {
-    return <AuthPage />;
-  }
-
-  if (pathname === '/buildings') {
-    window.location.replace('/');
-    return null;
-  }
-
-  if (pathname === '/') {
-    return <BuildingsPage />;
-  }
-
   return (
-    <main style={{ padding: 24 }}>
-      <h1>404</h1>
-      <p>Страница не найдена.</p>
-      <a href="/">На главную</a>
-    </main>
+    <Routes>
+      <Route path="/" element={<BuildingsPage />} />
+      <Route path="/building/:id" element={<BuildingDetailsPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/map-admin" element={<MapAdminPage />} />
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/buildings" element={<Navigate to="/" replace />} />
+      <Route
+        path="*"
+        element={
+          <main style={{ padding: 24 }}>
+            <h1>404</h1>
+            <p>Страница не найдена.</p>
+            <Link to="/">На главную</Link>
+          </main>
+        }
+      />
+    </Routes>
   );
 }
 
