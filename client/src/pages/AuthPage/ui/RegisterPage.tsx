@@ -2,22 +2,27 @@ import React, { useState } from 'react';
 import './AuthPage.css';
 import authService from '../../../services/authService';
 
-export const AuthPage: React.FC = () => {
+export const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess(false);
     
     try {
-      const response = await authService.login({ username, password });
+      const response = await authService.register({ username, password });
       authService.setTokens(response.access, response.refresh);
-      // Redirect to main page or dashboard
-      window.location.href = '/';
+      setSuccess(true);
+      // Redirect to main page or dashboard after a short delay
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2000);
     } catch (err) {
-      setError('Неверный логин или пароль');
+      setError('Ошибка регистрации. Попробуйте другое имя пользователя.');
     }
   };
 
@@ -27,12 +32,13 @@ export const AuthPage: React.FC = () => {
         <h1>Информационно-навигационная платформа для людей с нарушением слуха</h1>
       </header>
       <main className="auth-main">
-        <h2>Авторизация</h2>
+        <h2>Регистрация</h2>
         {error && <div className="auth-error">{error}</div>}
+        {success && <div className="auth-success">Регистрация успешна! Перенаправление...</div>}
         <form className="auth-form" onSubmit={handleSubmit}>
           <input
             type="text"
-            placeholder="Логин"
+            placeholder="Имя пользователя"
             className="auth-input"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -46,7 +52,7 @@ export const AuthPage: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit" className="auth-button">Войти</button>
+          <button type="submit" className="auth-button">Зарегистрироваться</button>
         </form>
       </main>
       <footer className="auth-footer"></footer>
