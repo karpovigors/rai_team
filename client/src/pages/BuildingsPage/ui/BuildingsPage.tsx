@@ -46,6 +46,7 @@ export const BuildingsPage: React.FC = () => {
       try {
         const response = await authService.fetchCurrentUser();
         authService.setUsername(response.user.username);
+        authService.setEmail(response.user.email || '');
         authService.setIsModerator(response.user.is_moderator);
         setIsModerator(response.user.is_moderator);
       } catch {
@@ -87,8 +88,9 @@ export const BuildingsPage: React.FC = () => {
     window.location.href = '/';
   };
 
-  const handleModeratorClick = () => {
-    window.location.href = '/moderator';
+  const handleProfileClick = () => {
+    setIsProfileModalOpen(false);
+    window.location.href = '/profile';
   };
 
   const handleAddObjectSubmit = (e: React.FormEvent) => {
@@ -158,7 +160,11 @@ export const BuildingsPage: React.FC = () => {
   return (
     <div className="buildings-page">
       <header className="buildings-header">
-        <h1>Информационно-навигационная платформа для людей с нарушением слуха</h1>
+        <h1>
+          <a href="/" className="buildings-header-link">
+            Информационно-навигационная платформа для людей с нарушением слуха
+          </a>
+        </h1>
         <div className="header-right">
           <button className="map-button">Карта</button>
           <button
@@ -237,11 +243,9 @@ export const BuildingsPage: React.FC = () => {
             ) : (
               <>
                 <p className="profile-username">{username || 'Пользователь'}</p>
-                {isModerator && (
-                  <button type="button" className="profile-action-button" onClick={handleModeratorClick}>
-                    Режим модератора
-                  </button>
-                )}
+                <button type="button" className="profile-action-button" onClick={handleProfileClick}>
+                  Профиль
+                </button>
                 <button type="button" className="profile-action-button" onClick={handleLogoutClick}>
                   Выйти
                 </button>
