@@ -1,20 +1,40 @@
+:root {
+  --auth-page-bg: #ffffff;
+  --auth-surface-bg: #f0f0f0;
+  --auth-border: #e0e0e0;
+  --auth-text: #000000;
+  --auth-placeholder: #888888;
+  --auth-link-hover: #333333;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --auth-page-bg: #1f1f1f;
+    --auth-surface-bg: #2a2a2a;
+    --auth-border: #3a3a3a;
+    --auth-text: #f5f5f5;
+    --auth-placeholder: #b3b3b3;
+    --auth-link-hover: #d0d0d0;
+  }
+}
+
 .auth-page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   width: 100vw; /* Вернул 100vw для полной ширины экрана */
-  background-color: #ffffff;
-  color: #000000;
+  background-color: var(--auth-page-bg);
+  color: var(--auth-text);
   box-sizing: border-box;
   margin: 0; /* Убедимся, что нет внешних отступов */
   padding: 0; /* Убедимся, что нет внутренних отступов */
 }
 
 .auth-header {
-  background-color: #f0f0f0;
+  background-color: var(--auth-surface-bg);
   padding: 20px;
   text-align: center;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--auth-border);
   width: 100%; /* Полная ширина */
   box-sizing: border-box; /* Учитываем padding в расчёте ширины */
 }
@@ -54,10 +74,10 @@
 }
 
 .auth-input {
-  border: 1px solid #e0e0e0;
-  background-color: #f0f0f0;
-  color: #000000;
-  caret-color: #000000;
+  border: 1px solid var(--auth-border);
+  background-color: var(--auth-surface-bg);
+  color: inherit;
+  caret-color: currentColor;
   padding: 0.8rem 1rem;
   border-radius: 8px;
   font-size: 1rem;
@@ -66,13 +86,13 @@
 }
 
 .auth-input::placeholder {
-    color: #888;
+    color: var(--auth-placeholder);
 }
 
 .auth-button {
-  border: 1px solid #e0e0e0;
-  background-color: #f0f0f0;
-  color: #000;
+  border: 1px solid var(--auth-border);
+  background-color: var(--auth-surface-bg);
+  color: var(--auth-text);
   padding: 0.8rem 1rem;
   border-radius: 20px;
   font-size: 1rem;
@@ -84,12 +104,12 @@
 }
 
 .auth-button:hover {
-  background-color: #e0e0e0;
+  background-color: var(--auth-border);
 }
 
 .auth-footer {
     height: 100px;
-    background-color: #f0f0f0;
+    background-color: var(--auth-surface-bg);
     width: 100%; /* Полная ширина */
     box-sizing: border-box; /* Учитываем padding в расчёте ширины */
 }
@@ -124,10 +144,10 @@
 }
 
 .auth-register-link a {
-    color: #000000;
+    color: var(--auth-text);
     text-decoration: underline;
 }
 
 .auth-register-link a:hover {
-    color: #333333;
+    color: var(--auth-link-hover);
 }
