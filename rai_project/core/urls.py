@@ -12,4 +12,5 @@ urlpatterns = [
     path("cinema/", views.cinema, name="cinema"),
     path("auth/", views.auth_page, name="auth"),
     path("add_map/", views.map_adm, name="map_adm"),
+    path("api/objects", views.objects_api, name="objects_api"),
 ]
