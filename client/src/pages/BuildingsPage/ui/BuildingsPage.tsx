@@ -5,16 +5,21 @@ import authService from '../../../services/authService';
 interface BuildingListItem {
   id: number;
   title: string;
+  name?: string;
   address: string;
   schedule: string;
   metros: string[];
   image_url: string;
+  infrastructure_type?: string;
+  infrastructureType?: string;
 }
 
 export const BuildingsPage: React.FC = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [buildings, setBuildings] = useState<BuildingListItem[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedInfrastructureType, setSelectedInfrastructureType] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [createError, setCreateError] = useState('');
@@ -77,6 +82,34 @@ export const BuildingsPage: React.FC = () => {
   useEffect(() => {
     void loadBuildings();
   }, [apiBaseUrl]);
+
+  const normalizeText = (value: unknown) => String(value ?? '').trim().toLocaleLowerCase('ru-RU');
+
+  const infrastructureTypes = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          buildings
+            .map((building) => String(building.infrastructure_type || building.infrastructureType || '').trim())
+            .filter(Boolean),
+        ),
+      ),
+    [buildings],
+  );
+
+  const filteredBuildings = useMemo(() => {
+    const query = normalizeText(searchQuery);
+    return buildings.filter((building) => {
+      const buildingTitle = normalizeText(building.title || building.name);
+      const buildingType = normalizeText(building.infrastructure_type || building.infrastructureType);
+      const selectedType = normalizeText(selectedInfrastructureType);
+
+      const matchesTitle = !query || buildingTitle.includes(query);
+      const matchesInfrastructureType =
+        !selectedType || buildingType === selectedType;
+      return matchesTitle && matchesInfrastructureType;
+    });
+  }, [buildings, searchQuery, selectedInfrastructureType]);
 
   const handleLoginClick = () => {
     window.location.href = '/auth';
@@ -177,15 +210,34 @@ export const BuildingsPage: React.FC = () => {
       </header>
       <main className="buildings-main">
         <div className="search-container">
-          <input type="text" placeholder="Поиск" className="search-input" />
+          <input
+            type="text"
+            placeholder="Поиск по названию"
+            className="search-input"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
         <div className="filter-buttons">
-          <button>Театр</button>
-          <button>Кинотеатр</button>
-          <button>Музей</button>
-          <button>...</button>
+          <button
+            type="button"
+            className={!selectedInfrastructureType ? 'active' : ''}
+            onClick={() => setSelectedInfrastructureType('')}
+          >
+            Все
+          </button>
+          {infrastructureTypes.map((type) => (
+            <button
+              type="button"
+              key={type}
+              className={selectedInfrastructureType === type ? 'active' : ''}
+              onClick={() => setSelectedInfrastructureType(type)}
+            >
+              {type}
+            </button>
+          ))}
           {isModerator && (
-            <button onClick={() => setIsAddFormOpen((prev) => !prev)}>
+            <button type="button" onClick={() => setIsAddFormOpen((prev) => !prev)}>
               {isAddFormOpen ? 'Скрыть форму' : 'Добавить объект'}
             </button>
           )}
@@ -213,7 +265,7 @@ export const BuildingsPage: React.FC = () => {
         <div className="buildings-list">
           {isLoading && <div>Загрузка...</div>}
           {loadError && <div>{loadError}</div>}
-          {!isLoading && !loadError && buildings.map((building) => (
+          {!isLoading && !loadError && filteredBuildings.map((building) => (
             <a href={`/building/${building.id}`} className="building-card" key={building.id}>
               <img src={building.image_url} alt={building.title} />
               <h3>{building.title}</h3>
@@ -229,6 +281,9 @@ export const BuildingsPage: React.FC = () => {
               </div>
             </a>
           ))}
+          {!isLoading && !loadError && filteredBuildings.length === 0 && (
+            <div>Ничего не найдено по текущим фильтрам</div>
+          )}
         </div>
       </main>
       <footer className="buildings-footer"></footer>
