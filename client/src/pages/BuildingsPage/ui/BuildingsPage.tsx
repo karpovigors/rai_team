@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './BuildingsPage.css';
+import authService from '../../../services/authService';
 
 const buildings = [
   {
@@ -21,13 +22,32 @@ const buildings = [
 ];
 
 export const BuildingsPage: React.FC = () => {
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const isAuthenticated = authService.isAuthenticated();
+  const username = authService.getUsername();
+
+  const handleLoginClick = () => {
+    window.location.href = '/auth';
+  };
+
+  const handleLogoutClick = () => {
+    authService.logout();
+    setIsProfileModalOpen(false);
+    window.location.href = '/';
+  };
+
   return (
     <div className="buildings-page">
       <header className="buildings-header">
         <h1>Информационно-навигационная платформа для людей с нарушением слуха</h1>
         <div className="header-right">
           <button className="map-button">Карта</button>
-          <div className="profile-icon"></div>
+          <button
+            type="button"
+            className="profile-icon"
+            aria-label="Профиль"
+            onClick={() => setIsProfileModalOpen(true)}
+          ></button>
         </div>
       </header>
       <main className="buildings-main">
@@ -58,6 +78,25 @@ export const BuildingsPage: React.FC = () => {
         </div>
       </main>
       <footer className="buildings-footer"></footer>
+
+      {isProfileModalOpen && (
+        <div className="profile-modal-overlay" onClick={() => setIsProfileModalOpen(false)}>
+          <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
+            {!isAuthenticated ? (
+              <button type="button" className="profile-action-button" onClick={handleLoginClick}>
+                Войти
+              </button>
+            ) : (
+              <>
+                <p className="profile-username">{username || 'Пользователь'}</p>
+                <button type="button" className="profile-action-button" onClick={handleLogoutClick}>
+                  Выйти
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
