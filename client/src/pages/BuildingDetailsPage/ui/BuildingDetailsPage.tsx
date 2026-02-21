@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './BuildingDetailsPage.css';
+import authService from '../../../services/authService';
 
 const buildingDetails = {
   name: 'КАРО 11 Октябрь',
@@ -22,10 +23,33 @@ const buildingDetails = {
 };
 
 export const BuildingDetailsPage: React.FC = () => {
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const isAuthenticated = authService.isAuthenticated();
+  const username = authService.getUsername();
+
+  const handleLoginClick = () => {
+    window.location.href = '/auth';
+  };
+
+  const handleLogoutClick = () => {
+    authService.logout();
+    setIsProfileModalOpen(false);
+    window.location.href = '/';
+  };
+
   return (
     <div className="details-page">
       <header className="details-header">
         <h1>Информационно-навигационная платформа для людей с нарушением слуха</h1>
+        <div className="details-header-right">
+          <button type="button" className="details-map-button">Карта</button>
+          <button
+            type="button"
+            className="details-profile-icon"
+            aria-label="Профиль"
+            onClick={() => setIsProfileModalOpen(true)}
+          ></button>
+        </div>
       </header>
       <main className="details-main">
         <div className="building-title">
@@ -66,6 +90,25 @@ export const BuildingDetailsPage: React.FC = () => {
         </div>
       </main>
       <footer className="details-footer"></footer>
+
+      {isProfileModalOpen && (
+        <div className="details-profile-modal-overlay" onClick={() => setIsProfileModalOpen(false)}>
+          <div className="details-profile-modal" onClick={(e) => e.stopPropagation()}>
+            {!isAuthenticated ? (
+              <button type="button" className="details-profile-action-button" onClick={handleLoginClick}>
+                Войти
+              </button>
+            ) : (
+              <>
+                <p className="details-profile-username">{username || 'Пользователь'}</p>
+                <button type="button" className="details-profile-action-button" onClick={handleLogoutClick}>
+                  Выйти
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
