@@ -151,12 +151,20 @@ def ping(request):
     )
 
 
-@api_view(["GET", "PUT"])
+@api_view(["GET", "PUT", "DELETE"])
 @permission_classes([AllowAny])
 def object_detail(request, object_id):
     obj = get_object_or_404(PlaceObject, id=object_id)
     if request.method == "GET":
         return Response(_serialize_place(request, obj, include_reviews=True))
+
+    if request.method == "DELETE":
+        if not _is_moderator(request.user):
+            if not request.user.is_authenticated:
+                return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error": "Moderator permissions required"}, status=status.HTTP_403_FORBIDDEN)
+        obj.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     if not _is_moderator(request.user):
         if not request.user.is_authenticated:

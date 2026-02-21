@@ -59,6 +59,35 @@ def me(request):
     return Response({'user': UserSerializer(request.user).data})
 
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_me(request):
+    user = request.user
+    username = request.data.get('username')
+    email = request.data.get('email')
+    new_password = request.data.get('password')
+
+    if username is not None:
+        username = str(username).strip()
+        if not username:
+            return Response({'error': 'Username cannot be empty'}, status=status.HTTP_400_BAD_REQUEST)
+        user.username = username
+
+    if email is not None:
+        email = str(email).strip()
+        if not email:
+            return Response({'error': 'Email cannot be empty'}, status=status.HTTP_400_BAD_REQUEST)
+        user.email = email
+
+    if new_password:
+        if len(str(new_password)) < 6:
+            return Response({'error': 'Password must be at least 6 characters'}, status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(str(new_password))
+
+    user.save()
+    return Response({'user': UserSerializer(user).data})
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def refresh(request):

@@ -51,6 +51,11 @@
   text-align: left;
 }
 
+.details-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
 .details-header-right {
   display: flex;
   align-items: center;
@@ -132,6 +137,21 @@
 
 .details-edit-error {
   color: #b42318;
+}
+
+.details-edit-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.details-delete-button {
+  border: 1px solid #b42318;
+  background: transparent;
+  color: #b42318;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
 }
 
 .info-grid {

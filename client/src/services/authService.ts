@@ -9,7 +9,14 @@ interface LoginCredentials {
 
 interface RegisterData {
   username: string;
+  email: string;
   password: string;
+}
+
+interface UpdateProfileData {
+  username?: string;
+  email?: string;
+  password?: string;
 }
 
 interface AuthResponse {
@@ -18,6 +25,7 @@ interface AuthResponse {
   user: {
     id: number;
     username: string;
+    email: string;
     is_moderator: boolean;
   };
 }
@@ -26,6 +34,7 @@ interface MeResponse {
   user: {
     id: number;
     username: string;
+    email: string;
     is_moderator: boolean;
   };
 }
@@ -82,11 +91,28 @@ class AuthService {
     return response.json();
   }
 
+  async updateProfile(data: UpdateProfileData): Promise<MeResponse> {
+    const response = await this.authFetch('/api/auth/me/update/', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData?.error || 'Profile update failed');
+    }
+
+    return response.json();
+  }
+
   logout(): void {
-    // Clear auth data from localStorage
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('username');
+    localStorage.removeItem('email');
     localStorage.removeItem('isModerator');
   }
 
@@ -99,12 +125,20 @@ class AuthService {
     localStorage.setItem('username', username);
   }
 
+  setEmail(email: string): void {
+    localStorage.setItem('email', email);
+  }
+
   setIsModerator(isModerator: boolean): void {
     localStorage.setItem('isModerator', String(isModerator));
   }
 
   getUsername(): string | null {
     return localStorage.getItem('username');
+  }
+
+  getEmail(): string | null {
+    return localStorage.getItem('email');
   }
 
   isModerator(): boolean {
