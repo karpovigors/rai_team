@@ -65,3 +65,4 @@ services:
 
 volumes:
   postgres_data:
+  s3_data:
