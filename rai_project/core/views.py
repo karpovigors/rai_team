@@ -49,6 +49,12 @@ def _is_moderator(user):
 
 
 def _serialize_place(request, obj, include_reviews=False):
+    reviews_qs = obj.reviews.all()
+    reviews_list = list(reviews_qs) if include_reviews else None
+    rated_reviews = [review for review in (reviews_list or reviews_qs) if getattr(review, "rating", None)]
+    rating_count = len(rated_reviews)
+    rating_avg = round(sum(review.rating for review in rated_reviews) / rating_count, 1) if rating_count else 0
+
     payload = {
         "id": obj.id,
         "title": obj.title,
@@ -66,6 +72,8 @@ def _serialize_place(request, obj, include_reviews=False):
         "ramps": obj.ramps,
         "braille": obj.braille,
         "created_at": obj.created_at,
+        "rating_avg": rating_avg,
+        "rating_count": rating_count,
     }
 
     if include_reviews:
@@ -74,9 +82,10 @@ def _serialize_place(request, obj, include_reviews=False):
                 "id": review.id,
                 "author": review.author_name,
                 "text": review.text,
+                "rating": review.rating,
                 "created_at": review.created_at,
             }
-            for review in obj.reviews.all()
+            for review in reviews_list or []
         ]
 
     return payload
@@ -216,16 +225,31 @@ def object_reviews(request, object_id):
 
     obj = get_object_or_404(PlaceObject, id=object_id)
     text = str(request.data.get("text", "")).strip()
+    raw_rating = request.data.get("rating")
 
     if not text:
         return Response({"error": "Text is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-    review = PlaceReview.objects.create(place=obj, author_name=request.user.username, text=text)
+    try:
+        rating = int(raw_rating)
+    except (TypeError, ValueError):
+        return Response({"error": "Rating must be an integer from 1 to 5"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if rating < 1 or rating > 5:
+        return Response({"error": "Rating must be from 1 to 5"}, status=status.HTTP_400_BAD_REQUEST)
+
+    review = PlaceReview.objects.create(
+        place=obj,
+        author_name=request.user.username,
+        text=text,
+        rating=rating,
+    )
     return Response(
         {
             "id": review.id,
             "author": review.author_name,
             "text": review.text,
+            "rating": review.rating,
             "created_at": review.created_at,
         },
         status=status.HTTP_201_CREATED,
