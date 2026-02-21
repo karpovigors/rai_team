@@ -1,16 +1,40 @@
+:root {
+  --buildings-page-bg: #ffffff;
+  --buildings-surface-bg: #f0f0f0;
+  --buildings-border: #e0e0e0;
+  --buildings-text: #000000;
+  --buildings-overlay: rgba(0, 0, 0, 0.3);
+  --buildings-shadow: rgba(0, 0, 0, 0.15);
+  --profile-icon-bg: #cccccc;
+  --profile-icon-border: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --buildings-page-bg: #161616;
+    --buildings-surface-bg: #222222;
+    --buildings-border: #343434;
+    --buildings-text: #f5f5f5;
+    --buildings-overlay: rgba(0, 0, 0, 0.5);
+    --buildings-shadow: rgba(0, 0, 0, 0.35);
+    --profile-icon-bg: #3a3a3a;
+    --profile-icon-border: #d9d9d9;
+  }
+}
+
 .buildings-page {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #ffffff;
-  color: #000000;
-  }
+  background-color: var(--buildings-page-bg);
+  color: var(--buildings-text);
+}
 
 .buildings-header {
-  background-color: #f0f0f0;
+  background-color: var(--buildings-surface-bg);
   padding: 20px;
   text-align: center;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--buildings-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -30,9 +54,9 @@
 }
 
 .map-button {
-  border: 1px solid #e0e0e0;
-  background-color: #f0f0f0;
-  color: #000;
+  border: 1px solid var(--buildings-border);
+  background-color: var(--buildings-surface-bg);
+  color: var(--buildings-text);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-size: 1rem;
@@ -43,8 +67,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #ccc;
-  border: 2px solid #000;
+  background-color: var(--profile-icon-bg);
+  border: 2px solid var(--profile-icon-border);
   cursor: pointer;
 }
 
@@ -61,9 +85,15 @@
 .search-input {
   width: 100%;
   padding: 1rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--buildings-border);
+  background-color: var(--buildings-surface-bg);
+  color: var(--buildings-text);
   border-radius: 8px;
   font-size: 1rem;
+}
+
+.search-input::placeholder {
+  color: color-mix(in srgb, var(--buildings-text) 60%, transparent);
 }
 
 .filter-buttons {
@@ -73,9 +103,9 @@
 }
 
 .filter-buttons button {
-  border: 1px solid #e0e0e0;
-  background-color: #f0f0f0;
-  color: #000;
+  border: 1px solid var(--buildings-border);
+  background-color: var(--buildings-surface-bg);
+  color: var(--buildings-text);
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-size: 1rem;
@@ -89,9 +119,11 @@
 }
 
 .building-card {
-  background-color: #f0f0f0;
+  background-color: var(--buildings-surface-bg);
+  color: var(--buildings-text);
   border-radius: 8px;
   overflow: hidden;
+  border: 1px solid var(--buildings-border);
 }
 
 .building-card img {
@@ -112,15 +144,15 @@
 }
 
 .buildings-footer {
-    height: 100px;
-    background-color: #f0f0f0;
-    margin-top: 20px;
+  height: 100px;
+  background-color: var(--buildings-surface-bg);
+  margin-top: 20px;
 }
 
 .profile-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--buildings-overlay);
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
@@ -130,14 +162,15 @@
 
 .profile-modal {
   min-width: 220px;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: var(--buildings-surface-bg);
+  border: 1px solid var(--buildings-border);
   border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px var(--buildings-shadow);
   display: flex;
   flex-direction: column;
   gap: 12px;
+  color: var(--buildings-text);
 }
 
 .profile-username {
@@ -147,9 +180,9 @@
 }
 
 .profile-action-button {
-  border: 1px solid #e0e0e0;
-  background: #f0f0f0;
-  color: #000;
+  border: 1px solid var(--buildings-border);
+  background: var(--buildings-surface-bg);
+  color: var(--buildings-text);
   border-radius: 8px;
   padding: 0.6rem 1rem;
   cursor: pointer;
