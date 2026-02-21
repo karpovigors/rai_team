@@ -7,6 +7,11 @@ class PlaceObject(models.Model):
 
     infrastructure_type = models.CharField(max_length=100, blank=True)
     address = models.CharField(max_length=100, blank=True)
+    schedule = models.CharField(max_length=120, blank=True)
+    metros = models.JSONField(default=list, blank=True)
+    image_url = models.URLField(blank=True)
+    map_image_url = models.URLField(blank=True)
+    image = models.FileField(upload_to="places/", blank=True, null=True)
 
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
@@ -27,3 +32,16 @@ class PlaceObject(models.Model):
         ]
     def __str__(self):
         return self.title
+
+
+class PlaceReview(models.Model):
+    place = models.ForeignKey(PlaceObject, on_delete=models.CASCADE, related_name="reviews")
+    author_name = models.CharField(max_length=150)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.author_name}: {self.place.title}"
