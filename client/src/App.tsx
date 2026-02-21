@@ -1,6 +1,7 @@
 import { AuthPage, RegisterPage } from './pages/AuthPage';
 import { BuildingsPage } from './pages/BuildingsPage';
 import { BuildingDetailsPage } from './pages/BuildingDetailsPage';
+import { MapAdminPage } from './pages/MapAdminPage';
 
 function App() {
   const { pathname } = window.location;
@@ -15,6 +16,10 @@ function App() {
 
   if (pathname === '/register') {
     return <RegisterPage />;
+  }
+
+  if (pathname === '/map-admin') {
+    return <MapAdminPage />;
   }
 
   return (
