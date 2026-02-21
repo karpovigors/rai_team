@@ -42,7 +42,7 @@ export const BuildingsPage: React.FC = () => {
         </div>
         <div className="buildings-list">
           {buildings.map((building, index) => (
-            <div className="building-card" key={index}>
+            <a href={`/building/${index}`} className="building-card" key={index}>
               <img src={building.image} alt={building.name} />
               <h3>{building.name}</h3>
               <ul>
@@ -53,7 +53,7 @@ export const BuildingsPage: React.FC = () => {
               <div className="building-icons">
                 {/* Icons would go here */}
               </div>
-            </div>
+            </a>
           ))}
         </div>
       </main>
