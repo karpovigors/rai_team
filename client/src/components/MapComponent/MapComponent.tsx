@@ -28,9 +28,8 @@ function MapComponent({
     const coords = selectedFeature?.geometry?.coordinates
     if (coords && coords.length === 2) {
       setPlacemark(coords)
-      onMapClick?.(coords, selectedFeature)
     }
-  }, [onMapClick, selectedFeature])
+  }, [selectedFeature])
 
   const handleMapClick = (event: { get: (name: string) => [number, number] }) => {
     const coords = event.get('coords')
