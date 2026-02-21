@@ -1,7 +1,7 @@
 import { AuthPage, RegisterPage } from './pages/AuthPage';
 import { BuildingsPage } from './pages/BuildingsPage';
 import { BuildingDetailsPage } from './pages/BuildingDetailsPage';
-import { ModeratorPage } from './pages/ModeratorPage';
+import { ProfilePage } from './pages/ProfilePage';
 
 function App() {
   const { pathname } = window.location;
@@ -18,8 +18,8 @@ function App() {
     return <AuthPage />;
   }
 
-  if (pathname === '/moderator') {
-    return <ModeratorPage />;
+  if (pathname === '/profile') {
+    return <ProfilePage />;
   }
 
   if (pathname === '/buildings') {
@@ -35,7 +35,6 @@ function App() {
     <main style={{ padding: 24 }}>
       <h1>404</h1>
       <p>Страница не найдена.</p>
-      <a href="/">На главную</a>
     </main>
   );
 }
