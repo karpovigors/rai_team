@@ -1,0 +1,80 @@
+.accessibility-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+  max-width: 400px;
+}
+
+.accessibility-card__input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.accessibility-card__input:focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 0 2px rgb(74 144 217 / 20%);
+}
+
+.accessibility-card__textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.accessibility-card__textarea:focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 0 2px rgb(74 144 217 / 20%);
+}
+
+.accessibility-card__checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.accessibility-card__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.accessibility-card__item input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: #4a90d9;
+  cursor: pointer;
+}
+
+.accessibility-card__select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.accessibility-card__select:focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 0 2px rgb(74 144 217 / 20%);
+}
