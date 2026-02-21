@@ -19,6 +19,7 @@ function MapAdmin() {
   const [infrastructureType, setInfrastructureType] = useState('')
   const [loading, setLoading] = useState(false)
   const [address, setAddress] = useState('')
+  const [photoFile, setPhotoFile] = useState(null)
 
   const handleMapClick = (coords, clickedObject) => {
     setCoordinates(coords)
@@ -78,6 +79,12 @@ function MapAdmin() {
     setChecklist(prev => ({ ...prev, [field]: value }))
   }
 
+  // Загрузка фото на сервер (заглушка для S3)
+  const handlePhotoUpload = async (file) => {
+    setPhotoFile(file)
+    console.log('Фото выбрано:', file.name)
+  }
+
   // Отправка данных на сервер
   const handleSubmit = async () => {
     if (!coordinates) {
@@ -87,40 +94,74 @@ function MapAdmin() {
 
     setLoading(true)
 
-    const data = {
-      title,
-      description,
-      infrastructureType,
-      address,
-      coordinates: {
-        longitude: coordinates[1],
-        latitude: coordinates[0],
-      },
-      checklist,
-    }
-
     try {
-      const response = await fetch('http://172.20.10.2:8000/api/objects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
+      // Если есть фото, отправляем через FormData
+      if (photoFile) {
+        const formData = new FormData()
+        formData.append('photo', photoFile)
+        formData.append('title', title)
+        formData.append('description', description)
+        formData.append('infrastructureType', infrastructureType)
+        formData.append('address', address)
+        formData.append('longitude', coordinates[1])
+        formData.append('latitude', coordinates[0])
+        formData.append('checklist', JSON.stringify(checklist))
 
-      if (response.status === 409) {
-        alert('Такое место уже есть')
-        setLoading(false)
-        return
+        const response = await fetch('http://172.20.10.2:8000/api/objects', {
+          method: 'POST',
+          body: formData,
+        })
+
+        if (response.status === 409) {
+          alert('Такое место уже есть')
+          setLoading(false)
+          return
+        }
+
+        if (!response.ok) {
+          throw new Error('Ошибка отправки данных')
+        }
+
+        const result = await response.json()
+        console.log('Данные успешно отправлены:', result)
+        alert('Объект успешно добавлен!')
+        setPhotoFile(null)
+      } else {
+        // Отправляем без фото
+        const data = {
+          title,
+          description,
+          infrastructureType,
+          address,
+          coordinates: {
+            longitude: coordinates[1],
+            latitude: coordinates[0],
+          },
+          checklist,
+        }
+
+        const response = await fetch('http://172.20.10.2:8000/api/objects', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        })
+
+        if (response.status === 409) {
+          alert('Такое место уже есть')
+          setLoading(false)
+          return
+        }
+
+        if (!response.ok) {
+          throw new Error('Ошибка отправки данных')
+        }
+
+        const result = await response.json()
+        console.log('Данные успешно отправлены:', result)
+        alert('Объект успешно добавлен!')
       }
-
-      if (!response.ok) {
-        throw new Error('Ошибка отправки данных')
-      }
-
-      const result = await response.json()
-      console.log('Данные успешно отправлены:', result)
-      alert('Объект успешно добавлен!')
     } catch (error) {
       console.error('Ошибка при отправке:', error)
       alert('Ошибка при отправке данных')
@@ -149,6 +190,7 @@ function MapAdmin() {
             onChecklistChange={updateChecklist}
             infrastructureType={infrastructureType}
             onInfrastructureTypeChange={(e) => setInfrastructureType(e.target.value)}
+            onPhotoUpload={handlePhotoUpload}
           />
           {coordinates && (
             <div className="coordinates-display">
