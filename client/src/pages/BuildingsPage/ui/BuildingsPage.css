@@ -117,6 +117,11 @@
   cursor: pointer;
 }
 
+.filter-buttons button.active {
+  background-color: var(--buildings-text);
+  color: var(--buildings-page-bg);
+}
+
 .moderator-inline-form {
   display: flex;
   flex-direction: column;
