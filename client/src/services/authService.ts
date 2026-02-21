@@ -57,14 +57,23 @@ class AuthService {
   }
 
   logout(): void {
-    // Clear tokens from localStorage or sessionStorage
+    // Clear auth data from localStorage
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('username');
   }
 
   setTokens(accessToken: string, refreshToken: string): void {
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
+  }
+
+  setUsername(username: string): void {
+    localStorage.setItem('username', username);
+  }
+
+  getUsername(): string | null {
+    return localStorage.getItem('username');
   }
 
   getAccessToken(): string | null {
@@ -73,6 +82,10 @@ class AuthService {
 
   getRefreshToken(): string | null {
     return localStorage.getItem('refreshToken');
+  }
+
+  isAuthenticated(): boolean {
+    return Boolean(this.getAccessToken());
   }
 }
 

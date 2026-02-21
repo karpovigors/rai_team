@@ -9,17 +9,24 @@ function App() {
     return <BuildingDetailsPage />;
   }
 
-  if (pathname === '/buildings') {
-    return <BuildingsPage />;
-  }
-
   if (pathname === '/register') {
     return <RegisterPage />;
   }
 
-  return (
-    <AuthPage />
-  )
+  if (pathname === '/auth') {
+    return <AuthPage />;
+  }
+
+  if (pathname === '/buildings') {
+    window.location.replace('/');
+    return null;
+  }
+
+  if (pathname === '/') {
+    return <BuildingsPage />;
+  }
+
+  return <BuildingsPage />;
 }
 
 export default App

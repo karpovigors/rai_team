@@ -14,6 +14,7 @@ export const AuthPage: React.FC = () => {
     try {
       const response = await authService.login({ username, password });
       authService.setTokens(response.access, response.refresh);
+      authService.setUsername(response.user.username);
       // Redirect to main page or dashboard
       window.location.href = '/';
     } catch (err: unknown) {
