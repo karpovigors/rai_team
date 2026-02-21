@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
+const buildApiUrl = (path: string): string => `${API_BASE_URL}${path}`;
 
 interface LoginCredentials {
   username: string;
@@ -21,7 +23,7 @@ interface AuthResponse {
 
 class AuthService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
+    const response = await fetch(buildApiUrl('/api/auth/login/'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -30,14 +32,15 @@ class AuthService {
     });
 
     if (!response.ok) {
-      throw new Error('Invalid credentials');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData?.error || 'Invalid credentials');
     }
 
     return response.json();
   }
 
   async register(data: RegisterData): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/register/`, {
+    const response = await fetch(buildApiUrl('/api/auth/register/'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -46,7 +49,8 @@ class AuthService {
     });
 
     if (!response.ok) {
-      throw new Error('Registration failed');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData?.error || 'Registration failed');
     }
 
     return response.json();
