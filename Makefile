@@ -127,7 +127,7 @@ clean:
 # Пересобрать и перезапустить сервисы
 rebuild:
 	docker-compose down
-	docker-compose build --no-cache
+	docker-compose build
 	docker-compose up -d
 
 # Показать работающие контейнеры

@@ -37,6 +37,9 @@ services:
       DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME:-admin}
       DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD:-admin12345}
       DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL:-admin@example.com}
+      MODERATOR_USERNAME: ${MODERATOR_USERNAME:-moderator}
+      MODERATOR_PASSWORD: ${MODERATOR_PASSWORD:-moderator12345}
+      MODERATOR_EMAIL: ${MODERATOR_EMAIL:-moderator@example.com}
       S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
       S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
       S3_BUCKET_NAME: ${S3_BUCKET_NAME:-rai-images}
@@ -45,7 +48,7 @@ services:
       - ./rai_project:/app
     command: >
       sh -c "python manage.py migrate &&
-             python manage.py shell -c \"from django.contrib.auth import get_user_model; import os; User = get_user_model(); username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin'); password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin12345'); email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@example.com'); qs = User.objects.filter(username=username); (User.objects.create_superuser(username=username, password=password, email=email), print('Superuser created:', username)) if not qs.exists() else print('Superuser already exists:', username)\" &&
+             python manage.py bootstrap_users &&
              python manage.py runserver 0.0.0.0:8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
