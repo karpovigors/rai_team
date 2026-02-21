@@ -1,5 +1,4 @@
 import json
-from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -75,22 +74,15 @@ def objects_api(request):
     return resp
 
 
-#Домашняя страница
-def home(request):
-    return HttpResponse("Сайт работает")
+def health(request):
+    return HttpResponse("ok")
 
 
-def theatre(request):
-    return render(request, "core/theatre.html")
-
-
-def cinema(request):
-    return render(request, "core/cinema.html")
-
-
-def auth_page(request):
-    return render(request, "core/auth.html")
-
-
-def map_adm(request):
-    return render(request, "core/map_adm.html")
+@require_http_methods(["GET"])
+def ping(request):
+    return JsonResponse(
+        {
+            "status": "ok",
+            "service": "backend",
+        }
+    )
