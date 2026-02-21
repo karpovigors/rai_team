@@ -56,11 +56,11 @@ export const BuildingDetailsPage: React.FC = () => {
         <div className="reviews-section">
           {buildingDetails.reviews.map((review, index) => (
             <div className="review" key={index}>
-              <div className="review-user-icon"></div>
-              <div className='review-content'>
-                <p className="review-text">{review.text}</p>
+              <div className="review-user-info">
+                <div className="review-user-icon"></div>
                 <p className="review-user">{review.user}</p>
               </div>
+              <p className="review-text">{review.text}</p>
             </div>
           ))}
         </div>

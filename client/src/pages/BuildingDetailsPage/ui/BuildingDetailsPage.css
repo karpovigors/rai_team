@@ -73,12 +73,19 @@
 
 .review {
   display: flex;
-  align-items: center;
-  gap: 15px;
+  flex-direction: column;
+  gap: 10px;
   background-color: #fff;
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 10px;
+}
+
+.review-user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  gap: 5px;
 }
 
 .review-user-icon {
@@ -103,4 +110,27 @@
   height: 100px;
   background-color: #f0f0f0;
   margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .details-main {
+    padding: 20px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .building-title h2 {
+    font-size: 1.8rem;
+  }
+
+  .map-image {
+    height: 250px;
+  }
+
+  .details-header h1 {
+    font-size: 1.2rem;
+  }
 }
