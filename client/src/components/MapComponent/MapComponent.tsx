@@ -55,11 +55,6 @@ function MapComponent({
           onClick={handleMapClick}
           defaultOptions={{
             suppressMapOpenBlock: true,
-            trafficControl: 'off',
-            geolocationControl: 'off',
-            searchControl: 'off',
-            zoomControl: 'off',
-            fullscreenControl: 'off',
           }}
         >
           {objects.map((object, index) => {
