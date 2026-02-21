@@ -4,7 +4,9 @@ import authService from '../../../services/authService';
 
 export const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
@@ -12,11 +14,17 @@ export const RegisterPage: React.FC = () => {
     e.preventDefault();
     setError('');
     setSuccess(false);
+
+    if (password !== confirmPassword) {
+      setError('Пароли не совпадают');
+      return;
+    }
     
     try {
-      const response = await authService.register({ username, password });
+      const response = await authService.register({ username, email, password });
       authService.setTokens(response.access, response.refresh);
       authService.setUsername(response.user.username);
+      authService.setEmail(response.user.email || '');
       authService.setIsModerator(response.user.is_moderator);
       setSuccess(true);
       // Redirect to main page or dashboard after a short delay
@@ -35,7 +43,11 @@ export const RegisterPage: React.FC = () => {
   return (
     <div className="auth-page">
       <header className="auth-header">
-        <h1>Информационно-навигационная платформа для людей с нарушением слуха</h1>
+        <h1>
+          <a href="/" className="auth-header-link">
+            Информационно-навигационная платформа для людей с нарушением слуха
+          </a>
+        </h1>
       </header>
       <main className="auth-main">
         <h2>Регистрация</h2>
@@ -51,11 +63,27 @@ export const RegisterPage: React.FC = () => {
             required
           />
           <input
+            type="email"
+            placeholder="Электронная почта"
+            className="auth-input"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
             type="password"
             placeholder="Пароль"
             className="auth-input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Повторите пароль"
+            className="auth-input"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
           <button type="submit" className="auth-button">Зарегистрироваться</button>
