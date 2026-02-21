@@ -56,7 +56,11 @@ export const BuildingsPage: React.FC = () => {
   return (
     <div className="buildings-page">
       <header className="buildings-header">
-        <h1>Информационно-навигационная платформа для людей с нарушением слуха</h1>
+        <h1>
+          <a href="/" className="buildings-header-link">
+            Информационно-навигационная платформа для людей с нарушением слуха
+          </a>
+        </h1>
         <div className="header-right">
           <button className="map-button" onClick={() => navigate('/map-admin')}>Карта</button>
           <button

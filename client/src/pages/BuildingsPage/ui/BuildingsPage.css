@@ -47,6 +47,11 @@
   text-align: left;
 }
 
+.buildings-header-link {
+  color: inherit;
+  text-decoration: none;
+}
+
 .header-right {
   display: flex;
   align-items: center;

@@ -46,6 +46,7 @@ export const BuildingDetailsPage: React.FC = () => {
   const [editMapAddress, setEditMapAddress] = useState('');
   const [editError, setEditError] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
@@ -65,6 +66,7 @@ export const BuildingDetailsPage: React.FC = () => {
       try {
         const response = await authService.fetchCurrentUser();
         authService.setUsername(response.user.username);
+        authService.setEmail(response.user.email || '');
         authService.setIsModerator(response.user.is_moderator);
         setIsModerator(response.user.is_moderator);
       } catch {
@@ -130,8 +132,9 @@ export const BuildingDetailsPage: React.FC = () => {
     window.location.href = '/';
   };
 
-  const handleModeratorClick = () => {
-    window.location.href = '/moderator';
+  const handleProfileClick = () => {
+    setIsProfileModalOpen(false);
+    window.location.href = '/profile';
   };
 
   const handleSaveEdit = (e: React.FormEvent) => {
@@ -189,6 +192,42 @@ export const BuildingDetailsPage: React.FC = () => {
         }
       } finally {
         setIsSavingEdit(false);
+      }
+    })();
+  };
+
+  const handleDeleteObject = () => {
+    void (async () => {
+      if (!building) {
+        return;
+      }
+
+      const confirmed = window.confirm('Удалить этот объект? Действие необратимо.');
+      if (!confirmed) {
+        return;
+      }
+
+      setEditError('');
+      setIsDeleting(true);
+      try {
+        const response = await authService.authFetch(`/api/objects/${building.id}`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err?.error || 'Не удалось удалить объект');
+        }
+
+        window.location.href = '/';
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setEditError(error.message);
+        } else {
+          setEditError('Не удалось удалить объект');
+        }
+      } finally {
+        setIsDeleting(false);
       }
     })();
   };
@@ -307,7 +346,11 @@ export const BuildingDetailsPage: React.FC = () => {
   return (
     <div className="details-page">
       <header className="details-header">
-        <h1>Информационно-навигационная платформа для людей с нарушением слуха</h1>
+        <h1>
+          <a href="/" className="details-title-link">
+            Информационно-навигационная платформа для людей с нарушением слуха
+          </a>
+        </h1>
         <div className="details-header-right">
           <button type="button" className="details-map-button">Карта</button>
           <button
@@ -343,7 +386,19 @@ export const BuildingDetailsPage: React.FC = () => {
               <label><input type="checkbox" checked={editRamps} onChange={(e) => setEditRamps(e.target.checked)} />Пандусы</label>
               <label><input type="checkbox" checked={editBraille} onChange={(e) => setEditBraille(e.target.checked)} />Брайль</label>
             </div>
-            <button type="submit" disabled={isSavingEdit}>{isSavingEdit ? 'Сохранение...' : 'Сохранить изменения'}</button>
+            <div className="details-edit-actions">
+              <button type="submit" disabled={isSavingEdit || isDeleting}>
+                {isSavingEdit ? 'Сохранение...' : 'Сохранить изменения'}
+              </button>
+              <button
+                type="button"
+                className="details-delete-button"
+                onClick={handleDeleteObject}
+                disabled={isSavingEdit || isDeleting}
+              >
+                {isDeleting ? 'Удаление...' : 'Удалить объект'}
+              </button>
+            </div>
           </form>
         )}
         <div className="info-grid">
@@ -436,11 +491,9 @@ export const BuildingDetailsPage: React.FC = () => {
             ) : (
               <>
                 <p className="details-profile-username">{username || 'Пользователь'}</p>
-                {isModerator && (
-                  <button type="button" className="details-profile-action-button" onClick={handleModeratorClick}>
-                    Режим модератора
-                  </button>
-                )}
+                <button type="button" className="details-profile-action-button" onClick={handleProfileClick}>
+                  Профиль
+                </button>
                 <button type="button" className="details-profile-action-button" onClick={handleLogoutClick}>
                   Выйти
                 </button>
