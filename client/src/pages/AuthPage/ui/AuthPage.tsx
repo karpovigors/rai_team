@@ -15,6 +15,7 @@ export const AuthPage: React.FC = () => {
       const response = await authService.login({ username, password });
       authService.setTokens(response.access, response.refresh);
       authService.setUsername(response.user.username);
+      authService.setEmail(response.user.email || '');
       authService.setIsModerator(response.user.is_moderator);
       // Redirect to main page or dashboard
       window.location.href = '/';
@@ -34,7 +35,11 @@ export const AuthPage: React.FC = () => {
   return (
     <div className="auth-page">
       <header className="auth-header">
-        <h1>Информационно-навигационная платформа для людей с нарушением слуха</h1>
+        <h1>
+          <a href="/" className="auth-header-link">
+            Информационно-навигационная платформа для людей с нарушением слуха
+          </a>
+        </h1>
       </header>
       <main className="auth-main">
         <h2>Авторизация</h2>
