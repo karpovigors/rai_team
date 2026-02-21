@@ -16,8 +16,16 @@ export const AuthPage: React.FC = () => {
       authService.setTokens(response.access, response.refresh);
       // Redirect to main page or dashboard
       window.location.href = '/';
-    } catch (err) {
-      setError('Неверный логин или пароль');
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message === 'Invalid credentials') {
+        setError('Неверный логин или пароль');
+        return;
+      }
+      if (err instanceof TypeError) {
+        setError('Сервер авторизации недоступен. Проверьте API URL и CORS.');
+        return;
+      }
+      setError('Ошибка авторизации. Попробуйте позже.');
     }
   };
 
