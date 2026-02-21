@@ -33,6 +33,7 @@ function MapAdminPage() {
   const [infrastructureType, setInfrastructureType] = useState('')
   const [loading, setLoading] = useState(false)
   const [address, setAddress] = useState('')
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
 
   const fetchAddress = async (coords: [number, number]) => {
     try {
@@ -88,6 +89,10 @@ function MapAdminPage() {
     setChecklist((prev) => ({ ...prev, [field]: value }))
   }
 
+  const handlePhotoUpload = (file: File) => {
+    setPhotoFile(file)
+  }
+
   const handleSubmit = async () => {
     if (!coordinates) {
       window.alert('Пожалуйста, выберите координаты')
@@ -96,26 +101,45 @@ function MapAdminPage() {
 
     setLoading(true)
 
-    const payload = {
-      title,
-      description,
-      infrastructureType,
-      address,
-      coordinates: {
-        longitude: coordinates[1],
-        latitude: coordinates[0],
-      },
-      checklist,
-    }
-
     try {
-      const response = await fetch(buildApiUrl('/api/objects'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
+      let response: Response
+
+      if (photoFile) {
+        const formData = new FormData()
+        formData.append('photo', photoFile)
+        formData.append('title', title)
+        formData.append('description', description)
+        formData.append('infrastructureType', infrastructureType)
+        formData.append('address', address)
+        formData.append('longitude', String(coordinates[1]))
+        formData.append('latitude', String(coordinates[0]))
+        formData.append('checklist', JSON.stringify(checklist))
+
+        response = await fetch(buildApiUrl('/api/objects'), {
+          method: 'POST',
+          body: formData,
+        })
+      } else {
+        const payload = {
+          title,
+          description,
+          infrastructureType,
+          address,
+          coordinates: {
+            longitude: coordinates[1],
+            latitude: coordinates[0],
+          },
+          checklist,
+        }
+
+        response = await fetch(buildApiUrl('/api/objects'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        })
+      }
 
       if (response.status === 409) {
         window.alert('Такое место уже есть')
@@ -126,6 +150,7 @@ function MapAdminPage() {
         throw new Error('Ошибка отправки данных')
       }
 
+      setPhotoFile(null)
       window.alert('Объект успешно добавлен!')
     } catch {
       window.alert('Ошибка при отправке данных')
@@ -155,6 +180,7 @@ function MapAdminPage() {
             onInfrastructureTypeChange={(event) =>
               setInfrastructureType(event.target.value)
             }
+            onPhotoUpload={handlePhotoUpload}
           />
 
           {coordinates && (

@@ -7,12 +7,16 @@
 .map-admin-page__layout {
   background: #fff;
   display: flex;
+  width:100%;
   flex: 1;
-  overflow: hidden;
+  flex-wrap: wrap;
 }
 
 .map-admin-page__map {
   flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
 }
 
 .map-admin-page__side {
