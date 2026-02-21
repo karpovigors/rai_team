@@ -1,31 +1,69 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './BuildingDetailsPage.css';
 import authService from '../../../services/authService';
 
-const buildingDetails = {
-  name: 'КАРО 11 Октябрь',
-  schedule: 'ежедневно, 10:00-02:00',
-  address: 'ул. Новый Арбат, 24',
-  metros: ['Смоленская', 'Смоленская', 'Арбатская'],
-  description: 'Кинотеатр «КАРО 11 Октябрь» — это большой и красивый зал с большим экраном и сценой. Здесь часто проходят закрытые показы кинофильмов вместе с актерами, режиссерами и участниками съемок.',
-  accessibility: [
-    'Русский жестовый язык',
-    'Субтитры',
-    'Наличие пандусов',
-    'Шрифт Брайля / сопровождение для слепых',
-  ],
-  reviews: [
-    { user: 'User', text: 'Со всей семьей смотрели фильм, топчик, советую туда сходить, т.к. есть субтитры!' },
-    { user: 'User1', text: 'Хорошее место' },
-  ],
-  image: 'https://avatars.mds.yandex.net/get-altay/1881734/2a0000016b31d4a3311953c7416353d0c893/XXL',
-  mapImage: 'https://i.imgur.com/kM8v7vJ.png' // Placeholder for map
-};
+interface Review {
+  id: number;
+  author: string;
+  text: string;
+}
+
+interface BuildingDetails {
+  id: number;
+  title: string;
+  schedule: string;
+  address: string;
+  metros: string[];
+  description: string;
+  image_url: string;
+  map_image_url: string;
+  sign_language: boolean;
+  subtitles: boolean;
+  ramps: boolean;
+  braille: boolean;
+  reviews: Review[];
+}
 
 export const BuildingDetailsPage: React.FC = () => {
+  const buildingId = Number(window.location.pathname.split('/')[2]);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [building, setBuilding] = useState<BuildingDetails | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [newReviewText, setNewReviewText] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const isAuthenticated = authService.isAuthenticated();
   const username = authService.getUsername();
+  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
+  useEffect(() => {
+    const loadBuilding = async () => {
+      if (!Number.isFinite(buildingId)) {
+        setLoadError('Некорректный идентификатор объекта');
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      setLoadError('');
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/objects/${buildingId}`);
+        if (!response.ok) {
+          throw new Error('Failed to load building details');
+        }
+
+        const data = await response.json();
+        setBuilding(data);
+        setReviews(data.reviews || []);
+      } catch {
+        setLoadError('Не удалось загрузить данные объекта');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadBuilding();
+  }, [apiBaseUrl, buildingId]);
 
   const handleLoginClick = () => {
     window.location.href = '/auth';
@@ -36,6 +74,54 @@ export const BuildingDetailsPage: React.FC = () => {
     setIsProfileModalOpen(false);
     window.location.href = '/';
   };
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    void (async () => {
+      e.preventDefault();
+      const text = newReviewText.trim();
+      if (!text || !isAuthenticated || !building) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/objects/${building.id}/reviews`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            author: username || 'Пользователь',
+            text,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create review');
+        }
+
+        const createdReview = await response.json();
+        setReviews((prev) => [createdReview, ...prev]);
+        setNewReviewText('');
+      } catch {
+        // Keep silent here to avoid breaking UX with alerts
+      }
+    })();
+  };
+
+  if (isLoading) {
+    return <div className="details-page"><main className="details-main">Загрузка...</main></div>;
+  }
+
+  if (loadError || !building) {
+    return <div className="details-page"><main className="details-main">{loadError || 'Объект не найден'}</main></div>;
+  }
+
+  const accessibility = [
+    building.sign_language ? 'Русский жестовый язык' : null,
+    building.subtitles ? 'Субтитры' : null,
+    building.ramps ? 'Наличие пандусов' : null,
+    building.braille ? 'Шрифт Брайля / сопровождение для слепых' : null,
+  ].filter(Boolean) as string[];
 
   return (
     <div className="details-page">
@@ -53,36 +139,54 @@ export const BuildingDetailsPage: React.FC = () => {
       </header>
       <main className="details-main">
         <div className="building-title">
-          <h2>{buildingDetails.name}</h2>
+          <h2>{building.title}</h2>
         </div>
         <div className="info-grid">
           <div className="info-left">
             <ul>
-              <li>{buildingDetails.schedule}</li>
-              <li>{buildingDetails.address}</li>
-              <li>{buildingDetails.metros.join(', ')}</li>
+              <li>{building.schedule}</li>
+              <li>{building.address}</li>
+              <li>{building.metros.join(', ')}</li>
             </ul>
-            <p className="description">{buildingDetails.description}</p>
+            <p className="description">{building.description}</p>
           </div>
           <div className="info-right">
-            <img src={buildingDetails.image} alt={buildingDetails.name} className="building-image" />
+            <img src={building.image_url} alt={building.title} className="building-image" />
              <ul className="accessibility-list">
-              {buildingDetails.accessibility.map((item, index) => (
+              {accessibility.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>
           </div>
           <div className='info-right-map'>
-            <img src={buildingDetails.mapImage} alt="Map" className="map-image" />
+            <img src={building.map_image_url} alt="Map" className="map-image" />
           </div>
         </div>
 
         <div className="reviews-section">
-          {buildingDetails.reviews.map((review, index) => (
-            <div className="review" key={index}>
+          {isAuthenticated ? (
+            <form className="review-form" onSubmit={handleSubmitReview}>
+              <textarea
+                className="review-textarea"
+                placeholder="Напишите отзыв"
+                value={newReviewText}
+                onChange={(e) => setNewReviewText(e.target.value)}
+                rows={4}
+                required
+              />
+              <button type="submit" className="review-submit-button">Отправить отзыв</button>
+            </form>
+          ) : (
+            <div className="review-auth-required">
+              Для написания отзыва нужна авторизация. <a href="/auth">Войти</a>
+            </div>
+          )}
+
+          {reviews.map((review) => (
+            <div className="review" key={review.id}>
               <div className="review-user-info">
                 <div className="review-user-icon"></div>
-                <p className="review-user">{review.user}</p>
+                <p className="review-user">{review.author}</p>
               </div>
               <p className="review-text">{review.text}</p>
             </div>
