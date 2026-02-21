@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: rai_db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-rai_db}
+      POSTGRES_USER: ${DB_USER:-rai_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-rai_pass}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-rai_user}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./rai_project
+      dockerfile: Dockerfile
+    container_name: rai_backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_NAME: ${DB_NAME:-rai_db}
+      DB_USER: ${DB_USER:-rai_user}
+      DB_PASSWORD: ${DB_PASSWORD:-rai_pass}
+      DB_HOST: db
+      DB_PORT: 5432
+      DEBUG: "True"
+    volumes:
+      - ./rai_project:/app
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: rai_frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  postgres_data:
