@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import './BuildingDetailsPage.css';
 import authService from '../../../services/authService';
+import { MapComponent } from '../../../components/MapComponent';
 
 interface Review {
   id: number;
@@ -16,7 +17,6 @@ interface BuildingDetails {
   metros: string[];
   description: string;
   image_url: string;
-  map_image_url: string;
   sign_language: boolean;
   subtitles: boolean;
   ramps: boolean;
@@ -37,16 +37,19 @@ export const BuildingDetailsPage: React.FC = () => {
   const [editAddress, setEditAddress] = useState('');
   const [editSchedule, setEditSchedule] = useState('');
   const [editMetros, setEditMetros] = useState('');
-  const [editMapImageUrl, setEditMapImageUrl] = useState('');
   const [editImageFile, setEditImageFile] = useState<File | null>(null);
   const [editSignLanguage, setEditSignLanguage] = useState(false);
   const [editSubtitles, setEditSubtitles] = useState(false);
   const [editRamps, setEditRamps] = useState(false);
   const [editBraille, setEditBraille] = useState(false);
+  const [editCoordinates, setEditCoordinates] = useState<[number, number] | null>(null);
+  const [editMapAddress, setEditMapAddress] = useState('');
   const [editError, setEditError] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
+  const [address, setAddress] = useState('');
   const isAuthenticated = authService.isAuthenticated();
   const [isModerator, setIsModerator] = useState(authService.isModerator());
   const username = authService.getUsername();
@@ -97,11 +100,13 @@ export const BuildingDetailsPage: React.FC = () => {
         setEditAddress(data.address || '');
         setEditSchedule(data.schedule || '');
         setEditMetros(Array.isArray(data.metros) ? data.metros.join(', ') : '');
-        setEditMapImageUrl(data.map_image_url || '');
         setEditSignLanguage(Boolean(data.sign_language));
         setEditSubtitles(Boolean(data.subtitles));
         setEditRamps(Boolean(data.ramps));
         setEditBraille(Boolean(data.braille));
+        if (data.latitude && data.longitude) {
+          setEditCoordinates([data.latitude, data.longitude]);
+        }
         setEditImageFile(null);
         setEditError('');
         setIsEditMode(false);
@@ -150,13 +155,16 @@ export const BuildingDetailsPage: React.FC = () => {
         formData.append('address', editAddress.trim());
         formData.append('schedule', editSchedule.trim());
         formData.append('metros', editMetros);
-        formData.append('mapImageUrl', editMapImageUrl.trim());
         formData.append('sign_language', String(editSignLanguage));
         formData.append('subtitles', String(editSubtitles));
         formData.append('ramps', String(editRamps));
         formData.append('braille', String(editBraille));
         if (editImageFile) {
           formData.append('image', editImageFile);
+        }
+        if (editCoordinates) {
+          formData.append('latitude', String(editCoordinates[0]));
+          formData.append('longitude', String(editCoordinates[1]));
         }
 
         const response = await authService.authFetch(`/api/objects/${building.id}`, {
@@ -217,6 +225,70 @@ export const BuildingDetailsPage: React.FC = () => {
     })();
   };
 
+  const fetchAddress = useCallback(async (coords: [number, number], forEditMode: boolean) => {
+    try {
+      const [lat, lon] = coords;
+      const response = await fetch(
+        `https://geocode-maps.yandex.ru/1.x/?apikey=47c62267-b242-42c9-9937-1505fa4e1b24&geocode=${lon},${lat}&format=json&lang=ru_RU`,
+      );
+
+      if (!response.ok) {
+        throw new Error('Ошибка получения адреса');
+      }
+
+      const data = (await response.json()) as {
+        response?: {
+          GeoObjectCollection?: {
+            featureMember?: Array<{
+              GeoObject?: {
+                name?: string;
+                description?: string;
+              };
+            }>;
+          };
+        };
+      };
+
+      const feature = data.response?.GeoObjectCollection?.featureMember?.[0]?.GeoObject;
+      const addressName = feature?.name;
+      const addressDescription = feature?.description;
+
+      if (addressName || addressDescription) {
+        const newAddress = [addressName, addressDescription].filter(Boolean).join(', ');
+        if (forEditMode) {
+          setEditMapAddress(newAddress);
+          setEditAddress(newAddress);
+        } else {
+          setAddress(newAddress);
+        }
+      } else {
+        if (forEditMode) {
+          setEditMapAddress('Адрес не найден');
+        } else {
+          setAddress('Адрес не найден');
+        }
+      }
+    } catch {
+      if (forEditMode) {
+        setEditMapAddress('');
+      } else {
+        setAddress('');
+      }
+    }
+  }, []);
+
+  const handleMapClick = useCallback((coords: [number, number]) => {
+    if (isEditMode) {
+      setEditCoordinates(coords);
+      setEditMapAddress('');
+      void fetchAddress(coords, true);
+    } else {
+      setCoordinates(coords);
+      setAddress('');
+      void fetchAddress(coords, false);
+    }
+  }, [isEditMode, fetchAddress]);
+
   if (isLoading) {
     return <div className="details-page"><main className="details-main">Загрузка...</main></div>;
   }
@@ -260,10 +332,9 @@ export const BuildingDetailsPage: React.FC = () => {
             {editError && <div className="details-edit-error">{editError}</div>}
             <input placeholder="Название*" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required />
             <input placeholder="Тип (театр, кинотеатр...)" value={editInfrastructureType} onChange={(e) => setEditInfrastructureType(e.target.value)} />
-            <input placeholder="Адрес*" value={editAddress} onChange={(e) => setEditAddress(e.target.value)} required />
+           
             <input placeholder="Расписание" value={editSchedule} onChange={(e) => setEditSchedule(e.target.value)} />
             <input placeholder="Метро через запятую" value={editMetros} onChange={(e) => setEditMetros(e.target.value)} />
-            <input placeholder="URL карты" value={editMapImageUrl} onChange={(e) => setEditMapImageUrl(e.target.value)} />
             <textarea placeholder="Описание" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} rows={4} />
             <input type="file" accept="image/*" onChange={(e) => setEditImageFile(e.target.files?.[0] || null)} />
             <div className="details-edit-checklist">
@@ -292,8 +363,34 @@ export const BuildingDetailsPage: React.FC = () => {
               ))}
             </ul>
           </div>
-          <div className='info-right-map'>
-            <img src={building.map_image_url} alt="Map" className="map-image" />
+          <div className="info-right-map">
+            <div className="building-map-container">
+              <MapComponent
+                onMapClick={handleMapClick}
+                selectedFeature={editCoordinates ? { geometry: { coordinates: editCoordinates } } : null}
+              />
+              {isEditMode ? (
+                editCoordinates && (
+                  <div className="building-map-coordinates">
+                    <strong>Координаты:</strong> {editCoordinates[0].toFixed(6)}, {editCoordinates[1].toFixed(6)}
+                    {editMapAddress && (
+                      <div className="building-map-address">
+                        <strong>Адрес:</strong> {editMapAddress}
+                      </div>
+                    )}
+                  </div>
+                )
+              ) : coordinates && (
+                <div className="building-map-coordinates">
+                  <strong>Координаты:</strong> {coordinates[0].toFixed(6)}, {coordinates[1].toFixed(6)}
+                  {address && (
+                    <div className="building-map-address">
+                      <strong>Адрес:</strong> {address}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
