@@ -17,6 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+
+def _superuser_admin_only(request):
+    return request.user.is_active and request.user.is_superuser
+
+
+admin.site.has_permission = _superuser_admin_only
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
