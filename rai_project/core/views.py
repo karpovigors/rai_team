@@ -1,10 +1,11 @@
 import json
 from django.http import JsonResponse, HttpResponse
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.db import IntegrityError
 
-from .models import PlaceObject
+from .models import PlaceObject, PlaceReview
 
 
 @csrf_exempt
@@ -25,6 +26,10 @@ def objects_api(request):
                 "description",
                 "infrastructure_type",
                 "address",          # ← запятая
+                "schedule",
+                "metros",
+                "image_url",
+                "map_image_url",
                 "lat",
                 "lng",
                 "sign_language",
@@ -54,6 +59,10 @@ def objects_api(request):
             description=data.get("description", ""),
             infrastructure_type=data.get("infrastructureType", ""),
             address=data.get("address", ""),
+            schedule=data.get("schedule", ""),
+            metros=data.get("metros", []),
+            image_url=data.get("imageUrl", ""),
+            map_image_url=data.get("mapImageUrl", ""),
             lat=coords.get("latitude"),
             lng=coords.get("longitude"),
             sign_language=bool(checklist.get("signLanguage")),
@@ -85,4 +94,63 @@ def ping(request):
             "status": "ok",
             "service": "backend",
         }
+    )
+
+
+@require_http_methods(["GET"])
+def object_detail(request, object_id):
+    obj = get_object_or_404(PlaceObject, id=object_id)
+    reviews = [
+        {
+            "id": review.id,
+            "author": review.author_name,
+            "text": review.text,
+            "created_at": review.created_at,
+        }
+        for review in obj.reviews.all()
+    ]
+    return JsonResponse(
+        {
+            "id": obj.id,
+            "title": obj.title,
+            "description": obj.description,
+            "infrastructure_type": obj.infrastructure_type,
+            "address": obj.address,
+            "schedule": obj.schedule,
+            "metros": obj.metros,
+            "image_url": obj.image_url,
+            "map_image_url": obj.map_image_url,
+            "sign_language": obj.sign_language,
+            "subtitles": obj.subtitles,
+            "ramps": obj.ramps,
+            "braille": obj.braille,
+            "reviews": reviews,
+        }
+    )
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def object_reviews(request, object_id):
+    obj = get_object_or_404(PlaceObject, id=object_id)
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except Exception:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    author = str(data.get("author", "")).strip()
+    text = str(data.get("text", "")).strip()
+
+    if not author or not text:
+        return JsonResponse({"error": "Author and text are required"}, status=400)
+
+    review = PlaceReview.objects.create(place=obj, author_name=author, text=text)
+    return JsonResponse(
+        {
+            "id": review.id,
+            "author": review.author_name,
+            "text": review.text,
+            "created_at": review.created_at,
+        },
+        status=201,
     )

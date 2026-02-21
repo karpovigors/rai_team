@@ -129,6 +129,47 @@
   border-radius: 8px;
 }
 
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.review-textarea {
+  width: 100%;
+  border: 1px solid var(--details-border);
+  border-radius: 8px;
+  background-color: var(--details-card-bg);
+  color: var(--details-text);
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.review-textarea::placeholder {
+  color: var(--details-muted-text);
+}
+
+.review-submit-button {
+  align-self: flex-start;
+  border: 1px solid var(--details-border);
+  background-color: var(--details-card-bg);
+  color: var(--details-text);
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+}
+
+.review-auth-required {
+  margin-bottom: 16px;
+  color: var(--details-muted-text);
+}
+
+.review-auth-required a {
+  color: var(--details-text);
+  text-decoration: underline;
+}
+
 .review {
   display: flex;
   flex-direction: column;
