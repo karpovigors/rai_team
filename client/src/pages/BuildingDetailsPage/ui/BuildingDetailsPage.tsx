@@ -6,6 +6,7 @@ interface Review {
   id: number;
   author: string;
   text: string;
+  rating?: number;
 }
 
 interface BuildingDetails {
@@ -21,6 +22,8 @@ interface BuildingDetails {
   subtitles: boolean;
   ramps: boolean;
   braille: boolean;
+  rating_avg?: number;
+  rating_count?: number;
   reviews: Review[];
 }
 
@@ -31,6 +34,7 @@ export const BuildingDetailsPage: React.FC = () => {
   const [building, setBuilding] = useState<BuildingDetails | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReviewText, setNewReviewText] = useState('');
+  const [newReviewRating, setNewReviewRating] = useState(5);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editInfrastructureType, setEditInfrastructureType] = useState('');
@@ -228,7 +232,7 @@ export const BuildingDetailsPage: React.FC = () => {
     void (async () => {
       e.preventDefault();
       const text = newReviewText.trim();
-      if (!text || !isAuthenticated || !building) {
+      if (!text || !isAuthenticated || !building || newReviewRating < 1 || newReviewRating > 5) {
         return;
       }
 
@@ -240,6 +244,7 @@ export const BuildingDetailsPage: React.FC = () => {
           },
           body: JSON.stringify({
             text,
+            rating: newReviewRating,
           }),
         });
 
@@ -248,8 +253,9 @@ export const BuildingDetailsPage: React.FC = () => {
         }
 
         const createdReview = await response.json();
-        setReviews((prev) => [createdReview, ...prev]);
+        setReviews((prev) => [{ ...createdReview, rating: createdReview.rating ?? newReviewRating }, ...prev]);
         setNewReviewText('');
+        setNewReviewRating(5);
       } catch {
         // Keep silent here to avoid breaking UX with alerts
       }
@@ -270,6 +276,15 @@ export const BuildingDetailsPage: React.FC = () => {
     building.ramps ? 'Наличие пандусов' : null,
     building.braille ? 'Шрифт Брайля / сопровождение для слепых' : null,
   ].filter(Boolean) as string[];
+
+  const normalizedRatings = reviews
+    .map((review) => Number(review.rating))
+    .filter((rating) => Number.isFinite(rating) && rating >= 1 && rating <= 5);
+  const ratingCount = normalizedRatings.length;
+  const averageRating = ratingCount
+    ? Number((normalizedRatings.reduce((sum, rating) => sum + rating, 0) / ratingCount).toFixed(1))
+    : Number(building.rating_avg || 0);
+  const totalRatingCount = building.rating_count ?? ratingCount;
 
   return (
     <div className="details-page">
@@ -292,6 +307,14 @@ export const BuildingDetailsPage: React.FC = () => {
       <main className="details-main">
         <div className="building-title">
           <h2>{building.title}</h2>
+          <div className="building-rating-summary">
+            <span className="building-rating-stars">
+              {'★'.repeat(Math.round(averageRating))}
+              {'☆'.repeat(Math.max(0, 5 - Math.round(averageRating)))}
+            </span>
+            <span className="building-rating-value">{averageRating.toFixed(1)} / 5</span>
+            <span className="building-rating-count">({totalRatingCount} оценок)</span>
+          </div>
           {isModerator && (
             <button type="button" className="details-edit-button" onClick={() => setIsEditMode((prev) => !prev)}>
               {isEditMode ? 'Скрыть редактирование' : 'Редактировать объект'}
@@ -355,6 +378,21 @@ export const BuildingDetailsPage: React.FC = () => {
         <div className="reviews-section">
           {isAuthenticated ? (
             <form className="review-form" onSubmit={handleSubmitReview}>
+              <div className="review-rating-picker" role="group" aria-label="Оценка">
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    className={`rating-star-button ${value <= newReviewRating ? 'active' : ''}`}
+                    onClick={() => setNewReviewRating(value)}
+                    aria-label={`Оценка ${value} из 5`}
+                    title={`${value} из 5`}
+                  >
+                    ★
+                  </button>
+                ))}
+                <span className="review-rating-value">{newReviewRating}/5</span>
+              </div>
               <textarea
                 className="review-textarea"
                 placeholder="Напишите отзыв"
@@ -377,6 +415,10 @@ export const BuildingDetailsPage: React.FC = () => {
                 <div className="review-user-icon"></div>
                 <p className="review-user">{review.author}</p>
               </div>
+              <p className="review-rating">
+                {'★'.repeat(Math.max(0, Math.min(5, Number(review.rating) || 0)))}
+                {'☆'.repeat(Math.max(0, 5 - Math.max(0, Math.min(5, Number(review.rating) || 0))))}
+              </p>
               <p className="review-text">{review.text}</p>
             </div>
           ))}
