@@ -46,7 +46,7 @@ function MapComponent({
 
   return (
     <div className="map-component">
-      <YMaps query={{ apikey: '47c62267-b242-42c9-9937-1505fa4e1b24', lang: 'ru_RU' }}>
+      <YMaps query={{ apikey: '7bb401a3-59b4-4be6-bc2a-602c71197f26', lang: 'ru_RU' }}>
         <Map
           defaultState={{ center: [55.751244, 37.618423], zoom: 14 }}
           width="100%"
