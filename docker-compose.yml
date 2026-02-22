@@ -27,6 +27,8 @@ services:
         condition: service_healthy
       s3:
         condition: service_healthy
+      s3-init:
+        condition: service_completed_successfully
     environment:
       DB_NAME: ${DB_NAME:-rai_db}
       DB_USER: ${DB_USER:-rai_user}
@@ -44,6 +46,7 @@ services:
       S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
       S3_BUCKET_NAME: ${S3_BUCKET_NAME:-rai-images}
       S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-http://s3:9000}
+      YANDEX_GEOCODER_API_KEY: ${VITE_YANDEX_GEOCODER_API_KEY:-}
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:admin@example.com}
@@ -98,6 +101,24 @@ services:
       timeout: 5s
       retries: 2
     restart: unless-stopped
+
+  s3-init:
+    image: minio/mc:latest
+    container_name: rai_s3_init
+    depends_on:
+      s3:
+        condition: service_healthy
+    environment:
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-rai-images}
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://s3:9000 $$S3_ACCESS_KEY $$S3_SECRET_KEY &&
+      mc mb --ignore-existing local/$$S3_BUCKET_NAME &&
+      (mc anonymous set download local/$$S3_BUCKET_NAME || true)
+      "
+    restart: "no"
 
 volumes:
   postgres_data:
