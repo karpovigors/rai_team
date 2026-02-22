@@ -1,7 +1,9 @@
 import React from 'react';
 import '../../AuthPage/ui/AuthPage.css';
-import { useProfileForm } from '../model/hooks/useProfileForm';
+import './ProfilePage.css';
+import { useProfileEditor } from '../model/hooks/useProfileEditor';
 import { ProfileForm } from './sections/ProfileForm';
+import { ProfileAvatarEditor } from './sections/ProfileAvatarEditor';
 
 export const ProfilePage: React.FC = () => {
   const {
@@ -12,12 +14,28 @@ export const ProfilePage: React.FC = () => {
     error,
     success,
     isSaving,
+    isDragOver,
+    displayAvatar,
+    sourceImage,
+    crop,
+    imageDisplaySize,
+    fileInputRef,
+    imageRef,
     setUsername,
     setEmail,
     setPassword,
     setConfirmPassword,
+    setIsDragOver,
+    handleImageFile,
+    handleImageLoad,
+    handleCropStart,
+    handleDrop,
+    handleClearNewImage,
+    handleRemoveAvatar,
+    handleEditCurrentAvatar,
+    handleCropSizeChange,
     handleSubmit,
-  } = useProfileForm();
+  } = useProfileEditor();
 
   return (
     <div className="auth-page">
@@ -30,13 +48,36 @@ export const ProfilePage: React.FC = () => {
       </header>
       <main className="auth-main">
         <h2>Профиль</h2>
+        {error && <div className="auth-error">{error}</div>}
+        {success && <div className="auth-success">{success}</div>}
+
+        <ProfileAvatarEditor
+          username={username}
+          displayAvatar={displayAvatar}
+          sourceImage={sourceImage}
+          crop={crop}
+          imageDisplaySize={imageDisplaySize}
+          isDragOver={isDragOver}
+          fileInputRef={fileInputRef}
+          imageRef={imageRef}
+          onDragOverChange={setIsDragOver}
+          onImageFile={handleImageFile}
+          onImageLoad={handleImageLoad}
+          onCropStart={handleCropStart}
+          onDrop={handleDrop}
+          onClearNewImage={handleClearNewImage}
+          onRemoveAvatar={handleRemoveAvatar}
+          onEditCurrentAvatar={handleEditCurrentAvatar}
+          onCropSizeChange={handleCropSizeChange}
+        />
+
         <ProfileForm
           username={username}
           email={email}
           password={password}
           confirmPassword={confirmPassword}
-          error={error}
-          success={success}
+          error=""
+          success=""
           isSaving={isSaving}
           onUsernameChange={setUsername}
           onEmailChange={setEmail}

@@ -47,7 +47,8 @@ services:
     volumes:
       - ./rai_project:/app
     command: >
-      sh -c "python manage.py migrate &&
+      sh -c "python manage.py makemigrations --check --dry-run &&
+             python manage.py migrate &&
              python manage.py bootstrap_users &&
              python manage.py seed_mock_data &&
              python manage.py runserver 0.0.0.0:8000"
@@ -66,7 +67,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "8080:80"
+      - "80:80"
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health"]
       interval: 10s

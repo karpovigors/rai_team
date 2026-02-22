@@ -34,6 +34,7 @@ export const BuildingsPage: React.FC = () => {
   const [addBraille, setAddBraille] = useState(false);
   const [addError, setAddError] = useState('');
   const [isSubmittingAdd, setIsSubmittingAdd] = useState(false);
+  const [profileAvatarUrl] = useState(authService.getAvatarUrl() || '');
   const isAuthenticated = authService.isAuthenticated();
   const isModerator = authService.isModerator();
   const username = authService.getUsername();
@@ -111,6 +112,7 @@ export const BuildingsPage: React.FC = () => {
       <AppHeader
         onOpenMap={() => navigate('/map-admin')}
         onOpenProfile={() => setIsProfileModalOpen(true)}
+        profileAvatarUrl={profileAvatarUrl}
       />
       <main className="buildings-main">
         <BuildingsFilters
