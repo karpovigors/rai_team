@@ -83,6 +83,8 @@ function MapSearchPage() {
         ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;" />`
         : ''
 
+      const yandexRouteUrl = `https://yandex.ru/maps/?rtext=~${coords[0]},${coords[1]}&rtt=auto`
+
       const balloonCard = `
         <a href="/building/${object.id}" style="display:block;color:inherit;text-decoration:none;max-width:260px;">
           <div class="building-card" style="overflow:hidden;border:1px solid #e5e7eb;border-radius:10px;background:#fff;padding:8px;">
@@ -91,6 +93,11 @@ function MapSearchPage() {
             <p style="margin:0;color:#4b5563;font-size:13px;line-height:1.35;">${escapeHtml(description)}</p>
           </div>
         </a>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">
+          <a href="${yandexRouteUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-block;color:#007bff;text-decoration:none;font-size:13px;">
+            🧭 Добраться на Яндекс Картах
+          </a>
+        </div>
       `
 
       acc.push({
