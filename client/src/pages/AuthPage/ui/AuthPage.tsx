@@ -18,6 +18,7 @@ export const AuthPage: React.FC = () => {
       authService.setTokens(response.access, response.refresh);
       authService.setUsername(response.user.username);
       authService.setEmail(response.user.email || '');
+      authService.setAvatarUrl(response.user.avatar_url || '');
       authService.setIsModerator(response.user.is_moderator);
       navigate('/');
     } catch (err: unknown) {

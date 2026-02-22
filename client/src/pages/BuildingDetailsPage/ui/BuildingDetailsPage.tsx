@@ -42,9 +42,10 @@ export const BuildingDetailsPage: React.FC = () => {
   const [address, setAddress] = useState('');
   const isAuthenticated = authService.isAuthenticated();
   const [isModerator, setIsModerator] = useState(authService.isModerator());
+  const [profileAvatarUrl, setProfileAvatarUrl] = useState(authService.getAvatarUrl() || '');
   const username = authService.getUsername();
 
-  useSyncModeratorRole({ isAuthenticated, setIsModerator });
+  useSyncModeratorRole({ isAuthenticated, setIsModerator, setProfileAvatarUrl });
 
   useEffect(() => {
     if (!building) {
@@ -134,6 +135,7 @@ export const BuildingDetailsPage: React.FC = () => {
       <AppHeader
         onOpenMap={() => navigate('/map-admin')}
         onOpenProfile={() => setIsProfileModalOpen(true)}
+        profileAvatarUrl={profileAvatarUrl}
       />
       <main className="details-main">
         <BuildingDetailsContent
