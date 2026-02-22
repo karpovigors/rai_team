@@ -8,6 +8,8 @@ export interface CreateBuildingPayload {
   address: string;
   metros: string;
   description: string;
+  upcomingEvent: string;
+  discountInfo: string;
   signLanguage: boolean;
   subtitles: boolean;
   ramps: boolean;
@@ -25,6 +27,8 @@ export const createBuilding = async (payload: CreateBuildingPayload): Promise<Bu
   formData.append('address', payload.address.trim());
   formData.append('metros', payload.metros);
   formData.append('description', payload.description.trim());
+  formData.append('upcoming_event', payload.upcomingEvent.trim());
+  formData.append('discount_info', payload.discountInfo.trim());
   formData.append('sign_language', String(payload.signLanguage));
   formData.append('subtitles', String(payload.subtitles));
   formData.append('ramps', String(payload.ramps));
