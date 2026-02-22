@@ -126,7 +126,7 @@ export const BuildingsPage: React.FC = () => {
   return (
     <div className="buildings-page">
       <AppHeader
-        onOpenMap={() => navigate('/map-admin')}
+        onOpenMap={() => navigate('/map_search')}
         onOpenProfile={() => setIsProfileModalOpen(true)}
         profileAvatarUrl={profileAvatarUrl}
       />
