@@ -30,7 +30,7 @@ interface UseProfileEditorResult {
   setIsDragOver: (value: boolean) => void;
   handleImageFile: (file: File | null) => void;
   handleImageLoad: () => void;
-  handleCropStart: (e: React.MouseEvent<HTMLDivElement>) => void;
+  handleCropStart: (e: React.PointerEvent<HTMLDivElement>) => void;
   handleDrop: (e: React.DragEvent<HTMLDivElement>) => void;
   handleClearNewImage: () => void;
   handleRemoveAvatar: () => void;
@@ -167,8 +167,9 @@ export const useProfileEditor = (): UseProfileEditorResult => {
     setCrop(clampCrop(initialCrop));
   }, [clampCrop]);
 
-  const handleCropStart = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+  const handleCropStart = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.currentTarget.setPointerCapture?.(e.pointerId);
     setDragOffset({
       x: e.clientX - crop.x,
       y: e.clientY - crop.y,
@@ -179,7 +180,7 @@ export const useProfileEditor = (): UseProfileEditorResult => {
     if (!dragOffset) {
       return;
     }
-    const onMove = (e: MouseEvent) => {
+    const onMove = (e: PointerEvent) => {
       setCrop((prev) => {
         const next = {
           ...prev,
@@ -190,11 +191,13 @@ export const useProfileEditor = (): UseProfileEditorResult => {
       });
     };
     const onUp = () => setDragOffset(null);
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
     return () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
     };
   }, [clampCrop, dragOffset]);
 
