@@ -24,6 +24,9 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
   onMapClick,
 }) => {
   const selectedCoordinates = isEditMode ? editCoordinates : coordinates;
+  const yandexRouteUrl = selectedCoordinates
+    ? `https://yandex.ru/maps/?rtext=~${selectedCoordinates[0]},${selectedCoordinates[1]}&rtt=auto`
+    : null;
 
   return (
     <div className="info-grid">
@@ -48,6 +51,18 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
         <MapComponent
           onMapClick={onMapClick}
           selectedFeature={selectedCoordinates ? { geometry: { coordinates: selectedCoordinates } } : null}
+          placemarkPreset={isEditMode ? 'islands#blueCircleIcon' : 'islands#blueStretchyIcon'}
+          placemarkDraggable={isEditMode}
+          selectedPlacemarkProperties={
+            !isEditMode && yandexRouteUrl
+              ? {
+                  hintContent: 'Добраться',
+                  iconCaption: 'Добраться',
+                  balloonContent: `<a href="${yandexRouteUrl}" target="_blank" rel="noopener noreferrer">Добраться в Яндекс Картах</a>`,
+                }
+              : undefined
+          }
+          autoOpenSelectedBalloon={!isEditMode}
         />
         {isEditMode ? (
           editCoordinates && (
