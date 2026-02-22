@@ -90,7 +90,7 @@ function MapSearchPage() {
         <a href="/building/${object.id}" style="display:block;color:inherit;text-decoration:none;max-width:260px;">
           <div class="building-card" style="overflow:hidden;border:1px solid #e5e7eb;border-radius:10px;background:#fff;padding:8px;">
             ${photo}
-            <h3 style="margin:0 0 6px;font-size:16px;">${escapeHtml(title)}</h3>
+            <h3 style="margin:0 0 6px;font-size:16px;color:#111827;line-height:1.25;">${escapeHtml(title)}</h3>
             <p style="margin:0;color:#4b5563;font-size:13px;line-height:1.35;">${escapeHtml(description)}</p>
           </div>
         </a>
