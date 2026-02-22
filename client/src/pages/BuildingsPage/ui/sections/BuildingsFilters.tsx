@@ -6,7 +6,6 @@ interface BuildingsFiltersProps {
   infrastructureTypes: string[];
   isModerator: boolean;
   isAddFormOpen: boolean;
-  onOpenLearning: () => void;
   onSearchQueryChange: (value: string) => void;
   onInfrastructureTypeChange: (value: string) => void;
   onToggleAddForm: () => void;
@@ -18,7 +17,6 @@ export const BuildingsFilters: React.FC<BuildingsFiltersProps> = ({
   infrastructureTypes,
   isModerator,
   isAddFormOpen,
-  onOpenLearning,
   onSearchQueryChange,
   onInfrastructureTypeChange,
   onToggleAddForm,
@@ -51,9 +49,6 @@ export const BuildingsFilters: React.FC<BuildingsFiltersProps> = ({
           {type}
         </button>
       ))}
-      <button type="button" onClick={onOpenLearning}>
-        Обучение и советы
-      </button>
       {isModerator && (
         <button type="button" onClick={onToggleAddForm}>
           {isAddFormOpen ? 'Скрыть форму' : 'Добавить объект'}

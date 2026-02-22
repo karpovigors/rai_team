@@ -145,6 +145,7 @@ export const BuildingsPage: React.FC = () => {
     <div className="buildings-page">
       <AppHeader
         onOpenMap={() => navigate('/map_search')}
+        onOpenLearning={() => navigate('/learning')}
         onOpenProfile={() => setIsProfileModalOpen(true)}
         profileAvatarUrl={profileAvatarUrl}
       />
@@ -155,7 +156,6 @@ export const BuildingsPage: React.FC = () => {
           infrastructureTypes={infrastructureTypes}
           isModerator={isModerator}
           isAddFormOpen={isAddFormOpen}
-          onOpenLearning={() => navigate('/learning')}
           onSearchQueryChange={setSearchQuery}
           onInfrastructureTypeChange={setSelectedInfrastructureType}
           onToggleAddForm={handleToggleAddForm}

@@ -2,11 +2,12 @@ import React from 'react';
 
 interface AppHeaderProps {
   onOpenMap?: () => void;
+  onOpenLearning?: () => void;
   onOpenProfile: () => void;
   profileAvatarUrl?: string | null;
 }
 
-export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenMap, onOpenProfile, profileAvatarUrl }) => {
+export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenMap, onOpenLearning, onOpenProfile, profileAvatarUrl }) => {
   const [hasUnreadNotifications, setHasUnreadNotifications] = React.useState(
     localStorage.getItem('hasUnreadNotifications') === 'true',
   );
@@ -64,6 +65,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenMap, onOpenProfile, 
       </h1>
       <div className="details-header-right">
         <button type="button" className="details-map-button" onClick={onOpenMap}>Карта</button>
+        {onOpenLearning && (
+          <button type="button" className="details-map-button" onClick={onOpenLearning}>
+            Обучение и советы
+          </button>
+        )}
         <div className="details-profile-wrapper">
           <button
             type="button"
