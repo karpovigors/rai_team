@@ -13,6 +13,8 @@ import { useBuildingMutationActions } from '../model/hooks/useBuildingMutationAc
 import { useBuildingMapActions } from '../model/hooks/useBuildingMapActions';
 import { DetailsPageState } from './layout/DetailsPageState';
 import { BuildingDetailsContent } from './sections/BuildingDetailsContent';
+import { AccessibilityPanel } from '../../../components/AccessibilityPanel/AccessibilityPanel';
+import type { AccessibilitySettings } from '../../../hooks/useAccessibility';
 
 export const BuildingDetailsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -47,6 +49,11 @@ export const BuildingDetailsPage: React.FC = () => {
   const [isModerator, setIsModerator] = useState(authService.isModerator());
   const [profileAvatarUrl, setProfileAvatarUrl] = useState(authService.getAvatarUrl() || '');
   const username = authService.getUsername();
+  const [accessibilitySettings, setAccessibilitySettings] = useState<AccessibilitySettings>({
+    largeFont: false,
+    highContrast: false,
+    screenReader: false,
+  });
 
   useSyncModeratorRole({ isAuthenticated, setIsModerator, setProfileAvatarUrl });
 
@@ -159,6 +166,7 @@ export const BuildingDetailsPage: React.FC = () => {
   });
   const { handleMapClick } = useBuildingMapActions({
     isEditMode,
+    isModerator,
     setEditCoordinates,
     setEditMapAddress,
     setEditAddress,
@@ -251,6 +259,11 @@ export const BuildingDetailsPage: React.FC = () => {
         onLogin={handleLoginClick}
         onProfile={handleProfileClick}
         onLogout={handleLogoutClick}
+      />
+
+      <AccessibilityPanel
+        settings={accessibilitySettings}
+        onSettingsChange={setAccessibilitySettings}
       />
     </div>
   );
