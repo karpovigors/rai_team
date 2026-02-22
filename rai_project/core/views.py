@@ -492,6 +492,28 @@ def object_reviews(request, object_id):
     )
 
 
+@api_view(["DELETE"])
+@permission_classes([AllowAny])
+def object_review_detail(request, object_id, review_id):
+    if not request.user.is_authenticated:
+        return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    obj = get_object_or_404(PlaceObject, id=object_id)
+    review = get_object_or_404(PlaceReview, id=review_id, place=obj)
+
+    is_moderator = _is_moderator(request.user)
+    is_author = (review.author_name or "").strip() == (request.user.username or "").strip()
+
+    if not is_moderator and not is_author:
+        return Response(
+            {"error": "You can delete only your own review"},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    review.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 @api_view(["GET", "POST", "DELETE"])
 @permission_classes([IsAuthenticated])
 def push_subscriptions_api(request):
