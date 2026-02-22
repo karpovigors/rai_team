@@ -3,6 +3,7 @@ import authService from '../../../services/authService';
 import type { BuildingDetails, Review } from '../model/types';
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+const YANDEX_GEOCODER_API_KEY = import.meta.env.VITE_YANDEX_GEOCODER_API_KEY || '';
 const buildApiUrl = (path: string): string => `${API_BASE_URL}${path}`;
 
 export interface UpdateBuildingPayload {
@@ -98,7 +99,7 @@ export const reverseGeocodeCoordinates = async (
 ): Promise<string | null> => {
   const [lat, lon] = coords;
   const response = await fetch(
-    `https://geocode-maps.yandex.ru/1.x/?apikey=47c62267-b242-42c9-9937-1505fa4e1b24&geocode=${lon},${lat}&format=json&lang=ru_RU`,
+    `https://geocode-maps.yandex.ru/1.x/?apikey=${YANDEX_GEOCODER_API_KEY}&geocode=${lon},${lat}&format=json&lang=ru_RU`,
   );
 
   if (!response.ok) {
@@ -112,6 +113,9 @@ export const reverseGeocodeCoordinates = async (
           GeoObject?: {
             name?: string;
             description?: string;
+            Point?: {
+              pos?: string;
+            };
           };
         }>;
       };
@@ -127,4 +131,50 @@ export const reverseGeocodeCoordinates = async (
   }
 
   return [addressName, addressDescription].filter(Boolean).join(', ');
+};
+
+export const geocodeAddressToCoordinates = async (
+  address: string,
+): Promise<[number, number] | null> => {
+  const trimmedAddress = address.trim();
+  if (!trimmedAddress) {
+    return null;
+  }
+
+  const response = await fetch(
+    `https://geocode-maps.yandex.ru/1.x/?apikey=${YANDEX_GEOCODER_API_KEY}&geocode=${encodeURIComponent(trimmedAddress)}&format=json&lang=ru_RU`,
+  );
+
+  if (!response.ok) {
+    throw new Error('Ошибка геокодирования адреса');
+  }
+
+  const data = (await response.json()) as {
+    response?: {
+      GeoObjectCollection?: {
+        featureMember?: Array<{
+          GeoObject?: {
+            Point?: {
+              pos?: string;
+            };
+          };
+        }>;
+      };
+    };
+  };
+
+  const pos = data.response?.GeoObjectCollection?.featureMember?.[0]?.GeoObject?.Point?.pos;
+  if (!pos) {
+    return null;
+  }
+
+  const [lonRaw, latRaw] = pos.split(' ');
+  const lon = Number(lonRaw);
+  const lat = Number(latRaw);
+
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    return null;
+  }
+
+  return [lat, lon];
 };

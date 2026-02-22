@@ -63,6 +63,8 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+      args:
+        VITE_YANDEX_GEOCODER_API_KEY: ${VITE_YANDEX_GEOCODER_API_KEY}
     container_name: rai_frontend
     depends_on:
       - backend

@@ -22,8 +22,11 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
   coordinates,
   address,
   onMapClick,
-}) => (
-  <div className="info-grid">
+}) => {
+  const selectedCoordinates = isEditMode ? editCoordinates : coordinates;
+
+  return (
+    <div className="info-grid">
     <div className="info-left">
       <ul>
         <li>{building.schedule}</li>
@@ -44,7 +47,7 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
       <div className="building-map-container">
         <MapComponent
           onMapClick={onMapClick}
-          selectedFeature={editCoordinates ? { geometry: { coordinates: editCoordinates } } : null}
+          selectedFeature={selectedCoordinates ? { geometry: { coordinates: selectedCoordinates } } : null}
         />
         {isEditMode ? (
           editCoordinates && (
@@ -70,5 +73,5 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
       </div>
     </div>
   </div>
-);
-
+  );
+};
