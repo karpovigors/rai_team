@@ -259,6 +259,17 @@ rai_team/
 - `VITE_YANDEX_GEOCODER_API_KEY`
 - `VITE_YANDEX_MAPS_API_KEY`
 
+### Документация
+
+Backend-часть проекта содержит документацию в формате Doxygen. Чтобы сгенерировать документацию, выполните:
+
+```bash
+cd backend
+doxygen Doxyfile
+```
+
+Документация будет доступна в папке `backend/docs/html`.
+
 ## Устранение неполадок
 
 ### Распространенные проблемы

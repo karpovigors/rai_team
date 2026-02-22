@@ -19,7 +19,9 @@ User = get_user_model()
 @permission_classes([AllowAny])
 def register(request):
     """
-    Register a new user
+    @brief Регистрация нового пользователя
+    @param request Запрос с данными пользователя
+    @return Response Объект ответа с JWT токенами и данными пользователя
     """
     serializer = UserSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
@@ -37,7 +39,9 @@ def register(request):
 @permission_classes([AllowAny])
 def login(request):
     """
-    Authenticate user and return JWT tokens
+    @brief Аутентификация пользователя и возврат JWT токенов
+    @param request Запрос с логином и паролем пользователя
+    @return Response Объект ответа с JWT токенами и данными пользователя
     """
     username = request.data.get('username')
     password = request.data.get('password')
@@ -60,12 +64,22 @@ def login(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def me(request):
+    """
+    @brief Получение информации о текущем пользователе
+    @param request Запрос с аутентификацией
+    @return Response Объект ответа с данными пользователя
+    """
     return Response({'user': UserSerializer(request.user, context={'request': request}).data})
 
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_me(request):
+    """
+    @brief Обновление информации о текущем пользователе
+    @param request Запрос с обновленными данными пользователя
+    @return Response Объект ответа с обновленными данными пользователя
+    """
     user = request.user
     username = request.data.get('username')
     email = request.data.get('email')
@@ -113,6 +127,12 @@ def update_me(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def avatar_media(request, user_id):
+    """
+    @brief Получение аватара пользователя по ID
+    @param request Запрос без аутентификации
+    @param user_id ID пользователя
+    @return FileResponse Файл аватара пользователя
+    """
     user = get_object_or_404(User, id=user_id)
     if not user.avatar:
         return Response({'error': 'Avatar not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -125,6 +145,11 @@ def avatar_media(request, user_id):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def refresh(request):
+    """
+    @brief Обновление JWT токена
+    @param request Запрос с refresh токеном
+    @return Response Объект ответа с новыми access и refresh токенами
+    """
     token = request.data.get('refresh')
     if not token:
         return Response({'error': 'Refresh token required'}, status=status.HTTP_400_BAD_REQUEST)

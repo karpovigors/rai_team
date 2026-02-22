@@ -19,12 +19,18 @@ from django.conf import settings
 from django.urls import path, include
 from django.views.static import serve
 
-
 def _superuser_admin_only(request):
+    """
+    @brief Функция проверки прав доступа к админке
+    Ограничивает доступ к административной панели только суперпользователям
+    @param request HTTP-запрос
+    @return bool True, если пользователь активен и является суперпользователем
+    """
     return request.user.is_active and request.user.is_superuser
 
 
 admin.site.has_permission = _superuser_admin_only
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),

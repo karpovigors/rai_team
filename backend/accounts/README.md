@@ -7,6 +7,9 @@ This Django app provides JWT-based authentication for the RAI platform.
 - User registration
 - User login with JWT tokens
 - Custom user model with username as the primary identifier
+- Profile management (username, email, password)
+- Avatar upload and management
+- Moderator role management
 
 ## API Endpoints
 
@@ -53,6 +56,17 @@ This Django app provides JWT-based authentication for the RAI platform.
     }
   }
   ```
+
+## Documentation
+
+This module includes Doxygen-style documentation for all public classes, methods, and functions. To generate the documentation, run:
+
+```bash
+cd backend
+doxygen Doxyfile
+```
+
+Documentation will be generated in the `docs/html` directory.
 
 ## Testing
 

@@ -18,6 +18,11 @@ from .models import PlaceObject, PlaceReview, PushSubscription
 
 
 def _parse_bool(value):
+    """
+    @brief Преобразование значения в булевый тип
+    @param value Значение для преобразования
+    @return bool Преобразованное булевое значение
+    """
     if isinstance(value, bool):
         return value
     if isinstance(value, (int, float)):
@@ -28,6 +33,11 @@ def _parse_bool(value):
 
 
 def _parse_metros(value):
+    """
+    @brief Парсинг списка станций метро из строки или списка
+    @param value Входное значение (строка или список)
+    @return list Список станций метро
+    """
     if isinstance(value, list):
         return [str(item).strip() for item in value if str(item).strip()]
     if isinstance(value, str):
@@ -46,6 +56,12 @@ def _parse_metros(value):
 
 
 def _build_image_url(request, obj):
+    """
+    @brief Построение URL изображения для объекта
+    @param request HTTP-запрос
+    @param obj Объект места
+    @return str URL изображения
+    """
     if obj.image:
         image_key = quote(obj.image.name, safe="")
         return f"/objects/{obj.id}/image?key={image_key}"
@@ -53,10 +69,20 @@ def _build_image_url(request, obj):
 
 
 def _is_moderator(user):
+    """
+    @brief Проверка, является ли пользователь модератором
+    @param user Пользователь
+    @return bool True, если пользователь модератор или суперпользователь
+    """
     return user.is_authenticated and (user.is_superuser or getattr(user, "is_moderator", False))
 
 
 def _geocode_address(address):
+    """
+    @brief Геокодирование адреса с использованием Yandex Geocoder API
+    @param address Адрес для геокодирования
+    @return tuple|None Кортеж (широта, долгота) или None в случае ошибки
+    """
     address_value = str(address or "").strip()
     if not address_value:
         return None
@@ -108,6 +134,11 @@ def _geocode_address(address):
 
 
 def _subscription_payload_to_data(payload):
+    """
+    @brief Преобразование полезной нагрузки подписки в формат данных
+    @param payload Полезная нагрузка подписки
+    @return dict|None Словарь с данными подписки или None при ошибке
+    """
     endpoint = str(payload.get("endpoint", "")).strip()
     keys = payload.get("keys") or {}
     p256dh = str(keys.get("p256dh", "")).strip()
@@ -124,6 +155,14 @@ def _subscription_payload_to_data(payload):
 
 
 def _build_notification_payload(notification_type, title, body, url):
+    """
+    @brief Построение полезной нагрузки уведомления
+    @param notification_type Тип уведомления
+    @param title Заголовок уведомления
+    @param body Текст уведомления
+    @param url URL для перехода по умолчанию "/"
+    @return dict Словарь с данными уведомления
+    """
     return {
         "type": notification_type,
         "title": title,
@@ -133,6 +172,12 @@ def _build_notification_payload(notification_type, title, body, url):
 
 
 def _send_push_to_subscriptions(subscriptions, payload):
+    """
+    @brief Отправка push-уведомлений подписчикам
+    @param subscriptions Список подписок
+    @param payload Полезная нагрузка уведомления
+    @return dict Результат отправки уведомлений
+    """
     vapid_private_key = os.getenv("VAPID_PRIVATE_KEY", "").strip()
     vapid_subject = os.getenv("VAPID_SUBJECT", "mailto:admin@example.com").strip()
 
@@ -187,6 +232,13 @@ def _send_push_to_subscriptions(subscriptions, payload):
 
 
 def _serialize_place(request, obj, include_reviews=False):
+    """
+    @brief Сериализация объекта места в словарь
+    @param request HTTP-запрос
+    @param obj Объект места
+    @param include_reviews Флаг включения отзывов
+    @return dict Словарь с сериализованными данными места
+    """
     reviews_qs = obj.reviews.all()
     reviews_list = list(reviews_qs) if include_reviews else None
     rated_reviews = [review for review in (reviews_list or reviews_qs) if getattr(review, "rating", None)]
@@ -233,6 +285,13 @@ def _serialize_place(request, obj, include_reviews=False):
 @api_view(["GET", "POST"])
 @permission_classes([AllowAny])
 def objects_api(request):
+    """
+    @brief API для получения и создания объектов мест
+    GET: Возвращает список всех мест
+    POST: Создает новое место (только для модераторов)
+    @param request HTTP-запрос
+    @return Response Ответ с данными мест или результатом создания
+    """
     if request.method == "GET":
         items = [
             _serialize_place(request, obj)
@@ -322,12 +381,22 @@ def objects_api(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def health(request):
+    """
+    @brief Проверка состояния сервиса
+    @param request HTTP-запрос
+    @return Response Ответ со статусом "ok"
+    """
     return Response({"status": "ok"})
 
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def ping(request):
+    """
+    @brief Проверка работоспособности backend-сервиса
+    @param request HTTP-запрос
+    @return Response Ответ с информацией о сервисе
+    """
     return Response(
         {
             "status": "ok",
@@ -339,6 +408,11 @@ def ping(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def push_public_key(request):
+    """
+    @brief Получение публичного ключа для push-уведомлений
+    @param request HTTP-запрос
+    @return Response Ответ с публичным ключом
+    """
     return Response({
         "publicKey": os.getenv("VAPID_PUBLIC_KEY", "").strip(),
     })
@@ -347,6 +421,15 @@ def push_public_key(request):
 @api_view(["GET", "PUT", "DELETE"])
 @permission_classes([AllowAny])
 def object_detail(request, object_id):
+    """
+    @brief API для получения, обновления и удаления деталей объекта
+    GET: Возвращает подробную информацию о месте
+    PUT: Обновляет информацию о месте (только для модераторов)
+    DELETE: Удаляет место (только для модераторов)
+    @param request HTTP-запрос
+    @param object_id ID объекта
+    @return Response Ответ с данными объекта или результатом операции
+    """
     obj = get_object_or_404(PlaceObject, id=object_id)
     if request.method == "GET":
         return Response(_serialize_place(request, obj, include_reviews=True))
@@ -442,6 +525,12 @@ def object_detail(request, object_id):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def object_image(request, object_id):
+    """
+    @brief Получение изображения объекта по ID
+    @param request HTTP-запрос
+    @param object_id ID объекта
+    @return FileResponse Файл изображения объекта
+    """
     obj = get_object_or_404(PlaceObject, id=object_id)
     if not obj.image:
         return Response({"error": "Image not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -456,6 +545,12 @@ def object_image(request, object_id):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def object_reviews(request, object_id):
+    """
+    @brief API для добавления отзывов к объекту
+    @param request HTTP-запрос с данными отзыва
+    @param object_id ID объекта
+    @return Response Результат создания отзыва
+    """
     if not request.user.is_authenticated:
         return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -495,6 +590,13 @@ def object_reviews(request, object_id):
 @api_view(["DELETE"])
 @permission_classes([AllowAny])
 def object_review_detail(request, object_id, review_id):
+    """
+    @brief API для удаления конкретного отзыва
+    @param request HTTP-запрос
+    @param object_id ID объекта
+    @param review_id ID отзыва
+    @return Response Результат удаления отзыва
+    """
     if not request.user.is_authenticated:
         return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -517,6 +619,14 @@ def object_review_detail(request, object_id, review_id):
 @api_view(["GET", "POST", "DELETE"])
 @permission_classes([IsAuthenticated])
 def push_subscriptions_api(request):
+    """
+    @brief API для управления подписками на push-уведомления
+    GET: Возвращает список подписок пользователя
+    POST: Создает новую подписку
+    DELETE: Удаляет существующую подписку
+    @param request HTTP-запрос
+    @return Response Результат операции с подписками
+    """
     user = request.user
 
     if request.method == "GET":
@@ -565,6 +675,12 @@ def push_subscriptions_api(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def push_notify_api(request):
+    """
+    @brief API для отправки push-уведомлений всем подписчикам
+    Только для модераторов
+    @param request HTTP-запрос с данными уведомления
+    @return Response Результат отправки уведомлений
+    """
     if not _is_moderator(request.user):
         return Response({"error": "Moderator permissions required"}, status=status.HTTP_403_FORBIDDEN)
 

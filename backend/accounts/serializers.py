@@ -6,10 +6,17 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    @brief Сериализатор для модели пользователя
+    Обрабатывает преобразование данных пользователя в формат JSON и обратно
+    """
     password = serializers.CharField(write_only=True, allow_blank=False)
     avatar_url = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
+        """
+        @brief Метаданные сериализатора
+        """
         model = User
         fields = ('id', 'username', 'email', 'password', 'is_moderator', 'avatar', 'avatar_url')
         read_only_fields = ('is_moderator',)
@@ -19,11 +26,21 @@ class UserSerializer(serializers.ModelSerializer):
         }
     
     def create(self, validated_data):
+        """
+        @brief Создание нового пользователя
+        @param validated_data Валидированные данные пользователя
+        @return User Созданный пользователь
+        """
         password = validated_data.pop('password')
         user = User.objects.create_user(**validated_data, password=password)
         return user
 
     def get_avatar_url(self, obj):
+        """
+        @brief Получение URL аватара пользователя
+        @param obj Объект пользователя
+        @return str URL аватара или пустая строка, если аватар отсутствует
+        """
         if not getattr(obj, "avatar", None):
             return ""
 

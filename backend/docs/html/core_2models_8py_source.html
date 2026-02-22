@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.15.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>RAI TEAM: Исходный файл core/models.py</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">RAI TEAM<span id="projectnumber">&#160;1.0</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Создано системой Doxygen 1.15.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','Поиск',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('core_2models_8py_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Загрузка...</div>
+<div class="SRStatus" id="Searching">Поиск...</div>
+<div class="SRStatus" id="NoMatches">Не найдено</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">models.py</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="core_2models_8py.html">См. документацию.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno"><a class="line" href="namespacecore_1_1models.html">    1</a></span><span class="keyword">from</span> django.db <span class="keyword">import</span> models</div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="keyword">from</span> django.core.validators <span class="keyword">import</span> MaxValueValidator, MinValueValidator</div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="keyword">from</span> django.conf <span class="keyword">import</span> settings</div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment">#Объект карта яндекс</span></div>
+<div class="foldopen" id="foldopen00006" data-start="" data-end="">
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html">    6</a></span><span class="keyword">class </span><a class="code hl_class" href="classcore_1_1models_1_1PlaceObject.html">PlaceObject</a>(models.Model):</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>    <span class="stringliteral">&quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="stringliteral">    @brief Модель объекта места на карте</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="stringliteral">    Представляет собой заведение или точку интереса с информацией о доступности</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#a7946b484451adef6cf8b09589756e8ad">   11</a></span>    title = models.CharField(max_length=255)</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#a09a209bd2a3f0b9786b4c0b4cd6a1223">   12</a></span>    description = models.TextField(blank=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#a53caa3dd65ce1f90a9067a6c2e54f1a3">   13</a></span>    upcoming_event = models.CharField(max_length=255, blank=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#aaee6ba978d1df66be6fd81318d946f4e">   14</a></span>    discount_info = models.CharField(max_length=255, blank=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#af7b10a48b964b636f41bab9d949c93c2">   16</a></span>    infrastructure_type = models.CharField(max_length=100, blank=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#a8504cf9e9e752a1f87e9c3bafa5bbc48">   17</a></span>    address = models.CharField(max_length=100, blank=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#ab61e87ac09a360691e9f65a089763cbe">   18</a></span>    schedule = models.CharField(max_length=120, blank=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#a07b1db0150a070391626ade9e55045db">   19</a></span>    metros = models.JSONField(default=list, blank=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#ac9be1e277a8c0ea11b328ae59cddd0fd">   20</a></span>    image_url = models.URLField(blank=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#a2f36dac4b58298bc48b8a5ee5558207f">   21</a></span>    image = models.FileField(upload_to=<span class="stringliteral">&quot;places/&quot;</span>, blank=<span class="keyword">True</span>, null=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#a1727aeecea3a6756c996aae475f3f9e9">   23</a></span>    lat = models.FloatField(null=<span class="keyword">True</span>, blank=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#a76ec0e728e00ede038025daaddae127d">   24</a></span>    lng = models.FloatField(null=<span class="keyword">True</span>, blank=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#ab0742e9c623769541fb796318cfa5982">   26</a></span>    sign_language = models.BooleanField(default=<span class="keyword">False</span>)</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#a5934060be5634a38f1d1e5d169256f51">   27</a></span>    subtitles = models.BooleanField(default=<span class="keyword">False</span>)</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#a5387a1058a39d5ca9caf271a0e9f010a">   28</a></span>    ramps = models.BooleanField(default=<span class="keyword">False</span>)</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#ae0ed6650ace736d9d29bd2f3816677d5">   29</a></span>    braille = models.BooleanField(default=<span class="keyword">False</span>)</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#a0cd8f8847a9755ec0525c5c16395950a">   31</a></span>    created_at = models.DateTimeField(auto_now_add=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    </div>
+<div class="foldopen" id="foldopen00033" data-start="" data-end="">
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject_1_1Meta.html">   33</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classcore_1_1models_1_1PlaceObject_1_1Meta.html">Meta</a>:</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        <span class="stringliteral">&quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="stringliteral">        @brief Метаданные модели PlaceObject</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="stringliteral">        &quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject_1_1Meta.html#a857477624992507f5b550c2e4a3c8af9">   37</a></span>        constraints = [</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>            models.UniqueConstraint(</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>                fields=[<span class="stringliteral">&quot;title&quot;</span>, <span class="stringliteral">&quot;address&quot;</span>],</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>                name=<span class="stringliteral">&quot;unique_place_title_address&quot;</span>,</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>            )</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        ]</div>
+</div>
+<div class="foldopen" id="foldopen00043" data-start="" data-end="">
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceObject.html#a0219beb2cf7bb10e4dd221b1f32ba85c">   43</a></span>    <span class="keyword">def </span><a class="code hl_function" href="classcore_1_1models_1_1PlaceObject.html#a0219beb2cf7bb10e4dd221b1f32ba85c">__str__</a>(self):</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        <span class="stringliteral">&quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="stringliteral">        @brief Возвращает строковое представление объекта места</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="stringliteral">        @return Название места</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="stringliteral">        &quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        <span class="keywordflow">return</span> self.<a class="code hl_variable" href="classcore_1_1models_1_1PlaceObject.html#a7946b484451adef6cf8b09589756e8ad">title</a></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+</div>
+</div>
+<div class="foldopen" id="foldopen00051" data-start="" data-end="">
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceReview.html">   51</a></span><span class="keyword">class </span><a class="code hl_class" href="classcore_1_1models_1_1PlaceReview.html">PlaceReview</a>(models.Model):</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="stringliteral">&quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="stringliteral">    @brief Модель отзыва о месте</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="stringliteral">    Представляет собой отзыв пользователя о конкретном месте</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceReview.html#ad3a35bf5233048a4adf48028f954065a">   56</a></span>    place = models.ForeignKey(PlaceObject, on_delete=models.CASCADE, related_name=<span class="stringliteral">&quot;reviews&quot;</span>)</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceReview.html#a8035e1e6273a5dd6d115c6bdfb6aa9cc">   57</a></span>    author_name = models.CharField(max_length=150)</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceReview.html#a05ad6992056b6474b191bd82518565a5">   58</a></span>    text = models.TextField()</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceReview.html#a14e1d8b84992e553eef1689d42c85ff1">   59</a></span>    rating = models.PositiveSmallIntegerField(</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        default=5,</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        validators=[MinValueValidator(1), MaxValueValidator(5)],</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    )</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceReview.html#a2f880ce30daa9e3886ebe70721094709">   63</a></span>    created_at = models.DateTimeField(auto_now_add=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="foldopen" id="foldopen00065" data-start="" data-end="">
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceReview_1_1Meta.html">   65</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classcore_1_1models_1_1PlaceReview_1_1Meta.html">Meta</a>:</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        <span class="stringliteral">&quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="stringliteral">        @brief Метаданные модели PlaceReview</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="stringliteral">        &quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceReview_1_1Meta.html#a9cc40986f9426e9cda058bcea42c0e0c">   69</a></span>        ordering = [<span class="stringliteral">&quot;-created_at&quot;</span>]</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
+</div>
+<div class="foldopen" id="foldopen00071" data-start="" data-end="">
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PlaceReview.html#a672c4f458eae0e3adbf1a3ff084908fd">   71</a></span>    <span class="keyword">def </span><a class="code hl_function" href="classcore_1_1models_1_1PlaceReview.html#a672c4f458eae0e3adbf1a3ff084908fd">__str__</a>(self):</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        <span class="stringliteral">&quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="stringliteral">        @brief Возвращает строковое представление отзыва</span></div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="stringliteral">        @return Строка в формате &quot;Имя автора: Название места&quot;</span></div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="stringliteral">        &quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        <span class="keywordflow">return</span> f<span class="stringliteral">&quot;{self.author_name}: {self.place.title}&quot;</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+</div>
+</div>
+<div class="foldopen" id="foldopen00079" data-start="" data-end="">
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PushSubscription.html">   79</a></span><span class="keyword">class </span><a class="code hl_class" href="classcore_1_1models_1_1PushSubscription.html">PushSubscription</a>(models.Model):</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <span class="stringliteral">&quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="stringliteral">    @brief Модель подписки на push-уведомления</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="stringliteral">    Хранит информацию о подписке пользователя на получение уведомлений</span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PushSubscription.html#a8c8a07a56c6308494160b6d3bf8854f5">   84</a></span>    user = models.ForeignKey(</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        settings.AUTH_USER_MODEL,</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        on_delete=models.CASCADE,</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        related_name=<span class="stringliteral">&quot;push_subscriptions&quot;</span>,</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    )</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PushSubscription.html#a7d190bb38b2b9db1f15376b2138c600e">   89</a></span>    endpoint = models.URLField(unique=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PushSubscription.html#af830fa3d95479f71a6e2771bfc57cdb4">   90</a></span>    p256dh = models.TextField()</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PushSubscription.html#adde826d77eb5f4c5760bfe17cfa74871">   91</a></span>    auth = models.TextField()</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PushSubscription.html#ac9b220104adff91be8f82d8fac05d524">   92</a></span>    created_at = models.DateTimeField(auto_now_add=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PushSubscription.html#a916b88ed4939399a277d57d3f2d10306">   93</a></span>    updated_at = models.DateTimeField(auto_now=<span class="keyword">True</span>)</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
+<div class="foldopen" id="foldopen00095" data-start="" data-end="">
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PushSubscription_1_1Meta.html">   95</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classcore_1_1models_1_1PushSubscription_1_1Meta.html">Meta</a>:</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        <span class="stringliteral">&quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="stringliteral">        @brief Метаданные модели PushSubscription</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="stringliteral">        &quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PushSubscription_1_1Meta.html#a2924af228c1ea6870b1ca62f353108b8">   99</a></span>        ordering = [<span class="stringliteral">&quot;-updated_at&quot;</span>]</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
+</div>
+<div class="foldopen" id="foldopen00101" data-start="" data-end="">
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno"><a class="line" href="classcore_1_1models_1_1PushSubscription.html#accf48edb3d843c22f409a9d74fa1cefe">  101</a></span>    <span class="keyword">def </span><a class="code hl_function" href="classcore_1_1models_1_1PushSubscription.html#accf48edb3d843c22f409a9d74fa1cefe">__str__</a>(self):</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        <span class="stringliteral">&quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="stringliteral">        @brief Возвращает строковое представление подписки</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="stringliteral">        @return Строка с ID пользователя и началом эндпоинта</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="stringliteral">        &quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        <span class="keywordflow">return</span> f<span class="stringliteral">&quot;{self.user.pk}: {self.endpoint[:60]}&quot;</span></div>
+</div>
+</div>
+<div class="ttc" id="aclasscore_1_1models_1_1PlaceObject_1_1Meta_html"><div class="ttname"><a href="classcore_1_1models_1_1PlaceObject_1_1Meta.html">core.models.PlaceObject.Meta</a></div><div class="ttdef"><b>Определения</b> <a href="#l00033">models.py:33</a></div></div>
+<div class="ttc" id="aclasscore_1_1models_1_1PlaceObject_html"><div class="ttname"><a href="classcore_1_1models_1_1PlaceObject.html">core.models.PlaceObject</a></div><div class="ttdef"><b>Определения</b> <a href="#l00006">models.py:6</a></div></div>
+<div class="ttc" id="aclasscore_1_1models_1_1PlaceObject_html_a0219beb2cf7bb10e4dd221b1f32ba85c"><div class="ttname"><a href="classcore_1_1models_1_1PlaceObject.html#a0219beb2cf7bb10e4dd221b1f32ba85c">core.models.PlaceObject.__str__</a></div><div class="ttdeci">__str__(self)</div><div class="ttdef"><b>Определения</b> <a href="#l00043">models.py:43</a></div></div>
+<div class="ttc" id="aclasscore_1_1models_1_1PlaceObject_html_a7946b484451adef6cf8b09589756e8ad"><div class="ttname"><a href="classcore_1_1models_1_1PlaceObject.html#a7946b484451adef6cf8b09589756e8ad">core.models.PlaceObject.title</a></div><div class="ttdeci">title</div><div class="ttdef"><b>Определения</b> <a href="#l00011">models.py:11</a></div></div>
+<div class="ttc" id="aclasscore_1_1models_1_1PlaceReview_1_1Meta_html"><div class="ttname"><a href="classcore_1_1models_1_1PlaceReview_1_1Meta.html">core.models.PlaceReview.Meta</a></div><div class="ttdef"><b>Определения</b> <a href="#l00065">models.py:65</a></div></div>
+<div class="ttc" id="aclasscore_1_1models_1_1PlaceReview_html"><div class="ttname"><a href="classcore_1_1models_1_1PlaceReview.html">core.models.PlaceReview</a></div><div class="ttdef"><b>Определения</b> <a href="#l00051">models.py:51</a></div></div>
+<div class="ttc" id="aclasscore_1_1models_1_1PlaceReview_html_a672c4f458eae0e3adbf1a3ff084908fd"><div class="ttname"><a href="classcore_1_1models_1_1PlaceReview.html#a672c4f458eae0e3adbf1a3ff084908fd">core.models.PlaceReview.__str__</a></div><div class="ttdeci">__str__(self)</div><div class="ttdef"><b>Определения</b> <a href="#l00071">models.py:71</a></div></div>
+<div class="ttc" id="aclasscore_1_1models_1_1PushSubscription_1_1Meta_html"><div class="ttname"><a href="classcore_1_1models_1_1PushSubscription_1_1Meta.html">core.models.PushSubscription.Meta</a></div><div class="ttdef"><b>Определения</b> <a href="#l00095">models.py:95</a></div></div>
+<div class="ttc" id="aclasscore_1_1models_1_1PushSubscription_html"><div class="ttname"><a href="classcore_1_1models_1_1PushSubscription.html">core.models.PushSubscription</a></div><div class="ttdef"><b>Определения</b> <a href="#l00079">models.py:79</a></div></div>
+<div class="ttc" id="aclasscore_1_1models_1_1PushSubscription_html_accf48edb3d843c22f409a9d74fa1cefe"><div class="ttname"><a href="classcore_1_1models_1_1PushSubscription.html#accf48edb3d843c22f409a9d74fa1cefe">core.models.PushSubscription.__str__</a></div><div class="ttdeci">__str__(self)</div><div class="ttdef"><b>Определения</b> <a href="#l00101">models.py:101</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_4270bfced15e0e73154b13468c7c9ad9.html">core</a></li><li class="navelem"><a href="core_2models_8py.html">models.py</a></li>
+    <li class="footer">Создано системой <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.15.0 </li>
+  </ul>
+</div>
+</body>
+</html>
