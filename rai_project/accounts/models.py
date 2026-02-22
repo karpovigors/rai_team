@@ -12,7 +12,6 @@ class CustomUser(AbstractUser):
         upload_to='avatars/',
         blank=True,
         null=True,
-        storage=FileSystemStorage(),
     )
     is_moderator = models.BooleanField(default=False)
     

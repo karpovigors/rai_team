@@ -1,39 +1,24 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './BuildingDetailsPage.css';
 import authService from '../../../services/authService';
-import { MapComponent } from '../../../components/MapComponent';
-
-interface Review {
-  id: number;
-  author: string;
-  text: string;
-  rating?: number;
-}
-
-interface BuildingDetails {
-  id: number;
-  title: string;
-  schedule: string;
-  address: string;
-  metros: string[];
-  description: string;
-  image_url: string;
-  lat?: number | null;
-  lng?: number | null;
-  sign_language: boolean;
-  subtitles: boolean;
-  ramps: boolean;
-  braille: boolean;
-  rating_avg?: number;
-  rating_count?: number;
-  reviews: Review[];
-}
+import { AppHeader } from '../../../widgets/AppHeader/ui/AppHeader';
+import { ProfileModal } from '../../../widgets/ProfileMenu/ui/ProfileModal';
+import { useProfileActions } from '../../../widgets/ProfileMenu/model/useProfileActions';
+import { useBuildingDetails } from '../model/hooks/useBuildingDetails';
+import type { Review } from '../model/types';
+import { useSyncModeratorRole } from '../model/hooks/useSyncModeratorRole';
+import { useBuildingMutationActions } from '../model/hooks/useBuildingMutationActions';
+import { useBuildingMapActions } from '../model/hooks/useBuildingMapActions';
+import { DetailsPageState } from './layout/DetailsPageState';
+import { BuildingDetailsContent } from './sections/BuildingDetailsContent';
 
 export const BuildingDetailsPage: React.FC = () => {
+  const navigate = useNavigate();
   const buildingId = Number(window.location.pathname.split('/')[2]);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [building, setBuilding] = useState<BuildingDetails | null>(null);
+  const { building, setBuilding, isLoading, loadError } = useBuildingDetails(buildingId);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReviewText, setNewReviewText] = useState('');
   const [newReviewRating, setNewReviewRating] = useState(5);
@@ -53,545 +38,167 @@ export const BuildingDetailsPage: React.FC = () => {
   const [editError, setEditError] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState('');
-  const [isBuildingImageBroken, setIsBuildingImageBroken] = useState(false);
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
   const [address, setAddress] = useState('');
   const isAuthenticated = authService.isAuthenticated();
   const [isModerator, setIsModerator] = useState(authService.isModerator());
   const [profileAvatarUrl, setProfileAvatarUrl] = useState(authService.getAvatarUrl() || '');
   const username = authService.getUsername();
-  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
-  const normalizeImageUrl = (rawUrl: string): string => {
-    const value = String(rawUrl || '').trim();
-    if (!value) {
-      return '';
-    }
-
-    try {
-      const parsed = new URL(value, window.location.origin);
-      if (['localhost', '127.0.0.1', '0.0.0.0'].includes(parsed.hostname)) {
-        return `${window.location.origin}${parsed.pathname}${parsed.search}${parsed.hash}`;
-      }
-      return parsed.toString();
-    } catch {
-      return value;
-    }
-  };
+  useSyncModeratorRole({ isAuthenticated, setIsModerator, setProfileAvatarUrl });
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setIsModerator(false);
-      setProfileAvatarUrl('');
+    if (!building) {
       return;
     }
 
-    const syncRole = async () => {
-      try {
-        const response = await authService.fetchCurrentUser();
-        authService.setUsername(response.user.username);
-        authService.setEmail(response.user.email || '');
-        authService.setAvatarUrl(response.user.avatar_url || '');
-        authService.setIsModerator(response.user.is_moderator);
-        setProfileAvatarUrl(response.user.avatar_url || '');
-        setIsModerator(response.user.is_moderator);
-      } catch {
-        setIsModerator(authService.isModerator());
-        setProfileAvatarUrl(authService.getAvatarUrl() || '');
-      }
-    };
-
-    void syncRole();
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    const loadBuilding = async () => {
-      if (!Number.isFinite(buildingId)) {
-        setLoadError('Некорректный идентификатор объекта');
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      setLoadError('');
-      try {
-        const response = await fetch(`${apiBaseUrl}/api/objects/${buildingId}`);
-        if (!response.ok) {
-          throw new Error('Failed to load building details');
-        }
-
-        const data = await response.json();
-        setBuilding({
-          ...data,
-          image_url: normalizeImageUrl(data.image_url),
-        });
-        setIsBuildingImageBroken(false);
-        setReviews(data.reviews || []);
-        setEditTitle(data.title || '');
-        setEditDescription(data.description || '');
-        setEditInfrastructureType(data.infrastructure_type || '');
-        setEditAddress(data.address || '');
-        setEditSchedule(data.schedule || '');
-        setEditMetros(Array.isArray(data.metros) ? data.metros.join(', ') : '');
-        setEditSignLanguage(Boolean(data.sign_language));
-        setEditSubtitles(Boolean(data.subtitles));
-        setEditRamps(Boolean(data.ramps));
-        setEditBraille(Boolean(data.braille));
-        if (data.latitude && data.longitude) {
-          setEditCoordinates([data.latitude, data.longitude]);
-        }
-        setEditImageFile(null);
-        setEditError('');
-        setIsEditMode(false);
-      } catch {
-        setLoadError('Не удалось загрузить данные объекта');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    void loadBuilding();
-  }, [apiBaseUrl, buildingId]);
-
-  const handleLoginClick = () => {
-    window.location.href = '/auth';
-  };
-
-  const handleLogoutClick = () => {
-    authService.logout();
-    setIsProfileModalOpen(false);
-    window.location.href = '/';
-  };
-
-  const handleProfileClick = () => {
-    setIsProfileModalOpen(false);
-    window.location.href = '/profile';
-  };
-
-  const handleSaveEdit = (e: React.FormEvent) => {
-    void (async () => {
-      e.preventDefault();
-      if (!building) {
-        return;
-      }
-      setEditError('');
-      if (!editTitle.trim() || !editAddress.trim()) {
-        setEditError('Заполните обязательные поля: название и адрес');
-        return;
-      }
-
-      setIsSavingEdit(true);
-      try {
-        const formData = new FormData();
-        formData.append('title', editTitle.trim());
-        formData.append('description', editDescription.trim());
-        formData.append('infrastructureType', editInfrastructureType.trim());
-        formData.append('address', editAddress.trim());
-        formData.append('schedule', editSchedule.trim());
-        formData.append('metros', editMetros);
-        formData.append('sign_language', String(editSignLanguage));
-        formData.append('subtitles', String(editSubtitles));
-        formData.append('ramps', String(editRamps));
-        formData.append('braille', String(editBraille));
-        if (editImageFile) {
-          formData.append('image', editImageFile);
-        }
-        if (editCoordinates) {
-          formData.append('latitude', String(editCoordinates[0]));
-          formData.append('longitude', String(editCoordinates[1]));
-        }
-
-        const response = await authService.authFetch(`/api/objects/${building.id}`, {
-          method: 'PUT',
-          body: formData,
-        });
-
-        if (!response.ok) {
-          const err = await response.json().catch(() => ({}));
-          throw new Error(err?.error || 'Не удалось обновить объект');
-        }
-
-        const updated = await response.json();
-        setBuilding({
-          ...updated,
-          image_url: normalizeImageUrl(updated.image_url),
-        });
-        setIsBuildingImageBroken(false);
-        setReviews(updated.reviews || []);
-        setIsEditMode(false);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          setEditError(error.message);
-        } else {
-          setEditError('Не удалось обновить объект');
-        }
-      } finally {
-        setIsSavingEdit(false);
-      }
-    })();
-  };
-
-  const handleDeleteObject = () => {
-    void (async () => {
-      if (!building) {
-        return;
-      }
-
-      const confirmed = window.confirm('Удалить этот объект? Действие необратимо.');
-      if (!confirmed) {
-        return;
-      }
-
-      setEditError('');
-      setIsDeleting(true);
-      try {
-        const response = await authService.authFetch(`/api/objects/${building.id}`, {
-          method: 'DELETE',
-        });
-
-        if (!response.ok) {
-          const err = await response.json().catch(() => ({}));
-          throw new Error(err?.error || 'Не удалось удалить объект');
-        }
-
-        window.location.href = '/';
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          setEditError(error.message);
-        } else {
-          setEditError('Не удалось удалить объект');
-        }
-      } finally {
-        setIsDeleting(false);
-      }
-    })();
-  };
-
-  const handleSubmitReview = (e: React.FormEvent) => {
-    void (async () => {
-      e.preventDefault();
-      const text = newReviewText.trim();
-      if (!text || !isAuthenticated || !building || newReviewRating < 1 || newReviewRating > 5) {
-        return;
-      }
-
-      try {
-        const response = await authService.authFetch(`/api/objects/${building.id}/reviews`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            text,
-            rating: newReviewRating,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to create review');
-        }
-
-        const createdReview = await response.json();
-        setReviews((prev) => [{ ...createdReview, rating: createdReview.rating ?? newReviewRating }, ...prev]);
-        setNewReviewText('');
-        setNewReviewRating(5);
-      } catch {
-        // Keep silent here to avoid breaking UX with alerts
-      }
-    })();
-  };
-
-  const fetchAddress = useCallback(async (coords: [number, number], forEditMode: boolean) => {
-    try {
-      const [lat, lon] = coords;
-      const response = await fetch(
-        `https://geocode-maps.yandex.ru/1.x/?apikey=47c62267-b242-42c9-9937-1505fa4e1b24&geocode=${lon},${lat}&format=json&lang=ru_RU`,
-      );
-
-      if (!response.ok) {
-        throw new Error('Ошибка получения адреса');
-      }
-
-      const data = (await response.json()) as {
-        response?: {
-          GeoObjectCollection?: {
-            featureMember?: Array<{
-              GeoObject?: {
-                name?: string;
-                description?: string;
-              };
-            }>;
-          };
-        };
-      };
-
-      const feature = data.response?.GeoObjectCollection?.featureMember?.[0]?.GeoObject;
-      const addressName = feature?.name;
-      const addressDescription = feature?.description;
-
-      if (addressName || addressDescription) {
-        const newAddress = [addressName, addressDescription].filter(Boolean).join(', ');
-        if (forEditMode) {
-          setEditMapAddress(newAddress);
-          setEditAddress(newAddress);
-        } else {
-          setAddress(newAddress);
-        }
-      } else {
-        if (forEditMode) {
-          setEditMapAddress('Адрес не найден');
-        } else {
-          setAddress('Адрес не найден');
-        }
-      }
-    } catch {
-      if (forEditMode) {
-        setEditMapAddress('');
-      } else {
-        setAddress('');
-      }
+    setReviews(building.reviews || []);
+    setEditTitle(building.title || '');
+    setEditDescription(building.description || '');
+    setEditInfrastructureType(building.infrastructure_type || '');
+    setEditAddress(building.address || '');
+    setEditSchedule(building.schedule || '');
+    setEditMetros(Array.isArray(building.metros) ? building.metros.join(', ') : '');
+    setEditSignLanguage(Boolean(building.sign_language));
+    setEditSubtitles(Boolean(building.subtitles));
+    setEditRamps(Boolean(building.ramps));
+    setEditBraille(Boolean(building.braille));
+    if (building.latitude && building.longitude) {
+      setEditCoordinates([building.latitude, building.longitude]);
     }
-  }, []);
+    setEditImageFile(null);
+    setEditError('');
+    setIsEditMode(false);
+  }, [building]);
 
-  const handleMapClick = useCallback((coords: [number, number]) => {
-    if (isEditMode) {
-      setEditCoordinates(coords);
-      setEditMapAddress('');
-      void fetchAddress(coords, true);
-    } else {
-      setCoordinates(coords);
-      setAddress('');
-      void fetchAddress(coords, false);
-    }
-  }, [isEditMode, fetchAddress]);
+  const { handleLoginClick, handleLogoutClick, handleProfileClick } = useProfileActions({
+    setIsProfileModalOpen,
+  });
+  const { handleSaveEdit, handleDeleteObject, handleSubmitReview } = useBuildingMutationActions({
+    building,
+    setBuilding,
+    isAuthenticated,
+    reviewsSetters: {
+      setReviews,
+      setNewReviewText,
+      setNewReviewRating,
+    },
+    reviewState: {
+      newReviewText,
+      newReviewRating,
+    },
+    editState: {
+      editTitle,
+      editDescription,
+      editInfrastructureType,
+      editAddress,
+      editSchedule,
+      editMetros,
+      editImageFile,
+      editSignLanguage,
+      editSubtitles,
+      editRamps,
+      editBraille,
+      editCoordinates,
+    },
+    editSetters: {
+      setEditError,
+      setIsSavingEdit,
+      setIsDeleting,
+      setIsEditMode,
+    },
+  });
+  const { handleMapClick } = useBuildingMapActions({
+    isEditMode,
+    setEditCoordinates,
+    setEditMapAddress,
+    setEditAddress,
+    setCoordinates,
+    setAddress,
+  });
 
   if (isLoading) {
-    return <div className="details-page"><main className="details-main">Загрузка...</main></div>;
+    return <DetailsPageState message="Загрузка..." />;
   }
 
   if (loadError || !building) {
-    return <div className="details-page"><main className="details-main">{loadError || 'Объект не найден'}</main></div>;
+    return <DetailsPageState message={loadError || 'Объект не найден'} />;
   }
 
-  const accessibility = [
-    building.sign_language ? 'Русский жестовый язык' : null,
-    building.subtitles ? 'Субтитры' : null,
-    building.ramps ? 'Наличие пандусов' : null,
-    building.braille ? 'Шрифт Брайля / сопровождение для слепых' : null,
-  ].filter(Boolean) as string[];
-
-  const normalizedRatings = reviews
-    .map((review) => Number(review.rating))
-    .filter((rating) => Number.isFinite(rating) && rating >= 1 && rating <= 5);
-  const ratingCount = normalizedRatings.length;
-  const averageRating = ratingCount
-    ? Number((normalizedRatings.reduce((sum, rating) => sum + rating, 0) / ratingCount).toFixed(1))
-    : Number(building.rating_avg || 0);
-  const totalRatingCount = building.rating_count ?? ratingCount;
-  const detailSelectedFeature = isEditMode
-    ? (editCoordinates ? { geometry: { coordinates: editCoordinates } } : null)
-    : (typeof building.lat === 'number' && typeof building.lng === 'number'
-        ? { geometry: { coordinates: [building.lat, building.lng] as [number, number] } }
-        : null);
+  const handleToggleEditMode = () => {
+    setEditImageFile(null);
+    setIsEditMode((prev) => !prev);
+  };
 
   return (
     <div className="details-page">
-      <header className="details-header">
-        <h1>
-          <a href="/" className="details-title-link">
-            Информационно-навигационная платформа для людей с нарушением слуха
-          </a>
-        </h1>
-        <div className="details-header-right">
-          <button type="button" className="details-map-button">Карта</button>
-          <button
-            type="button"
-            className={`details-profile-icon ${profileAvatarUrl ? 'details-profile-icon-with-image' : ''}`}
-            aria-label="Профиль"
-            onClick={() => setIsProfileModalOpen(true)}
-            style={profileAvatarUrl ? { backgroundImage: `url(${normalizeImageUrl(profileAvatarUrl)})` } : undefined}
-          ></button>
-        </div>
-      </header>
+      <AppHeader
+        onOpenMap={() => navigate('/map-admin')}
+        onOpenProfile={() => setIsProfileModalOpen(true)}
+        profileAvatarUrl={profileAvatarUrl}
+      />
       <main className="details-main">
-        <div className="building-title">
-          <h2>{building.title}</h2>
-          <div className="building-rating-summary">
-            <span className="building-rating-stars">
-              {'★'.repeat(Math.round(averageRating))}
-              {'☆'.repeat(Math.max(0, 5 - Math.round(averageRating)))}
-            </span>
-            <span className="building-rating-value">{averageRating.toFixed(1)} / 5</span>
-            <span className="building-rating-count">({totalRatingCount} оценок)</span>
-          </div>
-          {isModerator && (
-            <button type="button" className="details-edit-button" onClick={() => setIsEditMode((prev) => !prev)}>
-              {isEditMode ? 'Скрыть редактирование' : 'Редактировать объект'}
-            </button>
-          )}
-        </div>
-        {isModerator && isEditMode && (
-          <form className="details-edit-form" onSubmit={handleSaveEdit}>
-            {editError && <div className="details-edit-error">{editError}</div>}
-            <input placeholder="Название*" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required />
-            <input placeholder="Тип (театр, кинотеатр...)" value={editInfrastructureType} onChange={(e) => setEditInfrastructureType(e.target.value)} />
-           
-            <input placeholder="Расписание" value={editSchedule} onChange={(e) => setEditSchedule(e.target.value)} />
-            <input placeholder="Метро через запятую" value={editMetros} onChange={(e) => setEditMetros(e.target.value)} />
-            <textarea placeholder="Описание" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} rows={4} />
-            <input type="file" accept="image/*" onChange={(e) => setEditImageFile(e.target.files?.[0] || null)} />
-            <div className="details-edit-checklist">
-              <label><input type="checkbox" checked={editSignLanguage} onChange={(e) => setEditSignLanguage(e.target.checked)} />Жестовый язык</label>
-              <label><input type="checkbox" checked={editSubtitles} onChange={(e) => setEditSubtitles(e.target.checked)} />Субтитры</label>
-              <label><input type="checkbox" checked={editRamps} onChange={(e) => setEditRamps(e.target.checked)} />Пандусы</label>
-              <label><input type="checkbox" checked={editBraille} onChange={(e) => setEditBraille(e.target.checked)} />Брайль</label>
-            </div>
-            <div className="details-edit-actions">
-              <button type="submit" disabled={isSavingEdit || isDeleting}>
-                {isSavingEdit ? 'Сохранение...' : 'Сохранить изменения'}
-              </button>
-              <button
-                type="button"
-                className="details-delete-button"
-                onClick={handleDeleteObject}
-                disabled={isSavingEdit || isDeleting}
-              >
-                {isDeleting ? 'Удаление...' : 'Удалить объект'}
-              </button>
-            </div>
-          </form>
-        )}
-        <div className="info-grid">
-          <div className="info-left">
-            <ul>
-              <li>{building.schedule}</li>
-              <li>{building.address}</li>
-              <li>{building.metros.join(', ')}</li>
-            </ul>
-            <p className="description">{building.description}</p>
-          </div>
-          <div className="info-right">
-            {building.image_url && !isBuildingImageBroken ? (
-              <img
-                src={building.image_url}
-                alt={building.title}
-                className="building-image"
-                onError={() => setIsBuildingImageBroken(true)}
-              />
-            ) : (
-              <div className="building-image-placeholder">Фото отсутствует</div>
-            )}
-             <ul className="accessibility-list">
-              {accessibility.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="info-right-map">
-            <div className="building-map-container">
-              <MapComponent
-                onMapClick={handleMapClick}
-                selectedFeature={detailSelectedFeature}
-              />
-              {isEditMode ? (
-                editCoordinates && (
-                  <div className="building-map-coordinates">
-                    <strong>Координаты:</strong> {editCoordinates[0].toFixed(6)}, {editCoordinates[1].toFixed(6)}
-                    {editMapAddress && (
-                      <div className="building-map-address">
-                        <strong>Адрес:</strong> {editMapAddress}
-                      </div>
-                    )}
-                  </div>
-                )
-              ) : coordinates && (
-                <div className="building-map-coordinates">
-                  <strong>Координаты:</strong> {coordinates[0].toFixed(6)}, {coordinates[1].toFixed(6)}
-                  {address && (
-                    <div className="building-map-address">
-                      <strong>Адрес:</strong> {address}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="reviews-section">
-          {isAuthenticated ? (
-            <form className="review-form" onSubmit={handleSubmitReview}>
-              <div className="review-rating-picker" role="group" aria-label="Оценка">
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    className={`rating-star-button ${value <= newReviewRating ? 'active' : ''}`}
-                    onClick={() => setNewReviewRating(value)}
-                    aria-label={`Оценка ${value} из 5`}
-                    title={`${value} из 5`}
-                  >
-                    ★
-                  </button>
-                ))}
-                <span className="review-rating-value">{newReviewRating}/5</span>
-              </div>
-              <textarea
-                className="review-textarea"
-                placeholder="Напишите отзыв"
-                value={newReviewText}
-                onChange={(e) => setNewReviewText(e.target.value)}
-                rows={4}
-                required
-              />
-              <button type="submit" className="review-submit-button">Отправить отзыв</button>
-            </form>
-          ) : (
-            <div className="review-auth-required">
-              Для написания отзыва нужна авторизация. <a href="/auth">Войти</a>
-            </div>
-          )}
-
-          {reviews.map((review) => (
-            <div className="review" key={review.id}>
-              <div className="review-user-info">
-                <div className="review-user-icon"></div>
-                <p className="review-user">{review.author}</p>
-              </div>
-              <p className="review-rating">
-                {'★'.repeat(Math.max(0, Math.min(5, Number(review.rating) || 0)))}
-                {'☆'.repeat(Math.max(0, 5 - Math.max(0, Math.min(5, Number(review.rating) || 0))))}
-              </p>
-              <p className="review-text">{review.text}</p>
-            </div>
-          ))}
-        </div>
+        <BuildingDetailsContent
+          building={building}
+          reviews={reviews}
+          isModerator={isModerator}
+          isEditMode={isEditMode}
+          onToggleEditMode={handleToggleEditMode}
+          editFormProps={{
+            editError,
+            editTitle,
+            editInfrastructureType,
+            editSchedule,
+            editMetros,
+            editDescription,
+            editSignLanguage,
+            editSubtitles,
+            editRamps,
+            editBraille,
+            isSavingEdit,
+            isDeleting,
+            onTitleChange: setEditTitle,
+            onInfrastructureTypeChange: setEditInfrastructureType,
+            onScheduleChange: setEditSchedule,
+            onMetrosChange: setEditMetros,
+            onDescriptionChange: setEditDescription,
+            onImageChange: setEditImageFile,
+            onSignLanguageChange: setEditSignLanguage,
+            onSubtitlesChange: setEditSubtitles,
+            onRampsChange: setEditRamps,
+            onBrailleChange: setEditBraille,
+            onSubmit: handleSaveEdit,
+            onDelete: handleDeleteObject,
+          }}
+          infoSectionProps={{
+            isEditMode,
+            editCoordinates,
+            editMapAddress,
+            coordinates,
+            address,
+            onMapClick: handleMapClick,
+          }}
+          reviewsSectionProps={{
+            isAuthenticated,
+            newReviewText,
+            newReviewRating,
+            onSubmit: handleSubmitReview,
+            onReviewTextChange: setNewReviewText,
+            onReviewRatingChange: setNewReviewRating,
+          }}
+        />
       </main>
       <footer className="details-footer"></footer>
 
-      {isProfileModalOpen && (
-        <div className="details-profile-modal-overlay" onClick={() => setIsProfileModalOpen(false)}>
-          <div className="details-profile-modal" onClick={(e) => e.stopPropagation()}>
-            {!isAuthenticated ? (
-              <button type="button" className="details-profile-action-button" onClick={handleLoginClick}>
-                Войти
-              </button>
-            ) : (
-              <>
-                <p className="details-profile-username">{username || 'Пользователь'}</p>
-                <button type="button" className="details-profile-action-button" onClick={handleProfileClick}>
-                  Профиль
-                </button>
-                <button type="button" className="details-profile-action-button" onClick={handleLogoutClick}>
-                  Выйти
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        isAuthenticated={isAuthenticated}
+        username={username}
+        onClose={() => setIsProfileModalOpen(false)}
+        onLogin={handleLoginClick}
+        onProfile={handleProfileClick}
+        onLogout={handleLogoutClick}
+      />
     </div>
   );
 };

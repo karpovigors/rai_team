@@ -6,6 +6,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
+from django.http import FileResponse
+from django.shortcuts import get_object_or_404
+import mimetypes
+import os
 from .serializers import UserSerializer
 
 User = get_user_model()
@@ -86,14 +90,38 @@ def update_me(request):
             return Response({'error': 'Password must be at least 6 characters'}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(str(new_password))
 
-    if remove_avatar:
+    if remove_avatar and user.avatar:
+        user.avatar.delete(save=False)
         user.avatar = None
 
     if avatar_file is not None:
+        previous_avatar_name = user.avatar.name if user.avatar else None
+        _, extension = os.path.splitext(avatar_file.name or "")
+        safe_extension = extension.lower() if extension else ".png"
+        avatar_file.name = f"{user.username}/avatar_{user.id or 'new'}{safe_extension}"
         user.avatar = avatar_file
 
     user.save()
+    if avatar_file is not None and 'previous_avatar_name' in locals():
+        if previous_avatar_name and user.avatar and previous_avatar_name != user.avatar.name:
+            try:
+                user.avatar.storage.delete(previous_avatar_name)
+            except Exception:
+                pass
+
     return Response({'user': UserSerializer(user, context={'request': request}).data})
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def avatar_media(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if not user.avatar:
+        return Response({'error': 'Avatar not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    content_type, _ = mimetypes.guess_type(user.avatar.name)
+    avatar_file = user.avatar.open('rb')
+    return FileResponse(avatar_file, content_type=content_type or 'application/octet-stream')
 
 
 @api_view(['POST'])

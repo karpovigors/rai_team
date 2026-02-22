@@ -1,6 +1,9 @@
 import json
+import mimetypes
+from urllib.parse import quote
 
 from django.db import IntegrityError
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -40,7 +43,8 @@ def _parse_metros(value):
 
 def _build_image_url(request, obj):
     if obj.image:
-        return request.build_absolute_uri(obj.image.url)
+        image_key = quote(obj.image.name, safe="")
+        return f"/objects/{obj.id}/image?key={image_key}"
     return obj.image_url
 
 
@@ -170,6 +174,8 @@ def object_detail(request, object_id):
             if not request.user.is_authenticated:
                 return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
             return Response({"error": "Moderator permissions required"}, status=status.HTTP_403_FORBIDDEN)
+        if obj.image:
+            obj.image.delete(save=False)
         obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -187,6 +193,7 @@ def object_detail(request, object_id):
             checklist = {}
 
     image_file = request.FILES.get("image")
+    previous_image_name = obj.image.name if image_file and obj.image else None
 
     try:
         obj.title = str(data.get("title", obj.title)).strip() or obj.title
@@ -205,6 +212,11 @@ def object_detail(request, object_id):
         if image_file:
             obj.image = image_file
         obj.save()
+        if previous_image_name and obj.image and obj.image.name != previous_image_name:
+            try:
+                obj.image.storage.delete(previous_image_name)
+            except Exception:
+                pass
     except IntegrityError:
         return Response(
             {"error": "Object with same title and address already exists"},
@@ -212,6 +224,20 @@ def object_detail(request, object_id):
         )
 
     return Response(_serialize_place(request, obj, include_reviews=True))
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def object_image(request, object_id):
+    obj = get_object_or_404(PlaceObject, id=object_id)
+    if not obj.image:
+        return Response({"error": "Image not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    content_type, _ = mimetypes.guess_type(obj.image.name)
+    image_file = obj.image.open("rb")
+    response = FileResponse(image_file, content_type=content_type or "application/octet-stream")
+    response["Cache-Control"] = "no-store"
+    return response
 
 
 @api_view(["POST"])
