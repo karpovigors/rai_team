@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './BuildingsPage.css';
 import authService from '../../../services/authService';
@@ -11,6 +11,8 @@ import { BuildingsFilters } from './sections/BuildingsFilters';
 import { BuildingsList } from './sections/BuildingsList';
 import { AddBuildingForm } from './sections/AddBuildingForm';
 import { BuildingsProfileModal } from './overlays/BuildingsProfileModal';
+import { AccessibilityPanel } from '../../../components/AccessibilityPanel/AccessibilityPanel';
+import type { AccessibilitySettings } from '../../../hooks/useAccessibility';
 
 const DEFAULT_KREMLIN_LATITUDE = '55.751244';
 const DEFAULT_KREMLIN_LONGITUDE = '37.618423';
@@ -43,11 +45,27 @@ export const BuildingsPage: React.FC = () => {
   const isAuthenticated = authService.isAuthenticated();
   const isModerator = authService.isModerator();
   const username = authService.getUsername();
+  const [accessibilitySettings, setAccessibilitySettings] = useState<AccessibilitySettings>({
+    largeFont: false,
+    highContrast: false,
+    screenReader: false,
+  });
   const { infrastructureTypes, filteredBuildings } = useBuildingsView({
     buildings,
     searchQuery,
     selectedInfrastructureType,
   });
+
+  const handleSpeakText = useCallback((text: string) => {
+    if (accessibilitySettings.screenReader && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ru-RU';
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    }
+  }, [accessibilitySettings.screenReader]);
 
   const { handleLoginClick, handleLogoutClick, handleProfileClick } = useProfileActions({
     setIsProfileModalOpen,
@@ -181,6 +199,8 @@ export const BuildingsPage: React.FC = () => {
           buildings={filteredBuildings}
           isLoading={isLoading}
           loadError={loadError}
+          screenReader={accessibilitySettings.screenReader}
+          onSpeakText={handleSpeakText}
         />
       </main>
       <footer className="buildings-footer"></footer>
@@ -193,6 +213,11 @@ export const BuildingsPage: React.FC = () => {
         onLogin={handleLoginClick}
         onProfile={handleProfileClick}
         onLogout={handleLogoutClick}
+      />
+
+      <AccessibilityPanel
+        settings={accessibilitySettings}
+        onSettingsChange={setAccessibilitySettings}
       />
     </div>
   );
