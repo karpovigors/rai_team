@@ -98,6 +98,20 @@ export const createBuildingReview = async (
   return response.json();
 };
 
+export const deleteBuildingReview = async (
+  buildingId: number,
+  reviewId: number,
+): Promise<void> => {
+  const response = await authService.authFetch(`/api/objects/${buildingId}/reviews/${reviewId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err?.error || 'Не удалось удалить отзыв');
+  }
+};
+
 export const reverseGeocodeCoordinates = async (
   coords: [number, number],
 ): Promise<string | null> => {

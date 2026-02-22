@@ -3,20 +3,26 @@ import type { Review } from '../../model/types';
 
 interface ReviewsSectionProps {
   isAuthenticated: boolean;
+  isModerator: boolean;
+  currentUsername: string | null;
   newReviewText: string;
   newReviewRating: number;
   reviews: Review[];
   onSubmit: (e: React.FormEvent) => void;
+  onDeleteReview: (reviewId: number) => void;
   onReviewTextChange: (value: string) => void;
   onReviewRatingChange: (value: number) => void;
 }
 
 export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
   isAuthenticated,
+  isModerator,
+  currentUsername,
   newReviewText,
   newReviewRating,
   reviews,
   onSubmit,
+  onDeleteReview,
   onReviewTextChange,
   onReviewRatingChange,
 }) => (
@@ -57,8 +63,20 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
     {reviews.map((review) => (
       <div className="review" key={review.id}>
         <div className="review-user-info">
-          <div className="review-user-icon"></div>
-          <p className="review-user">{review.author}</p>
+          <div className="review-user-meta">
+            <div className="review-user-icon"></div>
+            <p className="review-user">{review.author}</p>
+          </div>
+          {(isModerator || (currentUsername && currentUsername === review.author)) && (
+            <button
+              type="button"
+              className="review-delete-button"
+              onClick={() => onDeleteReview(review.id)}
+              title={isModerator ? 'Удалить отзыв (модератор)' : 'Удалить свой отзыв'}
+            >
+              Удалить
+            </button>
+          )}
         </div>
         <p className="review-rating">
           {'★'.repeat(Math.max(0, Math.min(5, Number(review.rating) || 0)))}
@@ -69,4 +87,3 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
     ))}
   </div>
 );
-

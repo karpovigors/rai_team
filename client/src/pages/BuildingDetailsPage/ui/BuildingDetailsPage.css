@@ -395,9 +395,17 @@
 
 .review-user-info {
   display: flex;
-  flex-direction: column;
-  align-items: left;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 5px;
+}
+
+.review-user-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .review-user-icon {
@@ -422,6 +430,20 @@
     margin: 0;
     font-weight: bold;
     color: var(--details-muted-text);
+}
+
+.review-delete-button {
+  border: 1px solid #b42318;
+  background: transparent;
+  color: #d92d20;
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.review-delete-button:hover {
+  background: rgba(217, 45, 32, 0.08);
 }
 
 .details-footer {
