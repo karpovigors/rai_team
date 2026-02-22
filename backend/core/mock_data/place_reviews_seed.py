@@ -191,6 +191,7 @@ PROJECT_MEDIA_DIR = Path(__file__).resolve().parents[2] / 'media'
 
 
 def _apply_local_image(place: PlaceObject, image_local_path: str) -> None:
+    # Seed заполняет S3/MinIO из локального файла проекта, если он есть в репозитории.
     if not image_local_path:
         return
 
@@ -199,6 +200,7 @@ def _apply_local_image(place: PlaceObject, image_local_path: str) -> None:
         return
 
     current_name = place.image.name or ''
+    # Не перезаливаем файл повторно, если у объекта уже тот же ключ в storage.
     if current_name == image_local_path:
         return
 
@@ -217,6 +219,7 @@ def seed_place_objects_and_reviews() -> None:
         reviews = list(seed_item.get('reviews', []))
         image_local_path = seed_item.get('image_local_path', '')
 
+        # Идемпотентное заполнение: повторный запуск обновляет карточки, а не дублирует их.
         place, _ = PlaceObject.objects.update_or_create(
             title=item['title'],
             address=item['address'],
@@ -225,6 +228,7 @@ def seed_place_objects_and_reviews() -> None:
         _apply_local_image(place, image_local_path)
 
         for review_data in reviews:
+            # Отзывы seed тоже добавляются без дублей по автору + тексту.
             PlaceReview.objects.get_or_create(
                 place=place,
                 author_name=review_data['author_name'],

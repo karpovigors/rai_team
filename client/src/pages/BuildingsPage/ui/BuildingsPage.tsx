@@ -155,6 +155,7 @@ export const BuildingsPage: React.FC = () => {
           infrastructureTypes={infrastructureTypes}
           isModerator={isModerator}
           isAddFormOpen={isAddFormOpen}
+          onOpenLearning={() => navigate('/learning')}
           onSearchQueryChange={setSearchQuery}
           onInfrastructureTypeChange={setSelectedInfrastructureType}
           onToggleAddForm={handleToggleAddForm}

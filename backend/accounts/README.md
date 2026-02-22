@@ -60,7 +60,7 @@ To test the authentication flow:
 
 1. Start the Django server:
    ```bash
-   cd rai_project
+   cd backend
    python manage.py runserver
    ```
 
