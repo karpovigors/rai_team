@@ -6,6 +6,7 @@ interface BuildingInfoSectionProps {
   building: BuildingDetails;
   accessibility: string[];
   isEditMode: boolean;
+  isModerator: boolean;
   editCoordinates: [number, number] | null;
   editMapAddress: string;
   coordinates: [number, number] | null;
@@ -17,6 +18,7 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
   building,
   accessibility,
   isEditMode,
+  isModerator,
   editCoordinates,
   editMapAddress,
   coordinates,
@@ -54,7 +56,7 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
           onMapClick={onMapClick}
           selectedFeature={selectedCoordinates ? { geometry: { coordinates: selectedCoordinates } } : null}
           placemarkPreset={isEditMode ? 'islands#blueCircleIcon' : 'islands#blueStretchyIcon'}
-          placemarkDraggable={isEditMode}
+          placemarkDraggable={isEditMode && isModerator}
           selectedPlacemarkProperties={
             !isEditMode && yandexRouteUrl
               ? {
