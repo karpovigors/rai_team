@@ -19,6 +19,10 @@ interface MapComponentProps {
 
 const DEFAULT_CENTER: [number, number] = [55.751244, 37.618423]
 const DEFAULT_ZOOM = 14
+const YANDEX_MAPS_API_KEY =
+  import.meta.env.VITE_YANDEX_MAPS_API_KEY ||
+  import.meta.env.VITE_YANDEX_GEOCODER_API_KEY ||
+  ''
 
 function MapComponent({
   onMapClick,
@@ -76,7 +80,7 @@ function MapComponent({
 
   return (
     <div className="map-component">
-      <YMaps query={{ apikey: '7bb401a3-59b4-4be6-bc2a-602c71197f26', lang: 'ru_RU' }}>
+      <YMaps query={{ apikey: YANDEX_MAPS_API_KEY, lang: 'ru_RU' }}>
         <Map
           state={{ center: mapCenter, zoom: mapZoom }}
           width="100%"
