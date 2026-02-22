@@ -109,6 +109,9 @@ export const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
     <input
       type="file"
       accept="image/*"
+      onClick={(e) => {
+        e.currentTarget.value = '';
+      }}
       onChange={(e) => onImageChange(e.target.files?.[0] || null)}
     />
     <div className="moderator-inline-checklist">

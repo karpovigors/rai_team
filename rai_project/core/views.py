@@ -1,5 +1,6 @@
 import json
 import mimetypes
+from urllib.parse import quote
 
 from django.db import IntegrityError
 from django.http import FileResponse
@@ -42,7 +43,8 @@ def _parse_metros(value):
 
 def _build_image_url(request, obj):
     if obj.image:
-        return f"/objects/{obj.id}/image"
+        image_key = quote(obj.image.name, safe="")
+        return f"/objects/{obj.id}/image?key={image_key}"
     return obj.image_url
 
 
@@ -174,6 +176,8 @@ def object_detail(request, object_id):
             if not request.user.is_authenticated:
                 return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
             return Response({"error": "Moderator permissions required"}, status=status.HTTP_403_FORBIDDEN)
+        if obj.image:
+            obj.image.delete(save=False)
         obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -191,6 +195,7 @@ def object_detail(request, object_id):
             checklist = {}
 
     image_file = request.FILES.get("image")
+    previous_image_name = obj.image.name if image_file and obj.image else None
 
     try:
         obj.title = str(data.get("title", obj.title)).strip() or obj.title
@@ -210,6 +215,11 @@ def object_detail(request, object_id):
         if image_file:
             obj.image = image_file
         obj.save()
+        if previous_image_name and obj.image and obj.image.name != previous_image_name:
+            try:
+                obj.image.storage.delete(previous_image_name)
+            except Exception:
+                pass
     except IntegrityError:
         return Response(
             {"error": "Object with same title and address already exists"},
@@ -229,7 +239,7 @@ def object_image(request, object_id):
     content_type, _ = mimetypes.guess_type(obj.image.name)
     image_file = obj.image.open("rb")
     response = FileResponse(image_file, content_type=content_type or "application/octet-stream")
-    response["Cache-Control"] = "public, max-age=86400"
+    response["Cache-Control"] = "no-store"
     return response
 
 

@@ -124,6 +124,11 @@ export const BuildingDetailsPage: React.FC = () => {
     return <DetailsPageState message={loadError || 'Объект не найден'} />;
   }
 
+  const handleToggleEditMode = () => {
+    setEditImageFile(null);
+    setIsEditMode((prev) => !prev);
+  };
+
   return (
     <div className="details-page">
       <AppHeader
@@ -136,7 +141,7 @@ export const BuildingDetailsPage: React.FC = () => {
           reviews={reviews}
           isModerator={isModerator}
           isEditMode={isEditMode}
-          onToggleEditMode={() => setIsEditMode((prev) => !prev)}
+          onToggleEditMode={handleToggleEditMode}
           editFormProps={{
             editError,
             editTitle,
