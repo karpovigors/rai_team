@@ -1,6 +1,6 @@
 import { useCallback, type Dispatch, type FormEvent, type SetStateAction } from 'react';
 import type { BuildingDetails, Review } from '../types';
-import { createBuildingReview, deleteBuilding, updateBuilding } from '../../api/buildingDetailsApi';
+import { createBuildingReview, deleteBuilding, deleteBuildingReview, updateBuilding } from '../../api/buildingDetailsApi';
 
 interface UseBuildingMutationActionsParams {
   building: BuildingDetails | null;
@@ -43,6 +43,7 @@ interface UseBuildingMutationActionsResult {
   handleSaveEdit: (e: FormEvent) => void;
   handleDeleteObject: () => void;
   handleSubmitReview: (e: FormEvent) => void;
+  handleDeleteReview: (reviewId: number) => void;
 }
 
 export const useBuildingMutationActions = ({
@@ -159,9 +160,30 @@ export const useBuildingMutationActions = ({
     })();
   }, [building, isAuthenticated, reviewState, reviewsSetters]);
 
+  const handleDeleteReview = useCallback((reviewId: number) => {
+    void (async () => {
+      if (!building || !isAuthenticated) {
+        return;
+      }
+
+      const confirmed = window.confirm('Удалить отзыв?');
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        await deleteBuildingReview(building.id, reviewId);
+        reviewsSetters.setReviews((prev) => prev.filter((item) => item.id !== reviewId));
+      } catch {
+        // Keep silent to avoid intrusive alerts; UI list will remain unchanged.
+      }
+    })();
+  }, [building, isAuthenticated, reviewsSetters]);
+
   return {
     handleSaveEdit,
     handleDeleteObject,
     handleSubmitReview,
+    handleDeleteReview,
   };
 };

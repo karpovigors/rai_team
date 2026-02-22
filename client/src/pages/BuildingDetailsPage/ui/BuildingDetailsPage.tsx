@@ -128,7 +128,7 @@ export const BuildingDetailsPage: React.FC = () => {
   const { handleLoginClick, handleLogoutClick, handleProfileClick } = useProfileActions({
     setIsProfileModalOpen,
   });
-  const { handleSaveEdit, handleDeleteObject, handleSubmitReview } = useBuildingMutationActions({
+  const { handleSaveEdit, handleDeleteObject, handleSubmitReview, handleDeleteReview } = useBuildingMutationActions({
     building,
     setBuilding,
     isAuthenticated,
@@ -243,9 +243,12 @@ export const BuildingDetailsPage: React.FC = () => {
           }}
           reviewsSectionProps={{
             isAuthenticated,
+            isModerator,
+            currentUsername: username,
             newReviewText,
             newReviewRating,
             onSubmit: handleSubmitReview,
+            onDeleteReview: handleDeleteReview,
             onReviewTextChange: setNewReviewText,
             onReviewRatingChange: setNewReviewRating,
           }}
