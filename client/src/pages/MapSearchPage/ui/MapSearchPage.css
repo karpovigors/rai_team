@@ -1,0 +1,40 @@
+.map-search-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  height: 100vh;
+}
+
+.map-search-page__main {
+  flex: 1;
+  min-height: 0;
+}
+
+.map-search-page__footer {
+  height: 100px;
+  background-color: var(--buildings-surface-bg, #f0f0f0);
+  border-top: 1px solid var(--buildings-border, #e0e0e0);
+}
+
+.map-search-page__map-wrap {
+  flex: 1;
+  min-height: 360px;
+}
+
+.map-search-page__cards {
+  padding: 16px 20px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.map-search-page__building-card {
+  text-decoration: none;
+}
+
+.map-search-page__building-description {
+  margin: 0 10px 12px;
+  color: #4b5563;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}

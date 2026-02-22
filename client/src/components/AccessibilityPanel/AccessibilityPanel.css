@@ -1,0 +1,265 @@
+.accessibility-panel {
+  /* Базовые цвета меню доступности в светлой теме ОС. */
+  --a11y-menu-bg: #ffffff;
+  --a11y-menu-text: #222222;
+  --a11y-menu-shadow: rgba(0, 0, 0, 0.15);
+  --a11y-option-bg: #f5f5f5;
+  --a11y-option-hover: #e8e8e8;
+  --a11y-option-text: #333333;
+  --a11y-option-icon-bg: #e0e0e0;
+  --a11y-hint-bg: #fff3cd;
+  --a11y-hint-text: #856404;
+  --a11y-hc-page-bg: #ffffff;
+  --a11y-hc-page-text: #111111;
+  --a11y-hc-accent: #0047ff;
+  --a11y-hc-surface: #ffffff;
+  --a11y-hc-border: #111111;
+  --a11y-hc-hover-bg: #111111;
+  --a11y-hc-hover-text: #ffffff;
+  --a11y-hc-image-filter: contrast(1.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .accessibility-panel {
+    /* Отдельная палитра для темной темы ОС, чтобы high-contrast оставался читаемым. */
+    --a11y-menu-bg: #232323;
+    --a11y-menu-text: #f2f2f2;
+    --a11y-menu-shadow: rgba(0, 0, 0, 0.45);
+    --a11y-option-bg: #2d2d2d;
+    --a11y-option-hover: #383838;
+    --a11y-option-text: #e8e8e8;
+    --a11y-option-icon-bg: #414141;
+    --a11y-hint-bg: #4f3f12;
+    --a11y-hint-text: #ffe7a3;
+    --a11y-hc-page-bg: #000000;
+    --a11y-hc-page-text: #ffffff;
+    --a11y-hc-accent: #ffff00;
+    --a11y-hc-surface: #111111;
+    --a11y-hc-border: #ffff00;
+    --a11y-hc-hover-bg: #ffff00;
+    --a11y-hc-hover-text: #000000;
+    --a11y-hc-image-filter: contrast(1.1) brightness(0.95);
+  }
+}
+
+.accessibility-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10000;
+}
+
+.accessibility-toggle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.accessibility-toggle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.5);
+}
+
+.accessibility-toggle:focus {
+  outline: 3px solid #0056b3;
+  outline-offset: 2px;
+}
+
+.accessibility-menu {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background: var(--a11y-menu-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px var(--a11y-menu-shadow);
+  padding: 16px;
+  min-width: 220px;
+  animation: accessibility-menu-slide-up 0.2s ease-out;
+  color: var(--a11y-menu-text);
+}
+
+@keyframes accessibility-menu-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.accessibility-menu-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--a11y-menu-text);
+}
+
+.accessibility-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: var(--a11y-option-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--a11y-option-text);
+  transition: background 0.2s, transform 0.1s;
+  margin-bottom: 8px;
+}
+
+.accessibility-option:last-child {
+  margin-bottom: 0;
+}
+
+.accessibility-option:hover {
+  background: var(--a11y-option-hover);
+}
+
+.accessibility-option:focus {
+  outline: 3px solid #007bff;
+  outline-offset: 2px;
+}
+
+.accessibility-option:active {
+  transform: scale(0.98);
+}
+
+.accessibility-option.active {
+  background: #007bff;
+  color: #fff;
+}
+
+.accessibility-option.active .accessibility-option-icon {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.accessibility-option-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--a11y-option-icon-bg);
+  border-radius: 6px;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.accessibility-option-label {
+  flex: 1;
+  text-align: left;
+  font-weight: 500;
+}
+
+.accessibility-hint {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: var(--a11y-hint-bg);
+  border-radius: 6px;
+  color: var(--a11y-hint-text);
+  font-size: 12px;
+}
+
+/* Режим крупного шрифта */
+.accessibility-large-font {
+  font-size: 120% !important;
+}
+
+.accessibility-large-font h1,
+.accessibility-large-font h2,
+.accessibility-large-font h3,
+.accessibility-large-font h4,
+.accessibility-large-font h5,
+.accessibility-large-font h6 {
+  font-size: 140% !important;
+}
+
+.accessibility-large-font p,
+.accessibility-large-font li,
+.accessibility-large-font span,
+.accessibility-large-font a,
+.accessibility-large-font button,
+.accessibility-large-font input,
+.accessibility-large-font label {
+  font-size: 130% !important;
+}
+
+/* Режим высокого контраста */
+.accessibility-high-contrast {
+  filter: contrast(1.12);
+}
+
+.accessibility-high-contrast body {
+  background: var(--a11y-hc-page-bg) !important;
+  color: var(--a11y-hc-page-text) !important;
+}
+
+.accessibility-high-contrast .buildings-page,
+.accessibility-high-contrast .details-page,
+.accessibility-high-contrast .map-search-page {
+  background: var(--a11y-hc-page-bg) !important;
+  color: var(--a11y-hc-page-text) !important;
+}
+
+.accessibility-high-contrast a,
+.accessibility-high-contrast button,
+.accessibility-high-contrast input,
+.accessibility-high-contrast select {
+  color: var(--a11y-hc-accent) !important;
+  border-color: var(--a11y-hc-border) !important;
+}
+
+.accessibility-high-contrast a:hover,
+.accessibility-high-contrast button:hover {
+  background: var(--a11y-hc-hover-bg) !important;
+  color: var(--a11y-hc-hover-text) !important;
+}
+
+.accessibility-high-contrast img {
+  filter: var(--a11y-hc-image-filter);
+}
+
+.accessibility-high-contrast .building-card,
+.accessibility-high-contrast .search-input,
+.accessibility-high-contrast .filter-buttons {
+  border-color: var(--a11y-hc-border) !important;
+  background: var(--a11y-hc-surface) !important;
+  color: var(--a11y-hc-page-text) !important;
+}
+
+
+/* Screen reader announcements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.accessibility-speakable {
+  cursor: pointer;
+}
+
+.accessibility-speakable:hover {
+  outline: 2px solid #007bff;
+}
