@@ -1,3 +1,7 @@
+from pathlib import Path
+
+from django.core.files import File
+
 from core.models import PlaceObject, PlaceReview
 
 
@@ -11,7 +15,8 @@ SEED_PLACES = [
         'infrastructure_type': 'Кинотеатр',
         'schedule': 'ежедневно, 10:00-02:00',
         'metros': ['Смоленская', 'Арбатская'],
-        'image_url': 'https://avatars.mds.yandex.net/get-altay/1881734/2a0000016b31d4a3311953c7416353d0c893/XXL',
+        'image_url': '',
+        'image_local_path': 'places/780c0cad4f0decb42f27c25bd04bce36.jpg',
         'lat': 55.753083,
         'lng': 37.587623,
         'sign_language': False,
@@ -32,7 +37,8 @@ SEED_PLACES = [
         'infrastructure_type': 'Театр',
         'schedule': 'ежедневно, 10:00-21:00',
         'metros': ['Первомайская'],
-        'image_url': 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/18/34/40/1f/caption.jpg?w=1200&h=-1&s=1',
+        'image_url': '',
+        'image_local_path': 'places/1200_634d1c0282682c3a4aee9523.jpg',
         'lat': 55.79766,
         'lng': 37.797065,
         'sign_language': True,
@@ -53,6 +59,7 @@ SEED_PLACES = [
         'schedule': 'ежедневно, 12:00-22:00',
         'metros': ['Марьина Роща', 'Достоевская'],
         'image_url': '',
+        'image_local_path': '',
         'lat': 55.7949,
         'lng': 37.6097,
         'sign_language': True,
@@ -71,6 +78,7 @@ SEED_PLACES = [
         'schedule': 'ежедневно, 11:00-22:00',
         'metros': ['Парк культуры', 'Октябрьская'],
         'image_url': '',
+        'image_local_path': 'places/гараж.webp',
         'lat': 55.72778,
         'lng': 37.6016,
         'sign_language': False,
@@ -89,6 +97,7 @@ SEED_PLACES = [
         'schedule': 'ежедневно, 10:00-21:00',
         'metros': ['Октябрьская', 'Парк культуры'],
         'image_url': '',
+        'image_local_path': 'places/Новая_Третьяковка.jpg',
         'lat': 55.734643,
         'lng': 37.605768,
         'sign_language': False,
@@ -107,6 +116,7 @@ SEED_PLACES = [
         'schedule': 'ежедневно, 11:00-20:00',
         'metros': ['Кропоткинская', 'Боровицкая'],
         'image_url': '',
+        'image_local_path': '',
         'lat': 55.747277,
         'lng': 37.605194,
         'sign_language': True,
@@ -125,6 +135,7 @@ SEED_PLACES = [
         'schedule': 'ежедневно, 10:00-22:00',
         'metros': ['Китай-город', 'Площадь Революции'],
         'image_url': '',
+        'image_local_path': '',
         'lat': 55.7516,
         'lng': 37.6288,
         'sign_language': False,
@@ -145,6 +156,7 @@ SEED_PLACES = [
         'schedule': 'ежедневно, 10:00-22:00',
         'metros': ['ВДНХ'],
         'image_url': '',
+        'image_local_path': 'places/вндх.webp',
         'lat': 55.826296,
         'lng': 37.63765,
         'sign_language': False,
@@ -163,6 +175,7 @@ SEED_PLACES = [
         'schedule': 'ежедневно, 10:00-22:00',
         'metros': ['Деловой центр', 'Выставочная'],
         'image_url': '',
+        'image_local_path': 'places/мфц.webp',
         'lat': 55.749162,
         'lng': 37.539742,
         'sign_language': True,
@@ -174,16 +187,42 @@ SEED_PLACES = [
 ]
 
 
+PROJECT_MEDIA_DIR = Path(__file__).resolve().parents[2] / 'media'
+
+
+def _apply_local_image(place: PlaceObject, image_local_path: str) -> None:
+    if not image_local_path:
+        return
+
+    source_path = PROJECT_MEDIA_DIR / image_local_path
+    if not source_path.exists():
+        return
+
+    current_name = place.image.name or ''
+    if current_name == image_local_path:
+        return
+
+    with source_path.open('rb') as image_file:
+        place.image.save(source_path.name, File(image_file), save=False)
+    place.save(update_fields=['image'])
+
+
 def seed_place_objects_and_reviews() -> None:
     for seed_item in SEED_PLACES:
-        item = {k: v for k, v in seed_item.items() if k != 'reviews'}
+        item = {
+            k: v
+            for k, v in seed_item.items()
+            if k not in {'reviews', 'image_local_path'}
+        }
         reviews = list(seed_item.get('reviews', []))
+        image_local_path = seed_item.get('image_local_path', '')
 
         place, _ = PlaceObject.objects.update_or_create(
             title=item['title'],
             address=item['address'],
             defaults=item,
         )
+        _apply_local_image(place, image_local_path)
 
         for review_data in reviews:
             PlaceReview.objects.get_or_create(
