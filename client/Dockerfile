@@ -1,10 +1,13 @@
 # Build stage
-FROM node:22-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+ARG VITE_YANDEX_GEOCODER_API_KEY
+ENV VITE_YANDEX_GEOCODER_API_KEY=${VITE_YANDEX_GEOCODER_API_KEY}
+
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --foreground-scripts
 
 COPY . .
 RUN npm run build

@@ -7,6 +7,7 @@ import { ProfileModal } from '../../../widgets/ProfileMenu/ui/ProfileModal';
 import { useProfileActions } from '../../../widgets/ProfileMenu/model/useProfileActions';
 import { useBuildingDetails } from '../model/hooks/useBuildingDetails';
 import type { Review } from '../model/types';
+import { geocodeAddressToCoordinates } from '../api/buildingDetailsApi';
 import { useSyncModeratorRole } from '../model/hooks/useSyncModeratorRole';
 import { useBuildingMutationActions } from '../model/hooks/useBuildingMutationActions';
 import { useBuildingMapActions } from '../model/hooks/useBuildingMapActions';
@@ -52,6 +53,8 @@ export const BuildingDetailsPage: React.FC = () => {
       return;
     }
 
+    let isCancelled = false;
+
     setReviews(building.reviews || []);
     setEditTitle(building.title || '');
     setEditDescription(building.description || '');
@@ -63,12 +66,52 @@ export const BuildingDetailsPage: React.FC = () => {
     setEditSubtitles(Boolean(building.subtitles));
     setEditRamps(Boolean(building.ramps));
     setEditBraille(Boolean(building.braille));
-    if (building.latitude && building.longitude) {
-      setEditCoordinates([building.latitude, building.longitude]);
+    const resolvedLatitude = building.latitude ?? building.lat;
+    const resolvedLongitude = building.longitude ?? building.lng;
+    const hasValidCoordinates = Number.isFinite(resolvedLatitude) && Number.isFinite(resolvedLongitude);
+    if (hasValidCoordinates) {
+      const nextCoordinates: [number, number] = [resolvedLatitude as number, resolvedLongitude as number];
+      setEditCoordinates(nextCoordinates);
+      setCoordinates(nextCoordinates);
+      void (async () => {
+        try {
+          const geocodedCoordinates = await geocodeAddressToCoordinates(building.address || '');
+          if (isCancelled || !geocodedCoordinates) {
+            return;
+          }
+          setCoordinates(geocodedCoordinates);
+          setEditCoordinates(geocodedCoordinates);
+        } catch {
+          // fallback остается на координатах из backend
+        }
+      })();
+    } else {
+      void (async () => {
+        try {
+          const geocodedCoordinates = await geocodeAddressToCoordinates(building.address || '');
+          if (isCancelled || !geocodedCoordinates) {
+            setEditCoordinates(null);
+            setCoordinates(null);
+            return;
+          }
+          setEditCoordinates(geocodedCoordinates);
+          setCoordinates(geocodedCoordinates);
+        } catch {
+          if (!isCancelled) {
+            setEditCoordinates(null);
+            setCoordinates(null);
+          }
+        }
+      })();
     }
+    setAddress(building.address || '');
     setEditImageFile(null);
     setEditError('');
     setIsEditMode(false);
+
+    return () => {
+      isCancelled = true;
+    };
   }, [building]);
 
   const { handleLoginClick, handleLogoutClick, handleProfileClick } = useProfileActions({

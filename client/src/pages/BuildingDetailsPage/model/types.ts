@@ -20,8 +20,9 @@ export interface BuildingDetails {
   rating_avg?: number;
   rating_count?: number;
   infrastructure_type?: string;
+  lat?: number;
+  lng?: number;
   latitude?: number;
   longitude?: number;
   reviews: Review[];
 }
-
