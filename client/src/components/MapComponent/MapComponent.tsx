@@ -8,6 +8,10 @@ interface Feature {
   }
   properties?: {
     name?: string
+    hintContent?: string
+    balloonContent?: string
+    balloonContentBody?: string
+    iconCaption?: string
   }
 }
 
@@ -142,9 +146,16 @@ function MapComponent({
               <Placemark
                 key={`object-${index}`}
                 geometry={coords}
-                properties={{ name: object.properties?.name || 'Объект' }}
+                properties={{
+                  name: object.properties?.name || 'Объект',
+                  hintContent: object.properties?.hintContent,
+                  balloonContent: object.properties?.balloonContent,
+                  balloonContentBody: object.properties?.balloonContentBody,
+                  iconCaption: object.properties?.iconCaption,
+                }}
                 options={{ preset: 'islands#redCircleIcon' }}
                 onClick={handleObjectClick(object)}
+                modules={['geoObject.addon.balloon', 'geoObject.addon.hint']}
               />
             )
           })}
