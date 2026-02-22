@@ -46,6 +46,12 @@ export const BuildingsPage: React.FC = () => {
   const { handleLoginClick, handleLogoutClick, handleProfileClick } = useProfileActions({
     setIsProfileModalOpen,
   });
+
+  const handleToggleAddForm = () => {
+    setAddImageFile(null);
+    setIsAddFormOpen((prev) => !prev);
+  };
+
   const handleAddBuilding = (e: React.FormEvent) => {
     void (async () => {
       e.preventDefault();
@@ -115,7 +121,7 @@ export const BuildingsPage: React.FC = () => {
           isAddFormOpen={isAddFormOpen}
           onSearchQueryChange={setSearchQuery}
           onInfrastructureTypeChange={setSelectedInfrastructureType}
-          onToggleAddForm={() => setIsAddFormOpen((prev) => !prev)}
+          onToggleAddForm={handleToggleAddForm}
         />
         {isModerator && isAddFormOpen && (
           <AddBuildingForm
