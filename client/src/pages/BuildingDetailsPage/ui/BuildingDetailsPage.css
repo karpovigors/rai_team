@@ -87,6 +87,23 @@
   background-repeat: no-repeat;
 }
 
+.details-profile-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.details-notification-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ff3b30;
+  border: 2px solid var(--details-surface-bg);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
 .details-main {
   padding: 20px 40px;
   flex-grow: 1;

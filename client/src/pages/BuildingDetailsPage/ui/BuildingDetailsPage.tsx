@@ -25,6 +25,8 @@ export const BuildingDetailsPage: React.FC = () => {
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [editUpcomingEvent, setEditUpcomingEvent] = useState('');
+  const [editDiscountInfo, setEditDiscountInfo] = useState('');
   const [editInfrastructureType, setEditInfrastructureType] = useState('');
   const [editAddress, setEditAddress] = useState('');
   const [editSchedule, setEditSchedule] = useState('');
@@ -58,6 +60,8 @@ export const BuildingDetailsPage: React.FC = () => {
     setReviews(building.reviews || []);
     setEditTitle(building.title || '');
     setEditDescription(building.description || '');
+    setEditUpcomingEvent(building.upcoming_event || '');
+    setEditDiscountInfo(building.discount_info || '');
     setEditInfrastructureType(building.infrastructure_type || '');
     setEditAddress(building.address || '');
     setEditSchedule(building.schedule || '');
@@ -137,6 +141,8 @@ export const BuildingDetailsPage: React.FC = () => {
       editAddress,
       editSchedule,
       editMetros,
+      editUpcomingEvent,
+      editDiscountInfo,
       editImageFile,
       editSignLanguage,
       editSubtitles,
@@ -194,6 +200,8 @@ export const BuildingDetailsPage: React.FC = () => {
             editSchedule,
             editMetros,
             editDescription,
+            editUpcomingEvent,
+            editDiscountInfo,
             editSignLanguage,
             editSubtitles,
             editRamps,
@@ -205,6 +213,8 @@ export const BuildingDetailsPage: React.FC = () => {
             onScheduleChange: setEditSchedule,
             onMetrosChange: setEditMetros,
             onDescriptionChange: setEditDescription,
+            onUpcomingEventChange: setEditUpcomingEvent,
+            onDiscountInfoChange: setEditDiscountInfo,
             onImageChange: setEditImageFile,
             onSignLanguageChange: setEditSignLanguage,
             onSubtitlesChange: setEditSubtitles,

@@ -28,6 +28,8 @@ export const BuildingsPage: React.FC = () => {
   const [addAddress, setAddAddress] = useState('');
   const [addMetros, setAddMetros] = useState('');
   const [addDescription, setAddDescription] = useState('');
+  const [addUpcomingEvent, setAddUpcomingEvent] = useState('');
+  const [addDiscountInfo, setAddDiscountInfo] = useState('');
   const [addLatitude, setAddLatitude] = useState('');
   const [addLongitude, setAddLongitude] = useState('');
   const [addImageFile, setAddImageFile] = useState<File | null>(null);
@@ -82,6 +84,8 @@ export const BuildingsPage: React.FC = () => {
           address: addAddress,
           metros: addMetros,
           description: addDescription,
+          upcomingEvent: addUpcomingEvent,
+          discountInfo: addDiscountInfo,
           signLanguage: addSignLanguage,
           subtitles: addSubtitles,
           ramps: addRamps,
@@ -96,6 +100,8 @@ export const BuildingsPage: React.FC = () => {
         setAddAddress('');
         setAddMetros('');
         setAddDescription('');
+        setAddUpcomingEvent('');
+        setAddDiscountInfo('');
         setAddLatitude(DEFAULT_KREMLIN_LATITUDE);
         setAddLongitude(DEFAULT_KREMLIN_LONGITUDE);
         setAddImageFile(null);
@@ -143,6 +149,8 @@ export const BuildingsPage: React.FC = () => {
             address={addAddress}
             metros={addMetros}
             description={addDescription}
+            upcomingEvent={addUpcomingEvent}
+            discountInfo={addDiscountInfo}
             latitude={addLatitude}
             longitude={addLongitude}
             signLanguage={addSignLanguage}
@@ -157,6 +165,8 @@ export const BuildingsPage: React.FC = () => {
             onAddressChange={setAddAddress}
             onMetrosChange={setAddMetros}
             onDescriptionChange={setAddDescription}
+            onUpcomingEventChange={setAddUpcomingEvent}
+            onDiscountInfoChange={setAddDiscountInfo}
             onLatitudeChange={setAddLatitude}
             onLongitudeChange={setAddLongitude}
             onSignLanguageChange={setAddSignLanguage}

@@ -110,3 +110,45 @@
   color: #b42318;
 }
 
+.push-section {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid var(--auth-border);
+  border-radius: 12px;
+  background: var(--auth-surface-bg);
+}
+
+.push-section h3,
+.push-section h4 {
+  margin: 0;
+}
+
+.push-hint {
+  margin: 0;
+}
+
+.push-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.push-test-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.push-test-form input,
+.push-test-form select {
+  border: 1px solid var(--auth-border);
+  background: var(--auth-page-bg);
+  color: var(--auth-text);
+  border-radius: 8px;
+  padding: 9px 10px;
+}

@@ -9,6 +9,8 @@ const buildApiUrl = (path: string): string => `${API_BASE_URL}${path}`;
 export interface UpdateBuildingPayload {
   title: string;
   description: string;
+  upcomingEvent: string;
+  discountInfo: string;
   infrastructureType: string;
   address: string;
   schedule: string;
@@ -33,6 +35,8 @@ export const updateBuilding = async (
   const formData = new FormData();
   formData.append('title', payload.title.trim());
   formData.append('description', payload.description.trim());
+  formData.append('upcoming_event', payload.upcomingEvent.trim());
+  formData.append('discount_info', payload.discountInfo.trim());
   formData.append('infrastructureType', payload.infrastructureType.trim());
   formData.append('address', payload.address.trim());
   formData.append('schedule', payload.schedule.trim());

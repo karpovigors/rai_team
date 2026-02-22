@@ -7,6 +7,8 @@ interface EditBuildingFormProps {
   editSchedule: string;
   editMetros: string;
   editDescription: string;
+  editUpcomingEvent: string;
+  editDiscountInfo: string;
   editSignLanguage: boolean;
   editSubtitles: boolean;
   editRamps: boolean;
@@ -18,6 +20,8 @@ interface EditBuildingFormProps {
   onScheduleChange: (value: string) => void;
   onMetrosChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
+  onUpcomingEventChange: (value: string) => void;
+  onDiscountInfoChange: (value: string) => void;
   onImageChange: (file: File | null) => void;
   onSignLanguageChange: (value: boolean) => void;
   onSubtitlesChange: (value: boolean) => void;
@@ -34,6 +38,8 @@ export const EditBuildingForm: React.FC<EditBuildingFormProps> = ({
   editSchedule,
   editMetros,
   editDescription,
+  editUpcomingEvent,
+  editDiscountInfo,
   editSignLanguage,
   editSubtitles,
   editRamps,
@@ -45,6 +51,8 @@ export const EditBuildingForm: React.FC<EditBuildingFormProps> = ({
   onScheduleChange,
   onMetrosChange,
   onDescriptionChange,
+  onUpcomingEventChange,
+  onDiscountInfoChange,
   onImageChange,
   onSignLanguageChange,
   onSubtitlesChange,
@@ -68,6 +76,16 @@ export const EditBuildingForm: React.FC<EditBuildingFormProps> = ({
       value={editDescription}
       onChange={(e) => onDescriptionChange(e.target.value)}
       rows={4}
+    />
+    <input
+      placeholder="Предстоящее событие (опционально)"
+      value={editUpcomingEvent}
+      onChange={(e) => onUpcomingEventChange(e.target.value)}
+    />
+    <input
+      placeholder="Скидка (опционально)"
+      value={editDiscountInfo}
+      onChange={(e) => onDiscountInfoChange(e.target.value)}
     />
     <input
       type="file"

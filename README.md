@@ -46,3 +46,50 @@ The frontend includes authentication pages:
    cd client
    npm run dev
    ```
+
+## Push-уведомления и сервис подписок (MVP)
+
+Реализован базовый сервис подписок и push-уведомлений:
+
+- подписка/отписка пользователя от Web Push
+- отправка уведомлений по типам:
+  - `new_place` — новые заведения
+  - `route_opening` — открытия маршрутов
+  - `event` — предстоящие события
+  - `discount` — скидки
+  - `general` — общее уведомление
+- тестовая рассылка из интерфейса профиля (для модератора)
+
+### Переменные окружения
+
+Добавьте в `.env`:
+
+- `VAPID_PUBLIC_KEY`
+- `VAPID_PRIVATE_KEY`
+- `VAPID_SUBJECT` (например, `mailto:admin@example.com`)
+
+Шаблон уже обновлен в [`.env.example`](.env.example).
+
+### Генерация VAPID-ключей
+
+Пример генерации:
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+Полученные ключи вставьте в `.env`.
+
+### Backend API
+
+- `GET /api/push/public-key` — публичный VAPID-ключ
+- `GET /api/push/subscriptions` — список подписок текущего пользователя
+- `POST /api/push/subscriptions` — сохранить подписку браузера
+- `DELETE /api/push/subscriptions` — удалить подписку по `endpoint`
+- `POST /api/push/notify` — отправка push всем подписчикам (только модератор)
+
+### Frontend
+
+- Service Worker: [`client/public/sw.js`](client/public/sw.js)
+- клиент push-подписок: [`client/src/services/pushService.ts`](client/src/services/pushService.ts)
+- UI управления подпиской: [`client/src/pages/ProfilePage/ui/ProfilePage.tsx`](client/src/pages/ProfilePage/ui/ProfilePage.tsx)

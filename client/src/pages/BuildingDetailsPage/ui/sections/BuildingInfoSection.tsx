@@ -35,6 +35,8 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
         <li>{building.schedule}</li>
         <li>{building.address}</li>
         <li>{building.metros.join(', ')}</li>
+        {building.upcoming_event && <li><strong>Событие:</strong> {building.upcoming_event}</li>}
+        {building.discount_info && <li><strong>Скидка:</strong> {building.discount_info}</li>}
       </ul>
       <p className="description">{building.description}</p>
     </div>
