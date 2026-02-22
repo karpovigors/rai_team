@@ -25,6 +25,12 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
   address,
   onMapClick,
 }) => {
+  const [isImageBroken, setIsImageBroken] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsImageBroken(false);
+  }, [building.image_url]);
+
   const selectedCoordinates = isEditMode ? editCoordinates : coordinates;
   const yandexRouteUrl = selectedCoordinates
     ? `https://yandex.ru/maps/?rtext=~${selectedCoordinates[0]},${selectedCoordinates[1]}&rtt=auto`
@@ -43,7 +49,16 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
       <p className="description">{building.description}</p>
     </div>
     <div className="info-right">
-      <img src={building.image_url} alt={building.title} className="building-image" />
+      {building.image_url && !isImageBroken ? (
+        <img
+          src={building.image_url}
+          alt={building.title}
+          className="building-image"
+          onError={() => setIsImageBroken(true)}
+        />
+      ) : (
+        <div className="building-image-placeholder">Фото отсутствует</div>
+      )}
       <ul className="accessibility-list">
         {accessibility.map((item, index) => (
           <li key={index}>{item}</li>

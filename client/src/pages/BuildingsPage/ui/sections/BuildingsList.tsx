@@ -16,6 +16,8 @@ export const BuildingsList: React.FC<BuildingsListProps> = ({
   screenReader = false,
   onSpeakText,
 }) => {
+  const [brokenImageIds, setBrokenImageIds] = React.useState<Set<number>>(new Set());
+
   const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>, building: BuildingListItem) => {
     if (screenReader && onSpeakText) {
       e.preventDefault();
@@ -48,7 +50,21 @@ export const BuildingsList: React.FC<BuildingsListProps> = ({
             role="link"
             aria-label={`${building.title}, ${building.address}`}
           >
-            <img src={building.image_url} alt={building.title} />
+            {building.image_url && !brokenImageIds.has(building.id) ? (
+              <img
+                src={building.image_url}
+                alt={building.title}
+                onError={() =>
+                  setBrokenImageIds((prev) => {
+                    const next = new Set(prev);
+                    next.add(building.id);
+                    return next;
+                  })
+                }
+              />
+            ) : (
+              <div className="building-image-placeholder">Фото отсутствует</div>
+            )}
             <h3>{building.title}</h3>
             <ul>
               {building.schedule && <li>{building.schedule}</li>}

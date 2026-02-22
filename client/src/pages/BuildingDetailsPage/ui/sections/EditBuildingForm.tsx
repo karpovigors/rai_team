@@ -3,6 +3,7 @@ import React from 'react';
 interface EditBuildingFormProps {
   editError: string;
   editTitle: string;
+  editAddress: string;
   editInfrastructureType: string;
   editSchedule: string;
   editMetros: string;
@@ -16,6 +17,7 @@ interface EditBuildingFormProps {
   isSavingEdit: boolean;
   isDeleting: boolean;
   onTitleChange: (value: string) => void;
+  onAddressChange: (value: string) => void;
   onInfrastructureTypeChange: (value: string) => void;
   onScheduleChange: (value: string) => void;
   onMetrosChange: (value: string) => void;
@@ -34,6 +36,7 @@ interface EditBuildingFormProps {
 export const EditBuildingForm: React.FC<EditBuildingFormProps> = ({
   editError,
   editTitle,
+  editAddress,
   editInfrastructureType,
   editSchedule,
   editMetros,
@@ -47,6 +50,7 @@ export const EditBuildingForm: React.FC<EditBuildingFormProps> = ({
   isSavingEdit,
   isDeleting,
   onTitleChange,
+  onAddressChange,
   onInfrastructureTypeChange,
   onScheduleChange,
   onMetrosChange,
@@ -64,6 +68,7 @@ export const EditBuildingForm: React.FC<EditBuildingFormProps> = ({
   <form className="details-edit-form" onSubmit={onSubmit}>
     {editError && <div className="details-edit-error">{editError}</div>}
     <input placeholder="Название*" value={editTitle} onChange={(e) => onTitleChange(e.target.value)} required />
+    <input placeholder="Адрес*" value={editAddress} onChange={(e) => onAddressChange(e.target.value)} required />
     <input
       placeholder="Тип (театр, кинотеатр...)"
       value={editInfrastructureType}
