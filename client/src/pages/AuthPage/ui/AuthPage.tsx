@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AuthPage.css';
 import authService from '../../../services/authService';
 
 export const AuthPage: React.FC = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -18,8 +20,7 @@ export const AuthPage: React.FC = () => {
       authService.setEmail(response.user.email || '');
       authService.setAvatarUrl(response.user.avatar_url || '');
       authService.setIsModerator(response.user.is_moderator);
-      // Redirect to main page or dashboard
-      window.location.href = '/';
+      navigate('/');
     } catch (err: unknown) {
       if (err instanceof Error && err.message === 'Invalid credentials') {
         setError('Неверный логин или пароль');

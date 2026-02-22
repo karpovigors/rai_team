@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -27,7 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
             return ""
 
         request = self.context.get("request")
-        avatar_url = obj.avatar.url
+        avatar_url = reverse("avatar_media", kwargs={"user_id": obj.id})
         if request is not None:
             return request.build_absolute_uri(avatar_url)
         return avatar_url
