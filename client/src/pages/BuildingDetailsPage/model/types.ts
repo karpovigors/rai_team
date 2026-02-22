@@ -12,6 +12,8 @@ export interface BuildingDetails {
   address: string;
   metros: string[];
   description: string;
+  upcoming_event?: string;
+  discount_info?: string;
   image_url: string;
   sign_language: boolean;
   subtitles: boolean;

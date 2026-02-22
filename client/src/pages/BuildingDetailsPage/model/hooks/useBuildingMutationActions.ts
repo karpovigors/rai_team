@@ -18,6 +18,8 @@ interface UseBuildingMutationActionsParams {
   editState: {
     editTitle: string;
     editDescription: string;
+    editUpcomingEvent: string;
+    editDiscountInfo: string;
     editInfrastructureType: string;
     editAddress: string;
     editSchedule: string;
@@ -70,6 +72,8 @@ export const useBuildingMutationActions = ({
         const updated = await updateBuilding(building.id, {
           title: editState.editTitle,
           description: editState.editDescription,
+          upcomingEvent: editState.editUpcomingEvent,
+          discountInfo: editState.editDiscountInfo,
           infrastructureType: editState.editInfrastructureType,
           address: editState.editAddress,
           schedule: editState.editSchedule,

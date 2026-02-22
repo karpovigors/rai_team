@@ -7,6 +7,29 @@ interface AppHeaderProps {
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenMap, onOpenProfile, profileAvatarUrl }) => {
+  const [hasUnreadNotifications, setHasUnreadNotifications] = React.useState(
+    localStorage.getItem('hasUnreadNotifications') === 'true',
+  );
+
+  React.useEffect(() => {
+    if (!('serviceWorker' in navigator)) {
+      return;
+    }
+
+    const handleServiceWorkerMessage = (event: MessageEvent<{ type?: string }>) => {
+      if (event.data?.type !== 'push-received') {
+        return;
+      }
+      localStorage.setItem('hasUnreadNotifications', 'true');
+      setHasUnreadNotifications(true);
+    };
+
+    navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+    return () => {
+      navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
+    };
+  }, []);
+
   const normalizeImageUrl = (rawUrl: string): string => {
     const value = String(rawUrl || '').trim();
     if (!value) {
@@ -26,6 +49,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenMap, onOpenProfile, 
 
   const resolvedAvatarUrl = profileAvatarUrl ? normalizeImageUrl(profileAvatarUrl) : '';
 
+  const handleProfileOpen = () => {
+    localStorage.setItem('hasUnreadNotifications', 'false');
+    setHasUnreadNotifications(false);
+    onOpenProfile();
+  };
+
   return (
     <header className="details-header">
       <h1>
@@ -35,13 +64,16 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenMap, onOpenProfile, 
       </h1>
       <div className="details-header-right">
         <button type="button" className="details-map-button" onClick={onOpenMap}>Карта</button>
-        <button
-          type="button"
-          className={`details-profile-icon ${resolvedAvatarUrl ? 'details-profile-icon-with-image' : ''}`}
-          aria-label="Профиль"
-          onClick={onOpenProfile}
-          style={resolvedAvatarUrl ? { backgroundImage: `url(${resolvedAvatarUrl})` } : undefined}
-        ></button>
+        <div className="details-profile-wrapper">
+          <button
+            type="button"
+            className={`details-profile-icon ${resolvedAvatarUrl ? 'details-profile-icon-with-image' : ''}`}
+            aria-label="Профиль"
+            onClick={handleProfileOpen}
+            style={resolvedAvatarUrl ? { backgroundImage: `url(${resolvedAvatarUrl})` } : undefined}
+          ></button>
+          {hasUnreadNotifications && <span className="details-notification-dot" aria-label="Есть уведомления" />}
+        </div>
       </div>
     </header>
   );

@@ -12,6 +12,8 @@ interface AddBuildingFormProps {
   address: string;
   metros: string;
   description: string;
+  upcomingEvent: string;
+  discountInfo: string;
   latitude: string;
   longitude: string;
   signLanguage: boolean;
@@ -26,6 +28,8 @@ interface AddBuildingFormProps {
   onAddressChange: (value: string) => void;
   onMetrosChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
+  onUpcomingEventChange: (value: string) => void;
+  onDiscountInfoChange: (value: string) => void;
   onLatitudeChange: (value: string) => void;
   onLongitudeChange: (value: string) => void;
   onSignLanguageChange: (value: boolean) => void;
@@ -43,6 +47,8 @@ export const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
   address,
   metros,
   description,
+  upcomingEvent,
+  discountInfo,
   latitude,
   longitude,
   signLanguage,
@@ -57,6 +63,8 @@ export const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
   onAddressChange,
   onMetrosChange,
   onDescriptionChange,
+  onUpcomingEventChange,
+  onDiscountInfoChange,
   onLatitudeChange,
   onLongitudeChange,
   onSignLanguageChange,
@@ -132,6 +140,16 @@ export const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
         rows={4}
         value={description}
         onChange={(e) => onDescriptionChange(e.target.value)}
+      />
+      <input
+        placeholder="Предстоящее событие (опционально)"
+        value={upcomingEvent}
+        onChange={(e) => onUpcomingEventChange(e.target.value)}
+      />
+      <input
+        placeholder="Скидка (опционально)"
+        value={discountInfo}
+        onChange={(e) => onDiscountInfoChange(e.target.value)}
       />
 
       <div className="moderator-inline-map">

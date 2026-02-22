@@ -1,5 +1,6 @@
 import json
 import mimetypes
+import os
 from urllib.parse import quote
 
 from django.db import IntegrityError
@@ -7,10 +8,11 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from pywebpush import webpush, WebPushException
 
-from .models import PlaceObject, PlaceReview
+from .models import PlaceObject, PlaceReview, PushSubscription
 
 
 def _parse_bool(value):
@@ -52,6 +54,85 @@ def _is_moderator(user):
     return user.is_authenticated and (user.is_superuser or getattr(user, "is_moderator", False))
 
 
+def _subscription_payload_to_data(payload):
+    endpoint = str(payload.get("endpoint", "")).strip()
+    keys = payload.get("keys") or {}
+    p256dh = str(keys.get("p256dh", "")).strip()
+    auth = str(keys.get("auth", "")).strip()
+
+    if not endpoint or not p256dh or not auth:
+        return None
+
+    return {
+        "endpoint": endpoint,
+        "p256dh": p256dh,
+        "auth": auth,
+    }
+
+
+def _build_notification_payload(notification_type, title, body, url):
+    return {
+        "type": notification_type,
+        "title": title,
+        "body": body,
+        "url": url or "/",
+    }
+
+
+def _send_push_to_subscriptions(subscriptions, payload):
+    vapid_private_key = os.getenv("VAPID_PRIVATE_KEY", "").strip()
+    vapid_subject = os.getenv("VAPID_SUBJECT", "mailto:admin@example.com").strip()
+
+    if not vapid_private_key:
+        return {
+            "sent": 0,
+            "failed": len(subscriptions),
+            "removed": 0,
+            "errors": ["VAPID_PRIVATE_KEY is not configured"],
+        }
+
+    sent = 0
+    failed = 0
+    removed = 0
+    errors = []
+
+    for subscription in subscriptions:
+        subscription_info = {
+            "endpoint": subscription.endpoint,
+            "keys": {
+                "p256dh": subscription.p256dh,
+                "auth": subscription.auth,
+            },
+        }
+
+        try:
+            webpush(
+                subscription_info=subscription_info,
+                data=json.dumps(payload, ensure_ascii=False),
+                vapid_private_key=vapid_private_key,
+                vapid_claims={"sub": vapid_subject},
+            )
+            sent += 1
+        except WebPushException as exc:
+            failed += 1
+            status_code = getattr(getattr(exc, "response", None), "status_code", None)
+            if status_code in (404, 410):
+                subscription.delete()
+                removed += 1
+                continue
+            errors.append(str(exc))
+        except Exception as exc:
+            failed += 1
+            errors.append(str(exc))
+
+    return {
+        "sent": sent,
+        "failed": failed,
+        "removed": removed,
+        "errors": errors[:10],
+    }
+
+
 def _serialize_place(request, obj, include_reviews=False):
     reviews_qs = obj.reviews.all()
     reviews_list = list(reviews_qs) if include_reviews else None
@@ -63,6 +144,8 @@ def _serialize_place(request, obj, include_reviews=False):
         "id": obj.id,
         "title": obj.title,
         "description": obj.description,
+        "upcoming_event": obj.upcoming_event,
+        "discount_info": obj.discount_info,
         "infrastructure_type": obj.infrastructure_type,
         "address": obj.address,
         "schedule": obj.schedule,
@@ -123,6 +206,8 @@ def objects_api(request):
         obj = PlaceObject.objects.create(
             title=str(data.get("title", "")).strip(),
             description=str(data.get("description", "")).strip(),
+            upcoming_event=str(data.get("upcoming_event", "")).strip(),
+            discount_info=str(data.get("discount_info", "")).strip(),
             infrastructure_type=str(data.get("infrastructureType") or data.get("infrastructure_type") or "").strip(),
             address=str(data.get("address", "")).strip(),
             schedule=str(data.get("schedule", "")).strip(),
@@ -142,6 +227,36 @@ def objects_api(request):
             status=status.HTTP_409_CONFLICT,
         )
 
+    subscriptions = list(PushSubscription.objects.select_related("user").all())
+    notifications = [
+        _build_notification_payload(
+            "new_place",
+            "Новое заведение",
+            f"Добавлено новое место: {obj.title}",
+            f"/building/{obj.id}",
+        )
+    ]
+    if obj.upcoming_event:
+        notifications.append(
+            _build_notification_payload(
+                "event",
+                "Предстоящее событие",
+                f"{obj.title}: {obj.upcoming_event}",
+                f"/building/{obj.id}",
+            )
+        )
+    if obj.discount_info:
+        notifications.append(
+            _build_notification_payload(
+                "discount",
+                "Новая скидка",
+                f"{obj.title}: {obj.discount_info}",
+                f"/building/{obj.id}",
+            )
+        )
+    for notification_payload in notifications:
+        _send_push_to_subscriptions(subscriptions, notification_payload)
+
     return Response({"id": obj.id}, status=status.HTTP_201_CREATED)
 
 
@@ -160,6 +275,14 @@ def ping(request):
             "service": "backend",
         }
     )
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def push_public_key(request):
+    return Response({
+        "publicKey": os.getenv("VAPID_PUBLIC_KEY", "").strip(),
+    })
 
 
 @api_view(["GET", "PUT", "DELETE"])
@@ -185,6 +308,8 @@ def object_detail(request, object_id):
         return Response({"error": "Moderator permissions required"}, status=status.HTTP_403_FORBIDDEN)
 
     data = request.data
+    previous_upcoming_event = obj.upcoming_event
+    previous_discount_info = obj.discount_info
     checklist = data.get("checklist") or {}
     if isinstance(checklist, str):
         try:
@@ -198,6 +323,8 @@ def object_detail(request, object_id):
     try:
         obj.title = str(data.get("title", obj.title)).strip() or obj.title
         obj.description = str(data.get("description", obj.description)).strip()
+        obj.upcoming_event = str(data.get("upcoming_event", obj.upcoming_event)).strip()
+        obj.discount_info = str(data.get("discount_info", obj.discount_info)).strip()
         obj.infrastructure_type = str(data.get("infrastructureType") or data.get("infrastructure_type") or obj.infrastructure_type).strip()
         obj.address = str(data.get("address", obj.address)).strip()
         obj.schedule = str(data.get("schedule", obj.schedule)).strip()
@@ -221,6 +348,28 @@ def object_detail(request, object_id):
         return Response(
             {"error": "Object with same title and address already exists"},
             status=status.HTTP_409_CONFLICT,
+        )
+
+    subscriptions = list(PushSubscription.objects.select_related("user").all())
+    if obj.upcoming_event and obj.upcoming_event != previous_upcoming_event:
+        _send_push_to_subscriptions(
+            subscriptions,
+            _build_notification_payload(
+                "event",
+                "Обновление события",
+                f"{obj.title}: {obj.upcoming_event}",
+                f"/building/{obj.id}",
+            ),
+        )
+    if obj.discount_info and obj.discount_info != previous_discount_info:
+        _send_push_to_subscriptions(
+            subscriptions,
+            _build_notification_payload(
+                "discount",
+                "Обновление скидки",
+                f"{obj.title}: {obj.discount_info}",
+                f"/building/{obj.id}",
+            ),
         )
 
     return Response(_serialize_place(request, obj, include_reviews=True))
@@ -277,3 +426,75 @@ def object_reviews(request, object_id):
         },
         status=status.HTTP_201_CREATED,
     )
+
+
+@api_view(["GET", "POST", "DELETE"])
+@permission_classes([IsAuthenticated])
+def push_subscriptions_api(request):
+    user = request.user
+
+    if request.method == "GET":
+        items = [
+            {
+                "id": item.id,
+                "endpoint": item.endpoint,
+                "created_at": item.created_at,
+                "updated_at": item.updated_at,
+            }
+            for item in PushSubscription.objects.filter(user=user).order_by("-updated_at")
+        ]
+        return Response({"items": items})
+
+    if request.method == "DELETE":
+        endpoint = str(request.data.get("endpoint", "")).strip()
+        if not endpoint:
+            return Response({"error": "endpoint is required"}, status=status.HTTP_400_BAD_REQUEST)
+        deleted_count, _ = PushSubscription.objects.filter(user=user, endpoint=endpoint).delete()
+        return Response({"deleted": deleted_count})
+
+    subscription_data = _subscription_payload_to_data(request.data)
+    if not subscription_data:
+        return Response({"error": "Invalid subscription payload"}, status=status.HTTP_400_BAD_REQUEST)
+
+    item, _ = PushSubscription.objects.update_or_create(
+        endpoint=subscription_data["endpoint"],
+        defaults={
+            "user": user,
+            "p256dh": subscription_data["p256dh"],
+            "auth": subscription_data["auth"],
+        },
+    )
+
+    return Response(
+        {
+            "id": item.id,
+            "endpoint": item.endpoint,
+            "created_at": item.created_at,
+            "updated_at": item.updated_at,
+        },
+        status=status.HTTP_201_CREATED,
+    )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def push_notify_api(request):
+    if not _is_moderator(request.user):
+        return Response({"error": "Moderator permissions required"}, status=status.HTTP_403_FORBIDDEN)
+
+    notification_type = str(request.data.get("type", "")).strip() or "general"
+    title = str(request.data.get("title", "")).strip()
+    body = str(request.data.get("body", "")).strip()
+    url = str(request.data.get("url", "")).strip() or "/"
+
+    if not title or not body:
+        return Response({"error": "title and body are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    payload = _build_notification_payload(notification_type, title, body, url)
+    subscriptions = list(PushSubscription.objects.select_related("user").all())
+    delivery = _send_push_to_subscriptions(subscriptions, payload)
+
+    return Response({
+        "payload": payload,
+        "delivery": delivery,
+    })
