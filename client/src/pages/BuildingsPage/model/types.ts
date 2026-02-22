@@ -8,5 +8,9 @@ export interface BuildingListItem {
   image_url: string;
   infrastructure_type?: string;
   infrastructureType?: string;
+  sign_language?: boolean;
+  subtitles?: boolean;
+  ramps?: boolean;
+  braille?: boolean;
 }
 
