@@ -92,6 +92,8 @@ export const useProfileEditor = (): UseProfileEditorResult => {
     }
 
     const image = imageRef.current;
+    // Пересчитываем координаты из CSS-пикселей в натуральный размер изображения,
+    // чтобы превью и финальный аватар совпадали независимо от масштаба на экране.
     const scaleX = imageNaturalSize.width / imageDisplaySize.width;
     const scaleY = imageNaturalSize.height / imageDisplaySize.height;
     const sx = crop.x * scaleX;
@@ -169,6 +171,7 @@ export const useProfileEditor = (): UseProfileEditorResult => {
 
   const handleCropStart = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault();
+    // Pointer Events работают и на мыши, и на touch-экранах (мобилка).
     e.currentTarget.setPointerCapture?.(e.pointerId);
     setDragOffset({
       x: e.clientX - crop.x,
@@ -191,6 +194,8 @@ export const useProfileEditor = (): UseProfileEditorResult => {
       });
     };
     const onUp = () => setDragOffset(null);
+    // Подписываемся на window, чтобы перетаскивание не прерывалось, если палец/мышь
+    // вышли за границы кружка во время движения.
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
@@ -216,6 +221,7 @@ export const useProfileEditor = (): UseProfileEditorResult => {
     }
 
     const image = imageRef.current;
+    // Формируем итоговый PNG 512x512 для стабильного отображения аватаров в UI.
     const scaleX = imageNaturalSize.width / imageDisplaySize.width;
     const scaleY = imageNaturalSize.height / imageDisplaySize.height;
     const sx = crop.x * scaleX;
