@@ -1,6 +1,8 @@
 import json
+import mimetypes
 
 from django.db import IntegrityError
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -40,7 +42,7 @@ def _parse_metros(value):
 
 def _build_image_url(request, obj):
     if obj.image:
-        return request.build_absolute_uri(obj.image.url)
+        return f"/objects/{obj.id}/image"
     return obj.image_url
 
 
@@ -215,6 +217,20 @@ def object_detail(request, object_id):
         )
 
     return Response(_serialize_place(request, obj, include_reviews=True))
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def object_image(request, object_id):
+    obj = get_object_or_404(PlaceObject, id=object_id)
+    if not obj.image:
+        return Response({"error": "Image not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    content_type, _ = mimetypes.guess_type(obj.image.name)
+    image_file = obj.image.open("rb")
+    response = FileResponse(image_file, content_type=content_type or "application/octet-stream")
+    response["Cache-Control"] = "public, max-age=86400"
+    return response
 
 
 @api_view(["POST"])
