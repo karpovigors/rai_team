@@ -13,7 +13,7 @@ interface BuildingDetailsContentProps {
   isEditMode: boolean;
   onToggleEditMode: () => void;
   editFormProps: React.ComponentProps<typeof EditBuildingForm>;
-  infoSectionProps: Omit<React.ComponentProps<typeof BuildingInfoSection>, 'building' | 'accessibility'>;
+  infoSectionProps: Omit<React.ComponentProps<typeof BuildingInfoSection>, 'building' | 'accessibility' | 'isModerator'>;
   reviewsSectionProps: Omit<React.ComponentProps<typeof ReviewsSection>, 'reviews'>;
 }
 
@@ -46,6 +46,7 @@ export const BuildingDetailsContent: React.FC<BuildingDetailsContentProps> = ({
       <BuildingInfoSection
         building={building}
         accessibility={accessibility}
+        isModerator={isModerator}
         {...infoSectionProps}
       />
 
