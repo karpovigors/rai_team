@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { Map, Placemark, YMaps } from '@pbe/react-yandex-maps'
 import { useNavigate } from 'react-router-dom'
 import { AppHeader } from '../../../widgets/AppHeader/ui/AppHeader'
+import authService from '../../../services/authService'
 import './MapSearchPage.css'
 
 interface MapObject {
@@ -48,7 +49,7 @@ const getObjectCoords = (object: MapObject): [number, number] | null => {
 function MapSearchPage() {
   const navigate = useNavigate()
   const [objects, setObjects] = useState<MapObject[]>([])
-  const objectPlacemarkRefs = useRef<Array<any | null>>([])
+  const [profileAvatarUrl] = useState(authService.getAvatarUrl() || '')
 
   useEffect(() => {
     const loadObjects = async () => {
@@ -111,20 +112,6 @@ function MapSearchPage() {
     }, [])
   }, [objects])
 
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      objectPlacemarkRefs.current.forEach((instance) => {
-        if (instance?.balloon?.open) {
-          instance.balloon.open()
-        }
-      })
-    }, 350)
-
-    return () => {
-      window.clearTimeout(timeoutId)
-    }
-  }, [mapObjects])
-
   const mapCenter = mapObjects[0]?.coords || DEFAULT_CENTER
 
   return (
@@ -132,7 +119,7 @@ function MapSearchPage() {
       <AppHeader
         onOpenMap={() => navigate('/map_search')}
         onOpenProfile={() => navigate('/profile')}
-        profileAvatarUrl={null}
+        profileAvatarUrl={profileAvatarUrl}
       />
 
       <main className="map-search-page__main">
@@ -145,7 +132,7 @@ function MapSearchPage() {
             controls={['zoomControl']}
             defaultOptions={{ suppressMapOpenBlock: true }}
           >
-            {mapObjects.map((object, index) => (
+            {mapObjects.map((object) => (
               <Placemark
                 key={`map-object-${object.id}`}
                 geometry={object.coords}
@@ -156,9 +143,6 @@ function MapSearchPage() {
                 }}
                 options={{ preset: 'islands#redIcon' }}
                 modules={['geoObject.addon.balloon', 'geoObject.addon.hint']}
-                instanceRef={(instance: any) => {
-                  objectPlacemarkRefs.current[index] = instance
-                }}
               />
             ))}
           </Map>

@@ -204,6 +204,7 @@ export const BuildingDetailsPage: React.FC = () => {
           editFormProps={{
             editError,
             editTitle,
+            editAddress,
             editInfrastructureType,
             editSchedule,
             editMetros,
@@ -217,6 +218,7 @@ export const BuildingDetailsPage: React.FC = () => {
             isSavingEdit,
             isDeleting,
             onTitleChange: setEditTitle,
+            onAddressChange: setEditAddress,
             onInfrastructureTypeChange: setEditInfrastructureType,
             onScheduleChange: setEditSchedule,
             onMetrosChange: setEditMetros,

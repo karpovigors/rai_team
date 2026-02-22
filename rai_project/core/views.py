@@ -1,7 +1,9 @@
 import json
 import mimetypes
 import os
-from urllib.parse import quote
+from urllib.error import URLError
+from urllib.parse import quote, urlencode
+from urllib.request import urlopen
 
 from django.db import IntegrityError
 from django.http import FileResponse
@@ -52,6 +54,57 @@ def _build_image_url(request, obj):
 
 def _is_moderator(user):
     return user.is_authenticated and (user.is_superuser or getattr(user, "is_moderator", False))
+
+
+def _geocode_address(address):
+    address_value = str(address or "").strip()
+    if not address_value:
+        return None
+
+    api_key = (
+        os.getenv("YANDEX_GEOCODER_API_KEY", "").strip()
+        or os.getenv("VITE_YANDEX_GEOCODER_API_KEY", "").strip()
+    )
+    if not api_key:
+        return None
+
+    query = urlencode(
+        {
+            "apikey": api_key,
+            "geocode": address_value,
+            "format": "json",
+            "lang": "ru_RU",
+        }
+    )
+
+    try:
+        with urlopen(f"https://geocode-maps.yandex.ru/1.x/?{query}", timeout=5) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except (URLError, TimeoutError, ValueError, json.JSONDecodeError):
+        return None
+
+    members = (
+        payload.get("response", {})
+        .get("GeoObjectCollection", {})
+        .get("featureMember", [])
+    )
+    if not members:
+        return None
+
+    point_pos = (
+        members[0]
+        .get("GeoObject", {})
+        .get("Point", {})
+        .get("pos", "")
+    )
+    if not point_pos:
+        return None
+
+    try:
+        lon_str, lat_str = point_pos.split()
+        return float(lat_str), float(lon_str)
+    except (ValueError, TypeError):
+        return None
 
 
 def _subscription_payload_to_data(payload):
@@ -202,6 +255,12 @@ def objects_api(request):
 
     image_file = request.FILES.get("image")
 
+    lat_value = data.get("lat") or data.get("latitude")
+    lng_value = data.get("lng") or data.get("longitude")
+    fallback_coords = None
+    if not lat_value or not lng_value:
+        fallback_coords = _geocode_address(data.get("address", ""))
+
     try:
         obj = PlaceObject.objects.create(
             title=str(data.get("title", "")).strip(),
@@ -214,8 +273,8 @@ def objects_api(request):
             metros=_parse_metros(data.get("metros", [])),
             image_url=str(data.get("imageUrl") or data.get("image_url") or "").strip(),
             image=image_file,
-            lat=data.get("lat") or data.get("latitude"),
-            lng=data.get("lng") or data.get("longitude"),
+            lat=lat_value or (fallback_coords[0] if fallback_coords else None),
+            lng=lng_value or (fallback_coords[1] if fallback_coords else None),
             sign_language=_parse_bool(data.get("sign_language", checklist.get("signLanguage"))),
             subtitles=_parse_bool(data.get("subtitles", checklist.get("subtitles"))),
             ramps=_parse_bool(data.get("ramps", checklist.get("ramps"))),
@@ -332,6 +391,11 @@ def object_detail(request, object_id):
         obj.image_url = str(data.get("imageUrl") or data.get("image_url") or obj.image_url).strip()
         obj.lat = data.get("lat") or data.get("latitude") or obj.lat
         obj.lng = data.get("lng") or data.get("longitude") or obj.lng
+        if (obj.lat is None or obj.lng is None) and obj.address:
+            fallback_coords = _geocode_address(obj.address)
+            if fallback_coords:
+                obj.lat = obj.lat if obj.lat is not None else fallback_coords[0]
+                obj.lng = obj.lng if obj.lng is not None else fallback_coords[1]
         obj.sign_language = _parse_bool(data.get("sign_language", checklist.get("signLanguage", obj.sign_language)))
         obj.subtitles = _parse_bool(data.get("subtitles", checklist.get("subtitles", obj.subtitles)))
         obj.ramps = _parse_bool(data.get("ramps", checklist.get("ramps", obj.ramps)))
