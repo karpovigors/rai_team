@@ -3,6 +3,7 @@ import { reverseGeocodeCoordinates } from '../../api/buildingDetailsApi';
 
 interface UseBuildingMapActionsParams {
   isEditMode: boolean;
+  isModerator: boolean;
   setEditCoordinates: Dispatch<SetStateAction<[number, number] | null>>;
   setEditMapAddress: Dispatch<SetStateAction<string>>;
   setEditAddress: Dispatch<SetStateAction<string>>;
@@ -16,6 +17,7 @@ interface UseBuildingMapActionsResult {
 
 export const useBuildingMapActions = ({
   isEditMode,
+  isModerator,
   setEditCoordinates,
   setEditMapAddress,
   setEditAddress,
@@ -47,6 +49,10 @@ export const useBuildingMapActions = ({
   }, [setAddress, setEditAddress, setEditMapAddress]);
 
   const handleMapClick = useCallback((coords: [number, number]) => {
+    if (!isModerator) {
+      return;
+    }
+
     if (isEditMode) {
       setEditCoordinates(coords);
       setEditMapAddress('');
@@ -57,7 +63,7 @@ export const useBuildingMapActions = ({
     setCoordinates(coords);
     setAddress('');
     void fetchAddress(coords, false);
-  }, [fetchAddress, isEditMode, setAddress, setCoordinates, setEditCoordinates, setEditMapAddress]);
+  }, [fetchAddress, isEditMode, isModerator, setAddress, setCoordinates, setEditCoordinates, setEditMapAddress]);
 
   return { handleMapClick };
 };
