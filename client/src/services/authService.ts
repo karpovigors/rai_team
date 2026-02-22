@@ -17,6 +17,7 @@ interface UpdateProfileData {
   username?: string;
   email?: string;
   password?: string;
+  remove_avatar?: boolean;
 }
 
 interface AuthResponse {
@@ -27,6 +28,7 @@ interface AuthResponse {
     username: string;
     email: string;
     is_moderator: boolean;
+    avatar_url?: string;
   };
 }
 
@@ -36,6 +38,7 @@ interface MeResponse {
     username: string;
     email: string;
     is_moderator: boolean;
+    avatar_url?: string;
   };
 }
 
@@ -91,13 +94,14 @@ class AuthService {
     return response.json();
   }
 
-  async updateProfile(data: UpdateProfileData): Promise<MeResponse> {
+  async updateProfile(data: UpdateProfileData | FormData): Promise<MeResponse> {
+    const isFormData = data instanceof FormData;
     const response = await this.authFetch('/api/auth/me/update/', {
       method: 'PUT',
-      headers: {
+      headers: isFormData ? {} : {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: isFormData ? data : JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -113,6 +117,7 @@ class AuthService {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('username');
     localStorage.removeItem('email');
+    localStorage.removeItem('avatarUrl');
     localStorage.removeItem('isModerator');
   }
 
@@ -129,6 +134,10 @@ class AuthService {
     localStorage.setItem('email', email);
   }
 
+  setAvatarUrl(avatarUrl: string): void {
+    localStorage.setItem('avatarUrl', avatarUrl);
+  }
+
   setIsModerator(isModerator: boolean): void {
     localStorage.setItem('isModerator', String(isModerator));
   }
@@ -139,6 +148,10 @@ class AuthService {
 
   getEmail(): string | null {
     return localStorage.getItem('email');
+  }
+
+  getAvatarUrl(): string | null {
+    return localStorage.getItem('avatarUrl');
   }
 
   isModerator(): boolean {
@@ -155,16 +168,6 @@ class AuthService {
 
   isAuthenticated(): boolean {
     return Boolean(this.getAccessToken());
-  }
-
-  getAuthHeaders(): Record<string, string> {
-    const token = this.getAccessToken();
-    if (!token) {
-      return {};
-    }
-    return {
-      Authorization: `Bearer ${token}`,
-    };
   }
 
   private async refreshTokens(): Promise<void> {

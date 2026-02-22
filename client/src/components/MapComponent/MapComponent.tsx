@@ -17,24 +17,54 @@ interface MapComponentProps {
   selectedFeature?: Feature | null
 }
 
+const DEFAULT_CENTER: [number, number] = [55.751244, 37.618423]
+const DEFAULT_ZOOM = 14
+
 function MapComponent({
   onMapClick,
   objects = [],
   selectedFeature,
 }: MapComponentProps) {
   const [placemark, setPlacemark] = useState<[number, number] | null>(null)
+  const [mapCenter, setMapCenter] = useState<[number, number]>(DEFAULT_CENTER)
+  const [mapZoom, setMapZoom] = useState<number>(DEFAULT_ZOOM)
 
   useEffect(() => {
     const coords = selectedFeature?.geometry?.coordinates
     if (coords && coords.length === 2) {
       setPlacemark(coords)
+      setMapCenter(coords)
+      setMapZoom(17)
     }
   }, [selectedFeature])
 
   const handleMapClick = (event: { get: (name: string) => [number, number] }) => {
     const coords = event.get('coords')
     setPlacemark(coords)
+    setMapCenter(coords)
+    setMapZoom((prev) => Math.max(prev, 17))
     onMapClick?.(coords, null)
+  }
+
+  const handlePlacemarkDragEnd = (event: any) => {
+    const coords = event?.get?.('target')?.geometry?.getCoordinates?.() as [number, number]
+    if (!coords || coords.length !== 2) {
+      return
+    }
+    setPlacemark(coords)
+    setMapCenter(coords)
+    onMapClick?.(coords, null)
+  }
+
+  const handleBoundsChange = (event: any) => {
+    const nextCenter = event?.get?.('newCenter') as [number, number] | undefined
+    const nextZoom = event?.get?.('newZoom') as number | undefined
+    if (nextCenter && nextCenter.length === 2) {
+      setMapCenter(nextCenter)
+    }
+    if (typeof nextZoom === 'number') {
+      setMapZoom(nextZoom)
+    }
   }
 
   const handleObjectClick = (object: Feature) => () => {
@@ -48,10 +78,13 @@ function MapComponent({
     <div className="map-component">
       <YMaps query={{ apikey: '7bb401a3-59b4-4be6-bc2a-602c71197f26', lang: 'ru_RU' }}>
         <Map
-          defaultState={{ center: [55.751244, 37.618423], zoom: 14 }}
+          state={{ center: mapCenter, zoom: mapZoom }}
           width="100%"
           height="100%"
           onClick={handleMapClick}
+          onBoundsChange={handleBoundsChange}
+          modules={['control.ZoomControl']}
+          controls={['zoomControl']}
           defaultOptions={{
             suppressMapOpenBlock: true,
           }}
@@ -75,7 +108,8 @@ function MapComponent({
           {placemark && (
             <Placemark
               geometry={placemark}
-              options={{ preset: 'islands#blueCircleIcon' }}
+              options={{ preset: 'islands#blueCircleIcon', draggable: true }}
+              onDragEnd={handlePlacemarkDragEnd}
             />
           )}
         </Map>

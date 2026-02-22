@@ -19,7 +19,6 @@ def seed_place_objects_and_reviews() -> None:
                 "https://avatars.mds.yandex.net/get-altay/1881734/"
                 "2a0000016b31d4a3311953c7416353d0c893/XXL"
             ),
-            "map_image_url": "https://i.imgur.com/kM8v7vJ.png",
             "sign_language": True,
             "subtitles": True,
             "ramps": True,
@@ -42,7 +41,6 @@ def seed_place_objects_and_reviews() -> None:
                 "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/18/34/"
                 "40/1f/caption.jpg?w=1200&h=-1&s=1"
             ),
-            "map_image_url": "https://i.imgur.com/kM8v7vJ.png",
             "sign_language": True,
             "subtitles": True,
             "ramps": True,

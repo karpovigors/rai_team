@@ -64,7 +64,6 @@ def _serialize_place(request, obj, include_reviews=False):
         "schedule": obj.schedule,
         "metros": obj.metros,
         "image_url": _build_image_url(request, obj),
-        "map_image_url": obj.map_image_url,
         "lat": obj.lat,
         "lng": obj.lng,
         "sign_language": obj.sign_language,
@@ -125,7 +124,6 @@ def objects_api(request):
             schedule=str(data.get("schedule", "")).strip(),
             metros=_parse_metros(data.get("metros", [])),
             image_url=str(data.get("imageUrl") or data.get("image_url") or "").strip(),
-            map_image_url=str(data.get("mapImageUrl") or data.get("map_image_url") or "").strip(),
             image=image_file,
             lat=data.get("lat") or data.get("latitude"),
             lng=data.get("lng") or data.get("longitude"),
@@ -198,7 +196,6 @@ def object_detail(request, object_id):
         obj.schedule = str(data.get("schedule", obj.schedule)).strip()
         obj.metros = _parse_metros(data.get("metros", obj.metros))
         obj.image_url = str(data.get("imageUrl") or data.get("image_url") or obj.image_url).strip()
-        obj.map_image_url = str(data.get("mapImageUrl") or data.get("map_image_url") or obj.map_image_url).strip()
         obj.lat = data.get("lat") or data.get("latitude") or obj.lat
         obj.lng = data.get("lng") or data.get("longitude") or obj.lng
         obj.sign_language = _parse_bool(data.get("sign_language", checklist.get("signLanguage", obj.sign_language)))

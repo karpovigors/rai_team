@@ -25,6 +25,7 @@ export const RegisterPage: React.FC = () => {
       authService.setTokens(response.access, response.refresh);
       authService.setUsername(response.user.username);
       authService.setEmail(response.user.email || '');
+      authService.setAvatarUrl(response.user.avatar_url || '');
       authService.setIsModerator(response.user.is_moderator);
       setSuccess(true);
       // Redirect to main page or dashboard after a short delay
