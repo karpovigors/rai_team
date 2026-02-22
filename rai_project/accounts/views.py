@@ -17,14 +17,14 @@ def register(request):
     """
     Register a new user
     """
-    serializer = UserSerializer(data=request.data)
+    serializer = UserSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         user = serializer.save()
         refresh = RefreshToken.for_user(user)
         return Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),
-            'user': UserSerializer(user).data
+            'user': UserSerializer(user, context={'request': request}).data
         }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -45,7 +45,7 @@ def login(request):
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
-                'user': UserSerializer(user).data
+                'user': UserSerializer(user, context={'request': request}).data
             })
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -56,7 +56,7 @@ def login(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def me(request):
-    return Response({'user': UserSerializer(request.user).data})
+    return Response({'user': UserSerializer(request.user, context={'request': request}).data})
 
 
 @api_view(['PUT'])
@@ -66,6 +66,8 @@ def update_me(request):
     username = request.data.get('username')
     email = request.data.get('email')
     new_password = request.data.get('password')
+    avatar_file = request.FILES.get('avatar')
+    remove_avatar = str(request.data.get('remove_avatar', '')).lower() in ('1', 'true', 'yes')
 
     if username is not None:
         username = str(username).strip()
@@ -84,8 +86,14 @@ def update_me(request):
             return Response({'error': 'Password must be at least 6 characters'}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(str(new_password))
 
+    if remove_avatar:
+        user.avatar = None
+
+    if avatar_file is not None:
+        user.avatar = avatar_file
+
     user.save()
-    return Response({'user': UserSerializer(user).data})
+    return Response({'user': UserSerializer(user, context={'request': request}).data})
 
 
 @api_view(['POST'])

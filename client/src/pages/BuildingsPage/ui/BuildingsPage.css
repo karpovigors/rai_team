@@ -77,6 +77,12 @@
   cursor: pointer;
 }
 
+.profile-icon-with-image {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 .buildings-main {
   flex-grow: 1;
   padding: 20px;
@@ -158,6 +164,26 @@
   color: #b42318;
 }
 
+.moderator-inline-map {
+  width: 100%;
+  border: 1px solid var(--buildings-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.moderator-inline-map .map-component {
+  min-height: 280px;
+  height: 280px;
+}
+
+.moderator-inline-coordinates {
+  font-size: 0.95rem;
+  color: var(--buildings-text);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .buildings-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -176,6 +202,19 @@
   width: 100%;
   height: 150px;
   object-fit: cover;
+}
+
+.building-image-placeholder {
+  width: 100%;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--buildings-border);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--buildings-surface-bg) 80%, #ffffff 20%), var(--buildings-surface-bg));
+  color: color-mix(in srgb, var(--buildings-text) 75%, transparent);
+  font-size: 0.95rem;
 }
 
 .building-card h3 {
