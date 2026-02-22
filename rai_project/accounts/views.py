@@ -86,8 +86,6 @@ def update_me(request):
         user.email = email
 
     if new_password:
-        if len(str(new_password)) < 6:
-            return Response({'error': 'Password must be at least 6 characters'}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(str(new_password))
 
     if remove_avatar and user.avatar:

@@ -8,6 +8,14 @@
   --a11y-option-icon-bg: #e0e0e0;
   --a11y-hint-bg: #fff3cd;
   --a11y-hint-text: #856404;
+  --a11y-hc-page-bg: #ffffff;
+  --a11y-hc-page-text: #111111;
+  --a11y-hc-accent: #0047ff;
+  --a11y-hc-surface: #ffffff;
+  --a11y-hc-border: #111111;
+  --a11y-hc-hover-bg: #111111;
+  --a11y-hc-hover-text: #ffffff;
+  --a11y-hc-image-filter: contrast(1.08);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -21,6 +29,14 @@
     --a11y-option-icon-bg: #414141;
     --a11y-hint-bg: #4f3f12;
     --a11y-hint-text: #ffe7a3;
+    --a11y-hc-page-bg: #000000;
+    --a11y-hc-page-text: #ffffff;
+    --a11y-hc-accent: #ffff00;
+    --a11y-hc-surface: #111111;
+    --a11y-hc-border: #ffff00;
+    --a11y-hc-hover-bg: #ffff00;
+    --a11y-hc-hover-text: #000000;
+    --a11y-hc-image-filter: contrast(1.1) brightness(0.95);
   }
 }
 
@@ -183,44 +199,47 @@
 
 /* Режим высокого контраста */
 .accessibility-high-contrast {
-  filter: contrast(1.2);
+  filter: contrast(1.12);
 }
 
 .accessibility-high-contrast body {
-  background: #000 !important;
-  color: #fff !important;
+  background: var(--a11y-hc-page-bg) !important;
+  color: var(--a11y-hc-page-text) !important;
 }
 
 .accessibility-high-contrast .buildings-page,
 .accessibility-high-contrast .details-page,
 .accessibility-high-contrast .map-search-page {
-  background: #000 !important;
+  background: var(--a11y-hc-page-bg) !important;
+  color: var(--a11y-hc-page-text) !important;
 }
 
 .accessibility-high-contrast a,
 .accessibility-high-contrast button,
 .accessibility-high-contrast input,
 .accessibility-high-contrast select {
-  color: #ffff00 !important;
-  border-color: #ffff00 !important;
+  color: var(--a11y-hc-accent) !important;
+  border-color: var(--a11y-hc-border) !important;
 }
 
 .accessibility-high-contrast a:hover,
 .accessibility-high-contrast button:hover {
-  background: #ffff00 !important;
-  color: #000 !important;
+  background: var(--a11y-hc-hover-bg) !important;
+  color: var(--a11y-hc-hover-text) !important;
 }
 
 .accessibility-high-contrast img {
-  filter: contrast(1.1) brightness(0.9);
+  filter: var(--a11y-hc-image-filter);
 }
 
 .accessibility-high-contrast .building-card,
 .accessibility-high-contrast .search-input,
 .accessibility-high-contrast .filter-buttons {
-  border-color: #ffff00 !important;
-  background: #111 !important;
+  border-color: var(--a11y-hc-border) !important;
+  background: var(--a11y-hc-surface) !important;
+  color: var(--a11y-hc-page-text) !important;
 }
+
 
 /* Screen reader announcements */
 .sr-only {

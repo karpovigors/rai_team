@@ -18,7 +18,7 @@ interface ProfileAvatarEditorProps {
   onDragOverChange: (isDragOver: boolean) => void;
   onImageFile: (file: File | null) => void;
   onImageLoad: () => void;
-  onCropStart: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onCropStart: (e: React.PointerEvent<HTMLDivElement>) => void;
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
   onClearNewImage: () => void;
   onRemoveAvatar: () => void;
@@ -93,7 +93,7 @@ export const ProfileAvatarEditor: React.FC<ProfileAvatarEditorProps> = ({
               width: `${crop.size}px`,
               height: `${crop.size}px`,
             }}
-            onMouseDown={onCropStart}
+            onPointerDown={onCropStart}
           />
         </div>
 

@@ -81,6 +81,8 @@
   border: 2px solid #fff;
   border-radius: 50%;
   cursor: move;
+  touch-action: none;
+  user-select: none;
   box-shadow: 0 0 0 200vmax rgba(0, 0, 0, 0.35);
 }
 
