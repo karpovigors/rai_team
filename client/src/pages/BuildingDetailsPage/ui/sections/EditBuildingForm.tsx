@@ -69,7 +69,14 @@ export const EditBuildingForm: React.FC<EditBuildingFormProps> = ({
       onChange={(e) => onDescriptionChange(e.target.value)}
       rows={4}
     />
-    <input type="file" accept="image/*" onChange={(e) => onImageChange(e.target.files?.[0] || null)} />
+    <input
+      type="file"
+      accept="image/*"
+      onClick={(e) => {
+        e.currentTarget.value = '';
+      }}
+      onChange={(e) => onImageChange(e.target.files?.[0] || null)}
+    />
     <div className="details-edit-checklist">
       <label><input type="checkbox" checked={editSignLanguage} onChange={(e) => onSignLanguageChange(e.target.checked)} />Жестовый язык</label>
       <label><input type="checkbox" checked={editSubtitles} onChange={(e) => onSubtitlesChange(e.target.checked)} />Субтитры</label>
@@ -91,4 +98,3 @@ export const EditBuildingForm: React.FC<EditBuildingFormProps> = ({
     </div>
   </form>
 );
-
