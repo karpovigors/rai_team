@@ -1,5 +1,5 @@
 .venv
-.env
+# .env
 rai_project/places/
 rai_project/media/
 rai_project/avatars/
