@@ -4,6 +4,7 @@ import {
   type AccessibilityChecklist,
 } from '../../../components/AccessibilityCard'
 import { MapComponent } from '../../../components/MapComponent'
+import authService from '../../../services/authService'
 import './MapAdminPage.css'
 
 interface Feature {
@@ -15,15 +16,11 @@ interface Feature {
   }
 }
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
-const buildApiUrl = (path: string): string => `${API_BASE_URL}${path}`
-
 function MapAdminPage() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
   const [selectedObject, setSelectedObject] = useState<Feature | null>(null)
-  const [selectedFeature] = useState<Feature | null>(null)
   const [checklist, setChecklist] = useState<AccessibilityChecklist>({
     signLanguage: false,
     subtitles: false,
@@ -106,7 +103,7 @@ function MapAdminPage() {
 
       if (photoFile) {
         const formData = new FormData()
-        formData.append('photo', photoFile)
+        formData.append('image', photoFile)
         formData.append('title', title)
         formData.append('description', description)
         formData.append('infrastructureType', infrastructureType)
@@ -115,7 +112,7 @@ function MapAdminPage() {
         formData.append('latitude', String(coordinates[0]))
         formData.append('checklist', JSON.stringify(checklist))
 
-        response = await fetch(buildApiUrl('/api/objects'), {
+        response = await authService.authFetch('/api/objects', {
           method: 'POST',
           body: formData,
         })
@@ -132,13 +129,24 @@ function MapAdminPage() {
           checklist,
         }
 
-        response = await fetch(buildApiUrl('/api/objects'), {
+        response = await authService.authFetch('/api/objects', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(payload),
         })
+      }
+
+      if (response.status === 401) {
+        window.alert('Нужна авторизация. Войдите в аккаунт и повторите.')
+        window.location.href = '/auth'
+        return
+      }
+
+      if (response.status === 403) {
+        window.alert('Только модератор или администратор может добавлять объекты.')
+        return
       }
 
       if (response.status === 409) {
@@ -165,7 +173,6 @@ function MapAdminPage() {
         <div className="map-admin-page__map">
           <MapComponent
             onMapClick={handleMapClick}
-            selectedFeature={selectedFeature}
           />
         </div>
         <div className="map-admin-page__side">

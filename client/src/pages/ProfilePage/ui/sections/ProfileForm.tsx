@@ -5,8 +5,8 @@ interface ProfileFormProps {
   email: string;
   password: string;
   confirmPassword: string;
-  error: string;
-  success: string;
+  error?: string;
+  success?: string;
   isSaving: boolean;
   onUsernameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
@@ -20,8 +20,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   email,
   password,
   confirmPassword,
-  error,
-  success,
+  error = '',
+  success = '',
   isSaving,
   onUsernameChange,
   onEmailChange,
