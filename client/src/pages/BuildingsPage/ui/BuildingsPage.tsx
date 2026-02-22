@@ -12,6 +12,9 @@ import { BuildingsList } from './sections/BuildingsList';
 import { AddBuildingForm } from './sections/AddBuildingForm';
 import { BuildingsProfileModal } from './overlays/BuildingsProfileModal';
 
+const DEFAULT_KREMLIN_LATITUDE = '55.751244';
+const DEFAULT_KREMLIN_LONGITUDE = '37.618423';
+
 export const BuildingsPage: React.FC = () => {
   const navigate = useNavigate();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -50,7 +53,14 @@ export const BuildingsPage: React.FC = () => {
 
   const handleToggleAddForm = () => {
     setAddImageFile(null);
-    setIsAddFormOpen((prev) => !prev);
+    setIsAddFormOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        setAddLatitude((current) => current || DEFAULT_KREMLIN_LATITUDE);
+        setAddLongitude((current) => current || DEFAULT_KREMLIN_LONGITUDE);
+      }
+      return next;
+    });
   };
 
   const handleAddBuilding = (e: React.FormEvent) => {
@@ -86,8 +96,8 @@ export const BuildingsPage: React.FC = () => {
         setAddAddress('');
         setAddMetros('');
         setAddDescription('');
-        setAddLatitude('');
-        setAddLongitude('');
+        setAddLatitude(DEFAULT_KREMLIN_LATITUDE);
+        setAddLongitude(DEFAULT_KREMLIN_LONGITUDE);
         setAddImageFile(null);
         setAddSignLanguage(false);
         setAddSubtitles(false);
