@@ -26,6 +26,7 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
   onMapClick,
 }) => {
   const [isImageBroken, setIsImageBroken] = React.useState(false);
+  const avoidStairs = true;
 
   React.useEffect(() => {
     setIsImageBroken(false);
@@ -33,8 +34,18 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
 
   const selectedCoordinates = isEditMode ? editCoordinates : coordinates;
   const yandexRouteUrl = selectedCoordinates
-    ? `https://yandex.ru/maps/?rtext=~${selectedCoordinates[0]},${selectedCoordinates[1]}&rtt=auto`
+    ? `https://yandex.ru/maps/?rtext=~${selectedCoordinates[0]},${selectedCoordinates[1]}&rtt=${avoidStairs ? 'pd' : 'auto'}`
     : null;
+  const mapBalloonContent = !isEditMode && yandexRouteUrl
+    ? `
+      <div style="min-width:220px;max-width:280px;color:#111827;">
+        <div style="font-weight:700;font-size:15px;line-height:1.25;margin-bottom:6px;">${building.title}</div>
+        ${building.address ? `<div style="font-size:13px;color:#374151;margin-bottom:4px;">${building.address}</div>` : ''}
+        ${building.schedule ? `<div style="font-size:12px;color:#6b7280;margin-bottom:8px;">${building.schedule}</div>` : ''}
+        <a href="${yandexRouteUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-block;color:#2563eb;text-decoration:none;">Добраться в Яндекс Картах</a>
+      </div>
+    `
+    : undefined;
 
   return (
     <div className="info-grid">
@@ -47,6 +58,21 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
         {building.discount_info && <li><strong>Скидка:</strong> {building.discount_info}</li>}
       </ul>
       <p className="description">{building.description}</p>
+      {!isEditMode && yandexRouteUrl && (
+        <div className="details-route-panel">
+          <a
+            href={yandexRouteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="details-route-link"
+          >
+            Проложить маршрут
+          </a>
+          <small className="details-route-hint">
+            Маршрут откроется в пешем режиме. В Яндекс Картах включите параметр «Избегать лестниц».
+          </small>
+        </div>
+      )}
     </div>
     <div className="info-right">
       {building.image_url && !isImageBroken ? (
@@ -77,7 +103,7 @@ export const BuildingInfoSection: React.FC<BuildingInfoSectionProps> = ({
               ? {
                   hintContent: 'Добраться',
                   iconCaption: 'Добраться',
-                  balloonContent: `<a href="${yandexRouteUrl}" target="_blank" rel="noopener noreferrer">Добраться в Яндекс Картах</a>`,
+                  balloonContent: mapBalloonContent,
                 }
               : undefined
           }

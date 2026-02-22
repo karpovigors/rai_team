@@ -152,3 +152,32 @@
   border-radius: 8px;
   padding: 9px 10px;
 }
+
+.learning-section {
+  margin-top: 14px;
+}
+
+.learning-cards {
+  display: grid;
+  gap: 10px;
+}
+
+.learning-card {
+  border: 1px solid var(--auth-border);
+  background: var(--auth-page-bg);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.learning-card h4 {
+  margin: 0 0 6px 0;
+}
+
+.learning-card p {
+  margin: 0 0 8px 0;
+}
+
+.learning-card ul {
+  margin: 0;
+  padding-left: 18px;
+}
