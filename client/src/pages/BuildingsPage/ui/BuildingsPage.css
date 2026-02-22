@@ -272,3 +272,21 @@
   padding: 0.6rem 1rem;
   cursor: pointer;
 }
+
+/* Accessibility icons */
+.building-icons {
+  display: flex;
+  gap: 8px;
+  padding: 0 10px 10px;
+}
+
+.accessibility-icon {
+  font-size: 1.2rem;
+  cursor: help;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.accessibility-icon:hover {
+  opacity: 1;
+}
