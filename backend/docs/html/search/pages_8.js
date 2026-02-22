@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['testing_0',['Testing',['../dir_96d65e6e951da20ba5336eec6230db24.html#autotoc_md6',1,'']]]
+  ['push_20уведомления_0',['Push уведомления',['../index.html#autotoc_md34',1,'Push-уведомления'],['../index.html#autotoc_md43',1,'Push-уведомления']]]
 ];

@@ -1,7 +1,6 @@
 var dir_4270bfced15e0e73154b13468c7c9ad9 =
 [
     [ "management", "dir_1dd389bc9af070667a4e6d2420f648c1.html", "dir_1dd389bc9af070667a4e6d2420f648c1" ],
-    [ "migrations", "dir_8dce4f938e9b125435bd2edc49c3f01d.html", "dir_8dce4f938e9b125435bd2edc49c3f01d" ],
     [ "mock_data", "dir_02ec4cf354276e8a09da3c10670cf5fb.html", "dir_02ec4cf354276e8a09da3c10670cf5fb" ],
     [ "__init__.py", "core_2____init_____8py.html", null ],
     [ "admin.py", "admin_8py.html", "admin_8py" ],

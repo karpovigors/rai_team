@@ -25,6 +25,7 @@
 var NAVTREE =
 [
   [ "RAI TEAM", "index.html", [
+    [ "Информационно-навигационная платформа для людей с нарушением слуха", "index.html", "index" ],
     [ "Пространства имен", "namespaces.html", [
       [ "Пространства имен", "namespaces.html", "namespaces_dup" ],
       [ "Члены пространств имен", "namespacemembers.html", [
@@ -51,8 +52,8 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"0002__customuser__email_8py.html",
-"classrai__project_1_1apps_1_1RaiProjectConfig.html#a827904c85a5e5f2a2e5eb5b8c69b2328"
+"accounts_2____init_____8py.html",
+"namespaceaccounts_1_1views.html"
 ];
 
 var SYNCONMSG = 'нажмите на выключить для синхронизации панелей';

@@ -3,7 +3,6 @@ var namespacecore =
     [ "admin", "namespacecore_1_1admin.html", "namespacecore_1_1admin" ],
     [ "apps", "namespacecore_1_1apps.html", "namespacecore_1_1apps" ],
     [ "management", "namespacecore_1_1management.html", "namespacecore_1_1management" ],
-    [ "migrations", "namespacecore_1_1migrations.html", "namespacecore_1_1migrations" ],
     [ "mock_data", "namespacecore_1_1mock__data.html", "namespacecore_1_1mock__data" ],
     [ "models", "namespacecore_1_1models.html", "namespacecore_1_1models" ],
     [ "tests", "namespacecore_1_1tests.html", null ],

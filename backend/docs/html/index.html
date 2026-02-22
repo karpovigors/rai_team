@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.15.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>RAI TEAM: Титульная страница</title>
+<title>RAI TEAM: Информационно-навигационная платформа для людей с нарушением слуха</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -87,10 +87,312 @@ $(function(){initNavTree('index.html','',''); });
 </div>
 </div>
 
-<div class="header">
-  <div class="headertitle"><div class="title">RAI TEAM Документация</div></div>
+<div><div class="header">
+  <div class="headertitle"><div class="title">Информационно-навигационная платформа для людей с нарушением слуха </div></div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><p><a class="anchor" id="md__2home_2redalexdad_2GitHub_2rai__team_2README"></a></p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md14"></a>
+Описание системы</h1>
+<p>Это веб-приложение представляет собой информационно-навигационную платформу, специально разработанную для людей с нарушением слуха. Система предоставляет возможность находить доступные городские объекты, оценивать их по различным критериям доступности и делиться опытом через отзывы.</p>
+<p>Основные возможности системы:</p><ul>
+<li>Просмотр списка объектов с фильтрами</li>
+<li>Просмотр объектов на карте</li>
+<li>Переход в карточку объекта с подробной информацией</li>
+<li>Регистрация и вход в личный кабинет</li>
+<li>Редактирование профиля и аватара</li>
+<li>Подписка на push-уведомления</li>
+<li>Публикация отзывов</li>
+</ul>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
+Технологии</h1>
+<p>Проект состоит из двух основных частей:</p><ul>
+<li><b>Backend</b>: Django REST API</li>
+<li><b>Frontend</b>: React/Vite с использованием TypeScript</li>
+<li><b>База данных</b>: PostgreSQL</li>
+<li><b>Хранилище файлов</b>: S3-совместимое хранилище (MinIO)</li>
+<li><b>Оркестрация</b>: Docker Compose</li>
+</ul>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md16"></a>
+Установка и запуск</h1>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md17"></a>
+Требования</h2>
+<ul>
+<li>Docker Engine</li>
+<li>Docker Compose</li>
+<li>GNU Make</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md18"></a>
+Установка</h2>
+<ol type="1">
+<li>Клонируйте репозиторий: <div class="fragment"><div class="line">git clone https://github.com/karpovigors/rai_team.git</div>
+<div class="line">cd rai_team</div>
+</div><!-- fragment --></li>
+<li>Создайте файл <span class="tt">.env</span> на основе шаблона <span class="tt">.env.example</span>: <div class="fragment"><div class="line">cp .env.example .env</div>
+</div><!-- fragment --></li>
+<li>Отредактируйте <span class="tt">.env</span> файл и укажите необходимые переменные окружения:</li>
+</ol>
+<ul>
+<li><span class="tt">DB_NAME</span>, <span class="tt">DB_USER</span>, <span class="tt">DB_PASSWORD</span> - для подключения к PostgreSQL</li>
+<li><span class="tt">S3_ACCESS_KEY</span>, <span class="tt">S3_SECRET_KEY</span> - для подключения к MinIO</li>
+<li><span class="tt">DJANGO_SUPERUSER_USERNAME</span>, <span class="tt">DJANGO_SUPERUSER_PASSWORD</span> - для создания суперпользователя</li>
+<li><span class="tt">VAPID_PUBLIC_KEY</span>, <span class="tt">VAPID_PRIVATE_KEY</span>, <span class="tt">VAPID_SUBJECT</span> - для push-уведомлений</li>
+<li><span class="tt">VITE_YANDEX_GEOCODER_API_KEY</span> - для использования Яндекс.Карт</li>
+</ul>
+<ol type="1">
+<li>Запустите приложение с помощью Docker Compose: <div class="fragment"><div class="line">make build</div>
+<div class="line">make up</div>
+</div><!-- fragment --></li>
+</ol>
+<p>Приложение будет доступно по адресу <span class="tt"><a href="http://localhost">http://localhost</a></span></p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md19"></a>
+Альтернативный запуск без Docker</h2>
+<p>Если вы хотите запустить приложение без Docker:</p>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md20"></a>
+Backend:</h3>
+<div class="fragment"><div class="line">cd backend</div>
+<div class="line">pip install -r requirements.txt</div>
+<div class="line">python manage.py migrate</div>
+<div class="line">python manage.py runserver</div>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md21"></a>
+Frontend:</h3>
+<div class="fragment"><div class="line">cd client</div>
+<div class="line">npm install</div>
+<div class="line">npm run dev</div>
+</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="autotoc_md22"></a>
+Навигация по приложению</h1>
+<p>После запуска приложения вы можете получить доступ к следующим страницам:</p>
+<ul>
+<li><span class="tt">/</span> - Главная страница со списком объектов</li>
+<li><span class="tt">/building/:id</span> - Карточка конкретного объекта</li>
+<li><span class="tt">/map_search</span> - Карта с объектами</li>
+<li><span class="tt">/auth</span> - Страница авторизации</li>
+<li><span class="tt">/register</span> - Страница регистрации</li>
+<li><span class="tt">/profile</span> - Личный профиль пользователя</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md23"></a>
+Главная страница</h2>
+<p>На главной странице отображается список доступных объектов с возможностью:</p><ul>
+<li>Поиска по названию</li>
+<li>Фильтрации по типу инфраструктуры</li>
+<li>Просмотра карточек объектов с основной информацией</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md24"></a>
+Карта</h2>
+<p>На странице карты отображаются метки всех объектов с возможностью:</p><ul>
+<li>Просмотра информации о каждом объекте</li>
+<li>Перехода к построению маршрута в Яндекс.Картах</li>
+<li>Просмотра фотографий и краткого описания объекта</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md25"></a>
+Карточка объекта</h2>
+<p>Каждый объект имеет свою карточку, содержащую:</p><ul>
+<li>Название и описание</li>
+<li>Адрес</li>
+<li>График работы</li>
+<li>Ближайшие станции метро</li>
+<li>Информацию о доступности (жестовый язык, субтитры, пандусы, Брайль)</li>
+<li>Отзывы пользователей</li>
+</ul>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md26"></a>
+Регистрация и авторизация</h1>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md27"></a>
+Регистрация</h2>
+<p>Для регистрации нового пользователя:</p><ol type="1">
+<li>Перейдите на страницу <span class="tt">/register</span></li>
+<li>Заполните форму регистрации:<ul>
+<li>Имя пользователя</li>
+<li>Электронная почта</li>
+<li>Пароль</li>
+<li>Подтверждение пароля</li>
+</ul>
+</li>
+<li>Нажмите кнопку "Зарегистрироваться"</li>
+</ol>
+<p>После успешной регистрации вы автоматически войдете в систему.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md28"></a>
+Вход в систему</h2>
+<p>Для входа в систему:</p><ol type="1">
+<li>Перейдите на страницу <span class="tt">/auth</span></li>
+<li>Введите свои учетные данные:<ul>
+<li>Имя пользователя</li>
+<li>Пароль</li>
+</ul>
+</li>
+<li>Нажмите кнопку "Войти"</li>
+</ol>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md29"></a>
+Роли пользователей</h1>
+<p>Система поддерживает различные роли пользователей:</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md30"></a>
+Обычный пользователь</h2>
+<ul>
+<li>Может просматривать объекты</li>
+<li>Может оставлять отзывы</li>
+<li>Может редактировать свой профиль</li>
+<li>Может подписываться на push-уведомления</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md31"></a>
+Модератор</h2>
+<ul>
+<li>Все права обычного пользователя</li>
+<li>Может добавлять новые объекты</li>
+<li>Может редактировать существующие объекты</li>
+<li>Может удалять объекты</li>
+<li>Может удалять отзывы других пользователей</li>
+<li>Может отправлять тестовые push-уведомления</li>
+</ul>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md32"></a>
+Работа с профилем</h1>
+<p>В личном профиле пользователь может:</p><ul>
+<li>Изменить имя пользователя</li>
+<li>Изменить электронную почту</li>
+<li>Сменить пароль</li>
+<li>Загрузить или удалить аватар</li>
+<li>Управлять push-уведомлениями</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md33"></a>
+Работа с аватаром</h2>
+<p>Система поддерживает загрузку и редактирование аватаров:</p><ul>
+<li>Загрузка нового изображения</li>
+<li>Перетаскивание файла (drag-and-drop)</li>
+<li>Кадрирование изображения</li>
+<li>Удаление текущего аватара</li>
+<li>Редактирование уже установленного аватара</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md34"></a>
+Push-уведомления</h2>
+<p>Пользователи могут подписаться на различные типы уведомлений:</p><ul>
+<li>Новые заведения</li>
+<li>Открытия маршрутов</li>
+<li>События</li>
+<li>Скидки</li>
+<li>Общие уведомления</li>
+</ul>
+<p>Только модераторы могут отправлять тестовые уведомления другим пользователям.</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md35"></a>
+Специальные возможности интерфейса</h1>
+<p>Интерфейс приложения включает в себя панель специальных возможностей:</p><ul>
+<li>Увеличение шрифта</li>
+<li>Высокий контраст</li>
+<li>Озвучивание текста (экранный диктор)</li>
+</ul>
+<p>Эти функции помогают адаптировать работу приложения под индивидуальные потребности пользователей.</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md36"></a>
+Для разработчиков</h1>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md37"></a>
+Структура проекта</h2>
+<div class="fragment"><div class="line">rai_team/</div>
+<div class="line">├── backend/          # Django backend</div>
+<div class="line">│   ├── accounts/     # Модуль аутентификации</div>
+<div class="line">│   ├── core/         # Основная логика</div>
+<div class="line">│   └── rai_project/  # Настройки Django</div>
+<div class="line">├── client/           # React frontend</div>
+<div class="line">│   ├── src/</div>
+<div class="line">│   │   ├── components/    # Компоненты</div>
+<div class="line">│   │   ├── pages/         # Страницы приложения</div>
+<div class="line">│   │   ├── services/      # Сервисы (аутентификация, push-уведомления)</div>
+<div class="line">│   │   └── widgets/       # Виджеты</div>
+<div class="line">├── docker-compose.yml</div>
+<div class="line">├── Makefile</div>
+<div class="line">└── README.md</div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md38"></a>
+Команды Make</h2>
+<p>Проект включает удобные команды для администрирования:</p>
+<ul>
+<li><span class="tt">make build</span> - Сборка всех контейнеров</li>
+<li><span class="tt">make up</span> - Запуск всех сервисов</li>
+<li><span class="tt">make dev</span> - Запуск с логами</li>
+<li><span class="tt">make down</span> - Остановка и удаление контейнеров</li>
+<li><span class="tt">make logs</span> - Просмотр логов</li>
+<li><span class="tt">make migrate</span> - Применение миграций</li>
+<li><span class="tt">make test</span> - Запуск тестов</li>
+<li><span class="tt">make db-backup</span> - Создание бэкапа БД</li>
+<li><span class="tt">make clean</span> - Полная очистка</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md39"></a>
+Переменные окружения</h2>
+<p>Система использует следующие группы переменных окружения:</p>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md40"></a>
+База данных</h3>
+<ul>
+<li><span class="tt">DB_NAME</span></li>
+<li><span class="tt">DB_USER</span></li>
+<li><span class="tt">DB_PASSWORD</span></li>
+<li><span class="tt">DB_HOST</span></li>
+<li><span class="tt">DB_PORT</span></li>
+</ul>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md41"></a>
+Django</h3>
+<ul>
+<li><span class="tt">DEBUG</span></li>
+<li><span class="tt">SECRET_KEY</span></li>
+<li><span class="tt">DJANGO_SUPERUSER_*</span></li>
+<li><span class="tt">MODERATOR_*</span></li>
+</ul>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md42"></a>
+S3/MinIO</h3>
+<ul>
+<li><span class="tt">S3_ACCESS_KEY</span></li>
+<li><span class="tt">S3_SECRET_KEY</span></li>
+<li><span class="tt">S3_BUCKET_NAME</span></li>
+<li><span class="tt">S3_ENDPOINT_URL</span></li>
+</ul>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md43"></a>
+Push-уведомления</h3>
+<ul>
+<li><span class="tt">VAPID_PUBLIC_KEY</span></li>
+<li><span class="tt">VAPID_PRIVATE_KEY</span></li>
+<li><span class="tt">VAPID_SUBJECT</span></li>
+</ul>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md44"></a>
+Карты</h3>
+<ul>
+<li><span class="tt">VITE_YANDEX_GEOCODER_API_KEY</span></li>
+<li><span class="tt">VITE_YANDEX_MAPS_API_KEY</span></li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md45"></a>
+Документация</h2>
+<p>Backend-часть проекта содержит документацию в формате Doxygen. Чтобы сгенерировать документацию, выполните:</p>
+<div class="fragment"><div class="line">cd backend</div>
+<div class="line">doxygen Doxyfile</div>
+</div><!-- fragment --><p>Документация будет доступна в папке <span class="tt">backend/docs/html</span>.</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md46"></a>
+Устранение неполадок</h1>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md47"></a>
+Распространенные проблемы</h2>
+<ol type="1">
+<li><b>Не загружается карта</b><ul>
+<li>Проверьте, что в системе корректно настроен ключ Яндекс.Карт</li>
+</ul>
+</li>
+<li><b>Не работают push-уведомления</b><ul>
+<li>Проверьте разрешение уведомлений в браузере</li>
+</ul>
+</li>
+<li><b>Проблемы с авторизацией</b><ul>
+<li>Проверьте настройки CORS в Django</li>
+<li>Убедитесь, что сервер API доступен</li>
+</ul>
+</li>
+<li><b>Не загружаются изображения</b><ul>
+<li>Проверьте настройки S3/MinIO</li>
+<li>Убедитесь, что бакет создан и доступен</li>
+</ul>
+</li>
+</ol>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md48"></a>
+Общие шаги решения проблем</h2>
+<ol type="1">
+<li>Обновите страницу в браузере</li>
+<li>Проверьте интернет-соединение</li>
+<li>Повторите вход в аккаунт</li>
+<li>Проверьте логи контейнеров: <span class="tt">make logs</span></li>
+</ol>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md49"></a>
+Лицензия</h1>
+<p>Проект распространяется под лицензией MIT. </p>
+</div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>
 </div><!-- contents -->
 </div><!-- doc-content -->

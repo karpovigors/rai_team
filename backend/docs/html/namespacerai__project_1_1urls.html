@@ -145,17 +145,7 @@ Including another URLconf
 @return bool True, если пользователь активен и является суперпользователем
 </pre> 
 <p class="definition">См. определение в файле <a class="el" href="rai__project_2urls_8py_source.html">urls.py</a> строка <a class="el" href="rai__project_2urls_8py_source.html#l00022">22</a></p>
-<div class="fragment"><div class="line"><span class="lineno">   22</span><span class="keyword">def </span>_superuser_admin_only(request):</div>
-<div class="line"><span class="lineno">   23</span>    <span class="stringliteral">&quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">   24</span><span class="stringliteral">    @brief Функция проверки прав доступа к админке</span></div>
-<div class="line"><span class="lineno">   25</span><span class="stringliteral">    Ограничивает доступ к административной панели только суперпользователям</span></div>
-<div class="line"><span class="lineno">   26</span><span class="stringliteral">    @param request HTTP-запрос</span></div>
-<div class="line"><span class="lineno">   27</span><span class="stringliteral">    @return bool True, если пользователь активен и является суперпользователем</span></div>
-<div class="line"><span class="lineno">   28</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">   29</span>    <span class="keywordflow">return</span> request.user.is_active <span class="keywordflow">and</span> request.user.is_superuser</div>
-<div class="line"><span class="lineno">   30</span> </div>
-<div class="line"><span class="lineno">   31</span> </div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Переменные</h2>

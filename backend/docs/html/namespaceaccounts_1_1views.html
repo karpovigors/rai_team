@@ -130,25 +130,7 @@ $(function(){initNavTree('namespaceaccounts_1_1views.html','',''); });
 @return FileResponse Файл аватара пользователя
 </pre> 
 <p class="definition">См. определение в файле <a class="el" href="accounts_2views_8py_source.html">views.py</a> строка <a class="el" href="accounts_2views_8py_source.html#l00129">129</a></p>
-<div class="fragment"><div class="line"><span class="lineno">  129</span><span class="keyword">def </span>avatar_media(request, user_id):</div>
-<div class="line"><span class="lineno">  130</span>    <span class="stringliteral">&quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">  131</span><span class="stringliteral">    @brief Получение аватара пользователя по ID</span></div>
-<div class="line"><span class="lineno">  132</span><span class="stringliteral">    @param request Запрос без аутентификации</span></div>
-<div class="line"><span class="lineno">  133</span><span class="stringliteral">    @param user_id ID пользователя</span></div>
-<div class="line"><span class="lineno">  134</span><span class="stringliteral">    @return FileResponse Файл аватара пользователя</span></div>
-<div class="line"><span class="lineno">  135</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">  136</span>    user = get_object_or_404(User, id=user_id)</div>
-<div class="line"><span class="lineno">  137</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> user.avatar:</div>
-<div class="line"><span class="lineno">  138</span>        <span class="keywordflow">return</span> Response({<span class="stringliteral">&#39;error&#39;</span>: <span class="stringliteral">&#39;Avatar not found&#39;</span>}, status=status.HTTP_404_NOT_FOUND)</div>
-<div class="line"><span class="lineno">  139</span> </div>
-<div class="line"><span class="lineno">  140</span>    content_type, _ = mimetypes.guess_type(user.avatar.name)</div>
-<div class="line"><span class="lineno">  141</span>    avatar_file = user.avatar.open(<span class="stringliteral">&#39;rb&#39;</span>)</div>
-<div class="line"><span class="lineno">  142</span>    <span class="keywordflow">return</span> FileResponse(avatar_file, content_type=content_type <span class="keywordflow">or</span> <span class="stringliteral">&#39;application/octet-stream&#39;</span>)</div>
-<div class="line"><span class="lineno">  143</span> </div>
-<div class="line"><span class="lineno">  144</span> </div>
-<div class="line"><span class="lineno">  145</span><span class="preprocessor">@api_view([&#39;POST&#39;])</span></div>
-<div class="line"><span class="lineno">  146</span><span class="preprocessor">@permission_classes([AllowAny])</span></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a id="a041763a0aac0546cf7042f3b376030fb" name="a041763a0aac0546cf7042f3b376030fb"></a>
@@ -170,33 +152,7 @@ $(function(){initNavTree('namespaceaccounts_1_1views.html','',''); });
 @return Response Объект ответа с JWT токенами и данными пользователя
 </pre> 
 <p class="definition">См. определение в файле <a class="el" href="accounts_2views_8py_source.html">views.py</a> строка <a class="el" href="accounts_2views_8py_source.html#l00040">40</a></p>
-<div class="fragment"><div class="line"><span class="lineno">   40</span><span class="keyword">def </span>login(request):</div>
-<div class="line"><span class="lineno">   41</span>    <span class="stringliteral">&quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">   42</span><span class="stringliteral">    @brief Аутентификация пользователя и возврат JWT токенов</span></div>
-<div class="line"><span class="lineno">   43</span><span class="stringliteral">    @param request Запрос с логином и паролем пользователя</span></div>
-<div class="line"><span class="lineno">   44</span><span class="stringliteral">    @return Response Объект ответа с JWT токенами и данными пользователя</span></div>
-<div class="line"><span class="lineno">   45</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">   46</span>    username = request.data.get(<span class="stringliteral">&#39;username&#39;</span>)</div>
-<div class="line"><span class="lineno">   47</span>    password = request.data.get(<span class="stringliteral">&#39;password&#39;</span>)</div>
-<div class="line"><span class="lineno">   48</span>    </div>
-<div class="line"><span class="lineno">   49</span>    <span class="keywordflow">if</span> username <span class="keywordflow">and</span> password:</div>
-<div class="line"><span class="lineno">   50</span>        user = authenticate(request, username=username, password=password)</div>
-<div class="line"><span class="lineno">   51</span>        <span class="keywordflow">if</span> user:</div>
-<div class="line"><span class="lineno">   52</span>            refresh = RefreshToken.for_user(user)</div>
-<div class="line"><span class="lineno">   53</span>            <span class="keywordflow">return</span> Response({</div>
-<div class="line"><span class="lineno">   54</span>                <span class="stringliteral">&#39;refresh&#39;</span>: str(refresh),</div>
-<div class="line"><span class="lineno">   55</span>                <span class="stringliteral">&#39;access&#39;</span>: str(refresh.access_token),</div>
-<div class="line"><span class="lineno">   56</span>                <span class="stringliteral">&#39;user&#39;</span>: UserSerializer(user, context={<span class="stringliteral">&#39;request&#39;</span>: request}).data</div>
-<div class="line"><span class="lineno">   57</span>            })</div>
-<div class="line"><span class="lineno">   58</span>        <span class="keywordflow">else</span>:</div>
-<div class="line"><span class="lineno">   59</span>            <span class="keywordflow">return</span> Response({<span class="stringliteral">&#39;error&#39;</span>: <span class="stringliteral">&#39;Invalid credentials&#39;</span>}, status=status.HTTP_401_UNAUTHORIZED)</div>
-<div class="line"><span class="lineno">   60</span>    <span class="keywordflow">else</span>:</div>
-<div class="line"><span class="lineno">   61</span>        <span class="keywordflow">return</span> Response({<span class="stringliteral">&#39;error&#39;</span>: <span class="stringliteral">&#39;Username and password required&#39;</span>}, status=status.HTTP_400_BAD_REQUEST)</div>
-<div class="line"><span class="lineno">   62</span> </div>
-<div class="line"><span class="lineno">   63</span> </div>
-<div class="line"><span class="lineno">   64</span><span class="preprocessor">@api_view([&#39;GET&#39;])</span></div>
-<div class="line"><span class="lineno">   65</span><span class="preprocessor">@permission_classes([IsAuthenticated])</span></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a id="a615ba922ec2c36c23105da748f6a1ccf" name="a615ba922ec2c36c23105da748f6a1ccf"></a>
@@ -218,18 +174,7 @@ $(function(){initNavTree('namespaceaccounts_1_1views.html','',''); });
 @return Response Объект ответа с данными пользователя
 </pre> 
 <p class="definition">См. определение в файле <a class="el" href="accounts_2views_8py_source.html">views.py</a> строка <a class="el" href="accounts_2views_8py_source.html#l00066">66</a></p>
-<div class="fragment"><div class="line"><span class="lineno">   66</span><span class="keyword">def </span>me(request):</div>
-<div class="line"><span class="lineno">   67</span>    <span class="stringliteral">&quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">   68</span><span class="stringliteral">    @brief Получение информации о текущем пользователе</span></div>
-<div class="line"><span class="lineno">   69</span><span class="stringliteral">    @param request Запрос с аутентификацией</span></div>
-<div class="line"><span class="lineno">   70</span><span class="stringliteral">    @return Response Объект ответа с данными пользователя</span></div>
-<div class="line"><span class="lineno">   71</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">   72</span>    <span class="keywordflow">return</span> Response({<span class="stringliteral">&#39;user&#39;</span>: UserSerializer(request.user, context={<span class="stringliteral">&#39;request&#39;</span>: request}).data})</div>
-<div class="line"><span class="lineno">   73</span> </div>
-<div class="line"><span class="lineno">   74</span> </div>
-<div class="line"><span class="lineno">   75</span><span class="preprocessor">@api_view([&#39;PUT&#39;])</span></div>
-<div class="line"><span class="lineno">   76</span><span class="preprocessor">@permission_classes([IsAuthenticated])</span></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a id="ae413a985e2e995b12c3b31148f73055e" name="ae413a985e2e995b12c3b31148f73055e"></a>
@@ -251,25 +196,7 @@ $(function(){initNavTree('namespaceaccounts_1_1views.html','',''); });
 @return Response Объект ответа с новыми access и refresh токенами
 </pre> 
 <p class="definition">См. определение в файле <a class="el" href="accounts_2views_8py_source.html">views.py</a> строка <a class="el" href="accounts_2views_8py_source.html#l00147">147</a></p>
-<div class="fragment"><div class="line"><span class="lineno">  147</span><span class="keyword">def </span>refresh(request):</div>
-<div class="line"><span class="lineno">  148</span>    <span class="stringliteral">&quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">  149</span><span class="stringliteral">    @brief Обновление JWT токена</span></div>
-<div class="line"><span class="lineno">  150</span><span class="stringliteral">    @param request Запрос с refresh токеном</span></div>
-<div class="line"><span class="lineno">  151</span><span class="stringliteral">    @return Response Объект ответа с новыми access и refresh токенами</span></div>
-<div class="line"><span class="lineno">  152</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">  153</span>    token = request.data.get(<span class="stringliteral">&#39;refresh&#39;</span>)</div>
-<div class="line"><span class="lineno">  154</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> token:</div>
-<div class="line"><span class="lineno">  155</span>        <span class="keywordflow">return</span> Response({<span class="stringliteral">&#39;error&#39;</span>: <span class="stringliteral">&#39;Refresh token required&#39;</span>}, status=status.HTTP_400_BAD_REQUEST)</div>
-<div class="line"><span class="lineno">  156</span> </div>
-<div class="line"><span class="lineno">  157</span>    <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno">  158</span>        refresh_token = RefreshToken(token)</div>
-<div class="line"><span class="lineno">  159</span>        <span class="keywordflow">return</span> Response({</div>
-<div class="line"><span class="lineno">  160</span>            <span class="stringliteral">&#39;access&#39;</span>: str(refresh_token.access_token),</div>
-<div class="line"><span class="lineno">  161</span>            <span class="stringliteral">&#39;refresh&#39;</span>: str(refresh_token),</div>
-<div class="line"><span class="lineno">  162</span>        })</div>
-<div class="line"><span class="lineno">  163</span>    <span class="keywordflow">except</span> TokenError:</div>
-<div class="line"><span class="lineno">  164</span>        <span class="keywordflow">return</span> Response({<span class="stringliteral">&#39;error&#39;</span>: <span class="stringliteral">&#39;Invalid refresh token&#39;</span>}, status=status.HTTP_401_UNAUTHORIZED)</div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a id="aec76cad021048e2c435e8c1ed6181dc9" name="aec76cad021048e2c435e8c1ed6181dc9"></a>
@@ -291,27 +218,7 @@ $(function(){initNavTree('namespaceaccounts_1_1views.html','',''); });
 @return Response Объект ответа с JWT токенами и данными пользователя
 </pre> 
 <p class="definition">См. определение в файле <a class="el" href="accounts_2views_8py_source.html">views.py</a> строка <a class="el" href="accounts_2views_8py_source.html#l00020">20</a></p>
-<div class="fragment"><div class="line"><span class="lineno">   20</span><span class="keyword">def </span>register(request):</div>
-<div class="line"><span class="lineno">   21</span>    <span class="stringliteral">&quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">   22</span><span class="stringliteral">    @brief Регистрация нового пользователя</span></div>
-<div class="line"><span class="lineno">   23</span><span class="stringliteral">    @param request Запрос с данными пользователя</span></div>
-<div class="line"><span class="lineno">   24</span><span class="stringliteral">    @return Response Объект ответа с JWT токенами и данными пользователя</span></div>
-<div class="line"><span class="lineno">   25</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">   26</span>    serializer = UserSerializer(data=request.data, context={<span class="stringliteral">&#39;request&#39;</span>: request})</div>
-<div class="line"><span class="lineno">   27</span>    <span class="keywordflow">if</span> serializer.is_valid():</div>
-<div class="line"><span class="lineno">   28</span>        user = serializer.save()</div>
-<div class="line"><span class="lineno">   29</span>        refresh = RefreshToken.for_user(user)</div>
-<div class="line"><span class="lineno">   30</span>        <span class="keywordflow">return</span> Response({</div>
-<div class="line"><span class="lineno">   31</span>            <span class="stringliteral">&#39;refresh&#39;</span>: str(refresh),</div>
-<div class="line"><span class="lineno">   32</span>            <span class="stringliteral">&#39;access&#39;</span>: str(refresh.access_token),</div>
-<div class="line"><span class="lineno">   33</span>            <span class="stringliteral">&#39;user&#39;</span>: UserSerializer(user, context={<span class="stringliteral">&#39;request&#39;</span>: request}).data</div>
-<div class="line"><span class="lineno">   34</span>        }, status=status.HTTP_201_CREATED)</div>
-<div class="line"><span class="lineno">   35</span>    <span class="keywordflow">return</span> Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)</div>
-<div class="line"><span class="lineno">   36</span> </div>
-<div class="line"><span class="lineno">   37</span> </div>
-<div class="line"><span class="lineno">   38</span><span class="preprocessor">@api_view([&#39;POST&#39;])</span></div>
-<div class="line"><span class="lineno">   39</span><span class="preprocessor">@permission_classes([AllowAny])</span></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a id="ae4ce55b8b4ccb94b5a195feb4bed0ab2" name="ae4ce55b8b4ccb94b5a195feb4bed0ab2"></a>
@@ -333,59 +240,7 @@ $(function(){initNavTree('namespaceaccounts_1_1views.html','',''); });
 @return Response Объект ответа с обновленными данными пользователя
 </pre> 
 <p class="definition">См. определение в файле <a class="el" href="accounts_2views_8py_source.html">views.py</a> строка <a class="el" href="accounts_2views_8py_source.html#l00077">77</a></p>
-<div class="fragment"><div class="line"><span class="lineno">   77</span><span class="keyword">def </span>update_me(request):</div>
-<div class="line"><span class="lineno">   78</span>    <span class="stringliteral">&quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">   79</span><span class="stringliteral">    @brief Обновление информации о текущем пользователе</span></div>
-<div class="line"><span class="lineno">   80</span><span class="stringliteral">    @param request Запрос с обновленными данными пользователя</span></div>
-<div class="line"><span class="lineno">   81</span><span class="stringliteral">    @return Response Объект ответа с обновленными данными пользователя</span></div>
-<div class="line"><span class="lineno">   82</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">   83</span>    user = request.user</div>
-<div class="line"><span class="lineno">   84</span>    username = request.data.get(<span class="stringliteral">&#39;username&#39;</span>)</div>
-<div class="line"><span class="lineno">   85</span>    email = request.data.get(<span class="stringliteral">&#39;email&#39;</span>)</div>
-<div class="line"><span class="lineno">   86</span>    new_password = request.data.get(<span class="stringliteral">&#39;password&#39;</span>)</div>
-<div class="line"><span class="lineno">   87</span>    avatar_file = request.FILES.get(<span class="stringliteral">&#39;avatar&#39;</span>)</div>
-<div class="line"><span class="lineno">   88</span>    remove_avatar = str(request.data.get(<span class="stringliteral">&#39;remove_avatar&#39;</span>, <span class="stringliteral">&#39;&#39;</span>)).lower() <span class="keywordflow">in</span> (<span class="stringliteral">&#39;1&#39;</span>, <span class="stringliteral">&#39;true&#39;</span>, <span class="stringliteral">&#39;yes&#39;</span>)</div>
-<div class="line"><span class="lineno">   89</span> </div>
-<div class="line"><span class="lineno">   90</span>    <span class="keywordflow">if</span> username <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno">   91</span>        username = str(username).strip()</div>
-<div class="line"><span class="lineno">   92</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> username:</div>
-<div class="line"><span class="lineno">   93</span>            <span class="keywordflow">return</span> Response({<span class="stringliteral">&#39;error&#39;</span>: <span class="stringliteral">&#39;Username cannot be empty&#39;</span>}, status=status.HTTP_400_BAD_REQUEST)</div>
-<div class="line"><span class="lineno">   94</span>        user.username = username</div>
-<div class="line"><span class="lineno">   95</span> </div>
-<div class="line"><span class="lineno">   96</span>    <span class="keywordflow">if</span> email <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno">   97</span>        email = str(email).strip()</div>
-<div class="line"><span class="lineno">   98</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> email:</div>
-<div class="line"><span class="lineno">   99</span>            <span class="keywordflow">return</span> Response({<span class="stringliteral">&#39;error&#39;</span>: <span class="stringliteral">&#39;Email cannot be empty&#39;</span>}, status=status.HTTP_400_BAD_REQUEST)</div>
-<div class="line"><span class="lineno">  100</span>        user.email = email</div>
-<div class="line"><span class="lineno">  101</span> </div>
-<div class="line"><span class="lineno">  102</span>    <span class="keywordflow">if</span> new_password:</div>
-<div class="line"><span class="lineno">  103</span>        user.set_password(str(new_password))</div>
-<div class="line"><span class="lineno">  104</span> </div>
-<div class="line"><span class="lineno">  105</span>    <span class="keywordflow">if</span> remove_avatar <span class="keywordflow">and</span> user.avatar:</div>
-<div class="line"><span class="lineno">  106</span>        user.avatar.delete(save=<span class="keyword">False</span>)</div>
-<div class="line"><span class="lineno">  107</span>        user.avatar = <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno">  108</span> </div>
-<div class="line"><span class="lineno">  109</span>    <span class="keywordflow">if</span> avatar_file <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno">  110</span>        previous_avatar_name = user.avatar.name <span class="keywordflow">if</span> user.avatar <span class="keywordflow">else</span> <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno">  111</span>        _, extension = os.path.splitext(avatar_file.name <span class="keywordflow">or</span> <span class="stringliteral">&quot;&quot;</span>)</div>
-<div class="line"><span class="lineno">  112</span>        safe_extension = extension.lower() <span class="keywordflow">if</span> extension <span class="keywordflow">else</span> <span class="stringliteral">&quot;.png&quot;</span></div>
-<div class="line"><span class="lineno">  113</span>        avatar_file.name = f<span class="stringliteral">&quot;{user.username}/avatar_{user.id or &#39;new&#39;}{safe_extension}&quot;</span></div>
-<div class="line"><span class="lineno">  114</span>        user.avatar = avatar_file</div>
-<div class="line"><span class="lineno">  115</span> </div>
-<div class="line"><span class="lineno">  116</span>    user.save()</div>
-<div class="line"><span class="lineno">  117</span>    <span class="keywordflow">if</span> avatar_file <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> <span class="stringliteral">&#39;previous_avatar_name&#39;</span> <span class="keywordflow">in</span> locals():</div>
-<div class="line"><span class="lineno">  118</span>        <span class="keywordflow">if</span> previous_avatar_name <span class="keywordflow">and</span> user.avatar <span class="keywordflow">and</span> previous_avatar_name != user.avatar.name:</div>
-<div class="line"><span class="lineno">  119</span>            <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno">  120</span>                user.avatar.storage.delete(previous_avatar_name)</div>
-<div class="line"><span class="lineno">  121</span>            <span class="keywordflow">except</span> Exception:</div>
-<div class="line"><span class="lineno">  122</span>                <span class="keywordflow">pass</span></div>
-<div class="line"><span class="lineno">  123</span> </div>
-<div class="line"><span class="lineno">  124</span>    <span class="keywordflow">return</span> Response({<span class="stringliteral">&#39;user&#39;</span>: UserSerializer(user, context={<span class="stringliteral">&#39;request&#39;</span>: request}).data})</div>
-<div class="line"><span class="lineno">  125</span> </div>
-<div class="line"><span class="lineno">  126</span> </div>
-<div class="line"><span class="lineno">  127</span><span class="preprocessor">@api_view([&#39;GET&#39;])</span></div>
-<div class="line"><span class="lineno">  128</span><span class="preprocessor">@permission_classes([AllowAny])</span></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Переменные</h2>

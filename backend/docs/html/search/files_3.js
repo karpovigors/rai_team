@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['bootstrap_5fusers_2epy_0',['bootstrap_users.py',['../bootstrap__users_8py.html',1,'']]]
+  ['manage_2epy_0',['manage.py',['../manage_8py.html',1,'']]],
+  ['models_2epy_1',['models.py',['../accounts_2models_8py.html',1,'(Глобальное пространство имён)'],['../core_2models_8py.html',1,'(Глобальное пространство имён)']]]
 ];

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['views_0',['Views',['../dir_4270bfced15e0e73154b13468c7c9ad9.html#autotoc_md11',1,'']]],
-  ['views_2epy_1',['views.py',['../accounts_2views_8py.html',1,'(Глобальное пространство имён)'],['../core_2views_8py.html',1,'(Глобальное пространство имён)']]]
+  ['wsgi_2epy_0',['wsgi.py',['../wsgi_8py.html',1,'']]],
+  ['wsgi_5fapplication_1',['WSGI_APPLICATION',['../namespacerai__project_1_1settings.html#a6d81170ec8a258f86ec18ce154349621',1,'rai_project::settings']]]
 ];

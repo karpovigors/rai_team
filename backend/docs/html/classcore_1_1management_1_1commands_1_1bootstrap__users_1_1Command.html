@@ -143,35 +143,7 @@ $(function(){initNavTree('classcore_1_1management_1_1commands_1_1bootstrap__user
 </div><div class="memdoc">
 
 <p class="definition">См. определение в файле <a class="el" href="bootstrap__users_8py_source.html">bootstrap_users.py</a> строка <a class="el" href="bootstrap__users_8py_source.html#l00044">44</a></p>
-<div class="fragment"><div class="line"><span class="lineno">   44</span>    <span class="keyword">def </span>_ensure_moderator(self, user_model):</div>
-<div class="line"><span class="lineno">   45</span>        username = os.getenv(<span class="stringliteral">&quot;MODERATOR_USERNAME&quot;</span>, <span class="stringliteral">&quot;&quot;</span>).strip()</div>
-<div class="line"><span class="lineno">   46</span>        password = os.getenv(<span class="stringliteral">&quot;MODERATOR_PASSWORD&quot;</span>, <span class="stringliteral">&quot;&quot;</span>).strip()</div>
-<div class="line"><span class="lineno">   47</span>        email = os.getenv(<span class="stringliteral">&quot;MODERATOR_EMAIL&quot;</span>, <span class="stringliteral">&quot;&quot;</span>).strip()</div>
-<div class="line"><span class="lineno">   48</span> </div>
-<div class="line"><span class="lineno">   49</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> username:</div>
-<div class="line"><span class="lineno">   50</span>            self.stdout.write(<span class="stringliteral">&quot;Moderator username is not set, skipping.&quot;</span>)</div>
-<div class="line"><span class="lineno">   51</span>            <span class="keywordflow">return</span></div>
-<div class="line"><span class="lineno">   52</span> </div>
-<div class="line"><span class="lineno">   53</span>        user, created = user_model.objects.get_or_create(</div>
-<div class="line"><span class="lineno">   54</span>            username=username,</div>
-<div class="line"><span class="lineno">   55</span>            defaults={<span class="stringliteral">&quot;email&quot;</span>: email},</div>
-<div class="line"><span class="lineno">   56</span>        )</div>
-<div class="line"><span class="lineno">   57</span> </div>
-<div class="line"><span class="lineno">   58</span>        <span class="keywordflow">if</span> password:</div>
-<div class="line"><span class="lineno">   59</span>            user.set_password(password)</div>
-<div class="line"><span class="lineno">   60</span>        <span class="keywordflow">elif</span> created:</div>
-<div class="line"><span class="lineno">   61</span>            user.set_unusable_password()</div>
-<div class="line"><span class="lineno">   62</span> </div>
-<div class="line"><span class="lineno">   63</span>        <span class="keywordflow">if</span> email:</div>
-<div class="line"><span class="lineno">   64</span>            user.email = email</div>
-<div class="line"><span class="lineno">   65</span> </div>
-<div class="line"><span class="lineno">   66</span>        user.is_moderator = <span class="keyword">True</span></div>
-<div class="line"><span class="lineno">   67</span>        user.is_active = <span class="keyword">True</span></div>
-<div class="line"><span class="lineno">   68</span>        user.save()</div>
-<div class="line"><span class="lineno">   69</span> </div>
-<div class="line"><span class="lineno">   70</span>        status = <span class="stringliteral">&quot;created&quot;</span> <span class="keywordflow">if</span> created <span class="keywordflow">else</span> <span class="stringliteral">&quot;updated&quot;</span></div>
-<div class="line"><span class="lineno">   71</span>        self.stdout.write(f<span class="stringliteral">&quot;Moderator {status}: {username}&quot;</span>)</div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a id="a85be988c6012677a4e00bf565408af63" name="a85be988c6012677a4e00bf565408af63"></a>
@@ -202,35 +174,7 @@ $(function(){initNavTree('classcore_1_1management_1_1commands_1_1bootstrap__user
 </div><div class="memdoc">
 
 <p class="definition">См. определение в файле <a class="el" href="bootstrap__users_8py_source.html">bootstrap_users.py</a> строка <a class="el" href="bootstrap__users_8py_source.html#l00016">16</a></p>
-<div class="fragment"><div class="line"><span class="lineno">   16</span>    <span class="keyword">def </span>_ensure_superuser(self, user_model):</div>
-<div class="line"><span class="lineno">   17</span>        username = os.getenv(<span class="stringliteral">&quot;DJANGO_SUPERUSER_USERNAME&quot;</span>, <span class="stringliteral">&quot;&quot;</span>).strip()</div>
-<div class="line"><span class="lineno">   18</span>        password = os.getenv(<span class="stringliteral">&quot;DJANGO_SUPERUSER_PASSWORD&quot;</span>, <span class="stringliteral">&quot;&quot;</span>).strip()</div>
-<div class="line"><span class="lineno">   19</span>        email = os.getenv(<span class="stringliteral">&quot;DJANGO_SUPERUSER_EMAIL&quot;</span>, <span class="stringliteral">&quot;&quot;</span>).strip()</div>
-<div class="line"><span class="lineno">   20</span> </div>
-<div class="line"><span class="lineno">   21</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> username:</div>
-<div class="line"><span class="lineno">   22</span>            self.stdout.write(<span class="stringliteral">&quot;Superuser username is not set, skipping.&quot;</span>)</div>
-<div class="line"><span class="lineno">   23</span>            <span class="keywordflow">return</span></div>
-<div class="line"><span class="lineno">   24</span> </div>
-<div class="line"><span class="lineno">   25</span>        user, created = user_model.objects.get_or_create(</div>
-<div class="line"><span class="lineno">   26</span>            username=username,</div>
-<div class="line"><span class="lineno">   27</span>            defaults={<span class="stringliteral">&quot;email&quot;</span>: email},</div>
-<div class="line"><span class="lineno">   28</span>        )</div>
-<div class="line"><span class="lineno">   29</span> </div>
-<div class="line"><span class="lineno">   30</span>        <span class="keywordflow">if</span> password:</div>
-<div class="line"><span class="lineno">   31</span>            user.set_password(password)</div>
-<div class="line"><span class="lineno">   32</span> </div>
-<div class="line"><span class="lineno">   33</span>        <span class="keywordflow">if</span> email:</div>
-<div class="line"><span class="lineno">   34</span>            user.email = email</div>
-<div class="line"><span class="lineno">   35</span> </div>
-<div class="line"><span class="lineno">   36</span>        user.is_superuser = <span class="keyword">True</span></div>
-<div class="line"><span class="lineno">   37</span>        user.is_staff = <span class="keyword">True</span></div>
-<div class="line"><span class="lineno">   38</span>        user.is_active = <span class="keyword">True</span></div>
-<div class="line"><span class="lineno">   39</span>        user.save()</div>
-<div class="line"><span class="lineno">   40</span> </div>
-<div class="line"><span class="lineno">   41</span>        status = <span class="stringliteral">&quot;created&quot;</span> <span class="keywordflow">if</span> created <span class="keywordflow">else</span> <span class="stringliteral">&quot;updated&quot;</span></div>
-<div class="line"><span class="lineno">   42</span>        self.stdout.write(f<span class="stringliteral">&quot;Superuser {status}: {username}&quot;</span>)</div>
-<div class="line"><span class="lineno">   43</span> </div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a id="a1d7e6d3586859285de38a4122fcdc846" name="a1d7e6d3586859285de38a4122fcdc846"></a>
@@ -258,13 +202,7 @@ $(function(){initNavTree('classcore_1_1management_1_1commands_1_1bootstrap__user
 </div><div class="memdoc">
 
 <p class="definition">См. определение в файле <a class="el" href="bootstrap__users_8py_source.html">bootstrap_users.py</a> строка <a class="el" href="bootstrap__users_8py_source.html#l00010">10</a></p>
-<div class="fragment"><div class="line"><span class="lineno">   10</span>    <span class="keyword">def </span>handle(self, *args, **options):</div>
-<div class="line"><span class="lineno">   11</span>        user_model = get_user_model()</div>
-<div class="line"><span class="lineno">   12</span> </div>
-<div class="line"><span class="lineno">   13</span>        self._ensure_superuser(user_model)</div>
-<div class="line"><span class="lineno">   14</span>        self._ensure_moderator(user_model)</div>
-<div class="line"><span class="lineno">   15</span> </div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Данные класса</h2>

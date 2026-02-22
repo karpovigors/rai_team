@@ -16,17 +16,6 @@ var hierarchy =
     [ "core.models.PlaceObject.Meta", "classcore_1_1models_1_1PlaceObject_1_1Meta.html", null ],
     [ "core.models.PlaceReview.Meta", "classcore_1_1models_1_1PlaceReview_1_1Meta.html", null ],
     [ "core.models.PushSubscription.Meta", "classcore_1_1models_1_1PushSubscription_1_1Meta.html", null ],
-    [ "migrations.Migration", null, [
-      [ "accounts.migrations.0001_initial.Migration", "classaccounts_1_1migrations_1_10001__initial_1_1Migration.html", null ],
-      [ "accounts.migrations.0002_customuser_email.Migration", "classaccounts_1_1migrations_1_10002__customuser__email_1_1Migration.html", null ],
-      [ "accounts.migrations.0003_customuser_is_moderator.Migration", "classaccounts_1_1migrations_1_10003__customuser__is__moderator_1_1Migration.html", null ],
-      [ "accounts.migrations.0004_customuser_avatar.Migration", "classaccounts_1_1migrations_1_10004__customuser__avatar_1_1Migration.html", null ],
-      [ "core.migrations.0001_initial.Migration", "classcore_1_1migrations_1_10001__initial_1_1Migration.html", null ],
-      [ "core.migrations.0002_sync_placereview_rating_column.Migration", "classcore_1_1migrations_1_10002__sync__placereview__rating__column_1_1Migration.html", null ],
-      [ "core.migrations.0003_remove_placeobject_map_image_url.Migration", "classcore_1_1migrations_1_10003__remove__placeobject__map__image__url_1_1Migration.html", null ],
-      [ "core.migrations.0004_pushsubscription.Migration", "classcore_1_1migrations_1_10004__pushsubscription_1_1Migration.html", null ],
-      [ "core.migrations.0005_placeobject_event_discount.Migration", "classcore_1_1migrations_1_10005__placeobject__event__discount_1_1Migration.html", null ]
-    ] ],
     [ "models.Model", null, [
       [ "core.models.PlaceObject", "classcore_1_1models_1_1PlaceObject.html", null ],
       [ "core.models.PlaceReview", "classcore_1_1models_1_1PlaceReview.html", null ],

@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['handle_0',['handle',['../classcore_1_1management_1_1commands_1_1bootstrap__users_1_1Command.html#a1d7e6d3586859285de38a4122fcdc846',1,'core.management.commands.bootstrap_users.Command.handle()'],['../classcore_1_1management_1_1commands_1_1seed__mock__data_1_1Command.html#aaa36084003c28ff031e883c9a138c0c3',1,'core.management.commands.seed_mock_data.Command.handle()']]],
-  ['has_5fpermission_1',['has_permission',['../namespacerai__project_1_1urls.html#a350e026276b68375a2c0d4fa8d43513b',1,'rai_project::urls']]],
-  ['health_2',['health',['../namespacecore_1_1views.html#a79519a33953314edb2e21522350e34c8',1,'core::views']]],
-  ['help_3',['help',['../classcore_1_1management_1_1commands_1_1bootstrap__users_1_1Command.html#a1d6166696c7d914f0b5b2a5d312c73db',1,'core.management.commands.bootstrap_users.Command.help'],['../classcore_1_1management_1_1commands_1_1seed__mock__data_1_1Command.html#a0c17c254ae36c26557eb44118e81ee47',1,'core.management.commands.seed_mock_data.Command.help']]]
+  ['image_0',['image',['../classcore_1_1models_1_1PlaceObject.html#a2f36dac4b58298bc48b8a5ee5558207f',1,'core::models::PlaceObject']]],
+  ['image_5furl_1',['image_url',['../classcore_1_1models_1_1PlaceObject.html#ac9be1e277a8c0ea11b328ae59cddd0fd',1,'core::models::PlaceObject']]],
+  ['infrastructure_5ftype_2',['infrastructure_type',['../classcore_1_1models_1_1PlaceObject.html#af7b10a48b964b636f41bab9d949c93c2',1,'core::models::PlaceObject']]],
+  ['installed_5fapps_3',['INSTALLED_APPS',['../namespacerai__project_1_1settings.html#a4b34072bea15fcdff4be96c7200ec6a5',1,'rai_project::settings']]],
+  ['is_5fmoderator_4',['is_moderator',['../classaccounts_1_1models_1_1CustomUser.html#a0b93f34ac5b0d6af882b39d03ed5a945',1,'accounts::models::CustomUser']]]
 ];

@@ -1,7 +1,6 @@
 var namespaceaccounts =
 [
     [ "apps", "namespaceaccounts_1_1apps.html", "namespaceaccounts_1_1apps" ],
-    [ "migrations", "namespaceaccounts_1_1migrations.html", "namespaceaccounts_1_1migrations" ],
     [ "models", "namespaceaccounts_1_1models.html", "namespaceaccounts_1_1models" ],
     [ "serializers", "namespaceaccounts_1_1serializers.html", "namespaceaccounts_1_1serializers" ],
     [ "urls", "namespaceaccounts_1_1urls.html", [
