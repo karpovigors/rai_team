@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Map, Placemark, YMaps } from '@pbe/react-yandex-maps'
 import './MapComponent.css'
 
@@ -15,6 +15,14 @@ interface MapComponentProps {
   onMapClick?: (coords: [number, number], clickedObject: Feature | null) => void
   objects?: Feature[]
   selectedFeature?: Feature | null
+  placemarkPreset?: string
+  placemarkDraggable?: boolean
+  selectedPlacemarkProperties?: {
+    hintContent?: string
+    balloonContent?: string
+    iconCaption?: string
+  }
+  autoOpenSelectedBalloon?: boolean
 }
 
 const DEFAULT_CENTER: [number, number] = [55.751244, 37.618423]
@@ -28,10 +36,15 @@ function MapComponent({
   onMapClick,
   objects = [],
   selectedFeature,
+  placemarkPreset = 'islands#blueCircleIcon',
+  placemarkDraggable = true,
+  selectedPlacemarkProperties,
+  autoOpenSelectedBalloon = false,
 }: MapComponentProps) {
   const [placemark, setPlacemark] = useState<[number, number] | null>(null)
   const [mapCenter, setMapCenter] = useState<[number, number]>(DEFAULT_CENTER)
   const [mapZoom, setMapZoom] = useState<number>(DEFAULT_ZOOM)
+  const selectedPlacemarkRef = useRef<any>(null)
 
   useEffect(() => {
     const coords = selectedFeature?.geometry?.coordinates
@@ -42,6 +55,29 @@ function MapComponent({
     }
   }, [selectedFeature])
 
+  useEffect(() => {
+    if (!autoOpenSelectedBalloon || !selectedPlacemarkProperties?.balloonContent) {
+      return
+    }
+
+    const instance = selectedPlacemarkRef.current
+    if (!instance?.balloon?.open) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      instance.balloon.open()
+    }, 250)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [
+    autoOpenSelectedBalloon,
+    selectedPlacemarkProperties?.balloonContent,
+    selectedFeature,
+  ])
+
   const handleMapClick = (event: { get: (name: string) => [number, number] }) => {
     const coords = event.get('coords')
     setPlacemark(coords)
@@ -51,6 +87,10 @@ function MapComponent({
   }
 
   const handlePlacemarkDragEnd = (event: any) => {
+    if (!placemarkDraggable) {
+      return
+    }
+
     const coords = event?.get?.('target')?.geometry?.getCoordinates?.() as [number, number]
     if (!coords || coords.length !== 2) {
       return
@@ -111,9 +151,12 @@ function MapComponent({
 
           {placemark && (
             <Placemark
+              instanceRef={selectedPlacemarkRef}
               geometry={placemark}
-              options={{ preset: 'islands#blueCircleIcon', draggable: true }}
+              properties={selectedPlacemarkProperties}
+              options={{ preset: placemarkPreset, draggable: placemarkDraggable }}
               onDragEnd={handlePlacemarkDragEnd}
+              modules={['geoObject.addon.balloon', 'geoObject.addon.hint']}
             />
           )}
         </Map>
