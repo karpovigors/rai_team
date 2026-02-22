@@ -18,6 +18,8 @@ interface BuildingDetails {
   metros: string[];
   description: string;
   image_url: string;
+  lat?: number | null;
+  lng?: number | null;
   sign_language: boolean;
   subtitles: boolean;
   ramps: boolean;
@@ -53,16 +55,36 @@ export const BuildingDetailsPage: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [isBuildingImageBroken, setIsBuildingImageBroken] = useState(false);
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
   const [address, setAddress] = useState('');
   const isAuthenticated = authService.isAuthenticated();
   const [isModerator, setIsModerator] = useState(authService.isModerator());
+  const [profileAvatarUrl, setProfileAvatarUrl] = useState(authService.getAvatarUrl() || '');
   const username = authService.getUsername();
   const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
+  const normalizeImageUrl = (rawUrl: string): string => {
+    const value = String(rawUrl || '').trim();
+    if (!value) {
+      return '';
+    }
+
+    try {
+      const parsed = new URL(value, window.location.origin);
+      if (['localhost', '127.0.0.1', '0.0.0.0'].includes(parsed.hostname)) {
+        return `${window.location.origin}${parsed.pathname}${parsed.search}${parsed.hash}`;
+      }
+      return parsed.toString();
+    } catch {
+      return value;
+    }
+  };
 
   useEffect(() => {
     if (!isAuthenticated) {
       setIsModerator(false);
+      setProfileAvatarUrl('');
       return;
     }
 
@@ -71,10 +93,13 @@ export const BuildingDetailsPage: React.FC = () => {
         const response = await authService.fetchCurrentUser();
         authService.setUsername(response.user.username);
         authService.setEmail(response.user.email || '');
+        authService.setAvatarUrl(response.user.avatar_url || '');
         authService.setIsModerator(response.user.is_moderator);
+        setProfileAvatarUrl(response.user.avatar_url || '');
         setIsModerator(response.user.is_moderator);
       } catch {
         setIsModerator(authService.isModerator());
+        setProfileAvatarUrl(authService.getAvatarUrl() || '');
       }
     };
 
@@ -98,7 +123,11 @@ export const BuildingDetailsPage: React.FC = () => {
         }
 
         const data = await response.json();
-        setBuilding(data);
+        setBuilding({
+          ...data,
+          image_url: normalizeImageUrl(data.image_url),
+        });
+        setIsBuildingImageBroken(false);
         setReviews(data.reviews || []);
         setEditTitle(data.title || '');
         setEditDescription(data.description || '');
@@ -185,7 +214,11 @@ export const BuildingDetailsPage: React.FC = () => {
         }
 
         const updated = await response.json();
-        setBuilding(updated);
+        setBuilding({
+          ...updated,
+          image_url: normalizeImageUrl(updated.image_url),
+        });
+        setIsBuildingImageBroken(false);
         setReviews(updated.reviews || []);
         setIsEditMode(false);
       } catch (error: unknown) {
@@ -357,6 +390,11 @@ export const BuildingDetailsPage: React.FC = () => {
     ? Number((normalizedRatings.reduce((sum, rating) => sum + rating, 0) / ratingCount).toFixed(1))
     : Number(building.rating_avg || 0);
   const totalRatingCount = building.rating_count ?? ratingCount;
+  const detailSelectedFeature = isEditMode
+    ? (editCoordinates ? { geometry: { coordinates: editCoordinates } } : null)
+    : (typeof building.lat === 'number' && typeof building.lng === 'number'
+        ? { geometry: { coordinates: [building.lat, building.lng] as [number, number] } }
+        : null);
 
   return (
     <div className="details-page">
@@ -370,9 +408,10 @@ export const BuildingDetailsPage: React.FC = () => {
           <button type="button" className="details-map-button">Карта</button>
           <button
             type="button"
-            className="details-profile-icon"
+            className={`details-profile-icon ${profileAvatarUrl ? 'details-profile-icon-with-image' : ''}`}
             aria-label="Профиль"
             onClick={() => setIsProfileModalOpen(true)}
+            style={profileAvatarUrl ? { backgroundImage: `url(${normalizeImageUrl(profileAvatarUrl)})` } : undefined}
           ></button>
         </div>
       </header>
@@ -434,7 +473,16 @@ export const BuildingDetailsPage: React.FC = () => {
             <p className="description">{building.description}</p>
           </div>
           <div className="info-right">
-            <img src={building.image_url} alt={building.title} className="building-image" />
+            {building.image_url && !isBuildingImageBroken ? (
+              <img
+                src={building.image_url}
+                alt={building.title}
+                className="building-image"
+                onError={() => setIsBuildingImageBroken(true)}
+              />
+            ) : (
+              <div className="building-image-placeholder">Фото отсутствует</div>
+            )}
              <ul className="accessibility-list">
               {accessibility.map((item, index) => (
                 <li key={index}>{item}</li>
@@ -445,7 +493,7 @@ export const BuildingDetailsPage: React.FC = () => {
             <div className="building-map-container">
               <MapComponent
                 onMapClick={handleMapClick}
-                selectedFeature={editCoordinates ? { geometry: { coordinates: editCoordinates } } : null}
+                selectedFeature={detailSelectedFeature}
               />
               {isEditMode ? (
                 editCoordinates && (

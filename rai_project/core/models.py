@@ -11,7 +11,6 @@ class PlaceObject(models.Model):
     schedule = models.CharField(max_length=120, blank=True)
     metros = models.JSONField(default=list, blank=True)
     image_url = models.URLField(blank=True)
-    map_image_url = models.URLField(blank=True)
     image = models.FileField(upload_to="places/", blank=True, null=True)
 
     lat = models.FloatField(null=True, blank=True)
