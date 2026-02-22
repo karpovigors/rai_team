@@ -1,7 +1,4 @@
 .venv
 # .env
-rai_project/places/
-rai_project/media/
-rai_project/avatars/
 __pycache__/
 *.py[cod]
